@@ -671,15 +671,25 @@ function renderGrid(games) {
 }
 
 function loadGames() {
-  // This preview file is standalone (no games.json sitting next to it), so
-  // it renders directly from the fallback list. The real index.html in the
-  // project fetches games.json instead.
-  allGames = FALLBACK_GAMES.slice();
-  allGames.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
-  renderTagFilters(allGames);
-  renderGrid(allGames);
+  fetch('games.json')
+    .then((res) => {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then((games) => {
+      allGames = games;
+      allGames.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+      renderTagFilters(allGames);
+      renderGrid(allGames);
+    })
+    .catch((err) => {
+      console.error('Could not load games.json, using fallback list:', err);
+      allGames = FALLBACK_GAMES.slice();
+      allGames.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+      renderTagFilters(allGames);
+      renderGrid(allGames);
+    });
 }
-
 searchInput.addEventListener('input', applyFilters);
 loadGames();
 
