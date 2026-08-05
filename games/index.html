@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example Game — dailygametree</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <style>
+    :root {
+      --bg: #F6F5EF;
+      --bg-elevated: #EFEDE3;
+      --text: #20261C;
+      --text-dim: #5B6255;
+      --accent: #6E9C1E;
+      --line: #E1DDCF;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'JetBrains Mono', ui-monospace, monospace;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+    header a { color: var(--text-dim); text-decoration: none; }
+    header a:hover { color: var(--accent); }
+
+    /* ad rails: left/right columns on desktop, top/bottom banners on mobile,
+       flush to the viewport edge so no space is wasted outside them */
+    .layout { display: flex; align-items: flex-start; width: 100%; flex: 1; }
+    .ad-rail { flex: 0 0 160px; margin: 0 10px; position: sticky; top: 16px; }
+    .ad-slot {
+      border: 1px dashed #CBC6B4;
+      border-radius: 8px;
+      background: var(--bg-elevated);
+      color: var(--text-dim);
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.6;
+    }
+    .ad-rail .ad-slot { height: 600px; }
+    .main-content { flex: 1; min-width: 0; display: flex; }
+    @media (max-width: 900px) {
+      .layout { flex-direction: column; }
+      .ad-rail { position: static; flex: none; width: auto; margin: 10px 14px; }
+      .ad-rail.left { order: -1; }
+      .main-content { order: 0; }
+      .ad-rail.right { order: 1; }
+      .ad-rail .ad-slot { height: 90px; }
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    h1 { font-size: 28px; margin: 0; }
+    p { color: var(--text-dim); max-width: 480px; line-height: 1.6; }
+    .box {
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      padding: 40px;
+      background: #FFFFFF;
+    }
+    code {
+      color: var(--accent);
+      background: var(--bg-elevated);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="../../index.html">&larr; dailygametree.com</a>
+    <span>games/example-game/</span>
+  </header>
+
+  <div class="layout">
+    <aside class="ad-rail left">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --> Ad space<br>160&times;600</div>
+    </aside>
+
+    <div class="main-content">
+      <main>
+        <div class="box">
+          <h1>🌱 Your game goes here</h1>
+          <p>
+            Replace this page with your actual game. Keep everything for this game
+            — HTML, CSS, JS, images, sound — inside this same folder so the whole
+            thing stays self-contained and easy to copy.
+          </p>
+          <p>
+            Update <code>assets/favicon.svg</code> and <code>assets/banner.svg</code>
+            (or swap in .png files and update the paths), then edit the entry for
+            this game in <code>/games.json</code> at the site root so it shows up
+            on the home page.
+          </p>
+        </div>
+      </main>
+    </div>
+
+    <aside class="ad-rail right">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --> Ad space<br>160&times;600</div>
+    </aside>
+  </div>
+</body>
+</html>
