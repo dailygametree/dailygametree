@@ -1,0 +1,14 @@
+[
+  {
+    "id": "example-game",
+    "folder": "example-game",
+    "title": "Example Game",
+    "tagline": "A starter branch — replace me",
+    "description": "This is the template game. Duplicate its folder to start a new game, then delete this entry once you've added your own.",
+    "banner": "games/example-game/banner.svg",
+    "favicon": "games/example-game/favicon.svg",
+    "accent": "#6E9C1E",
+    "dateAdded": "2026-08-04",
+    "tags": ["puzzle", "template"]
+  }
+]
