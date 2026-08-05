@@ -1,18 +1,179 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>The 67 Number Game — dailygametree</title>
 <meta name="description" content="Use four numbers and maths to make 67. A new puzzle every day.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
+/* ---------- Site-wide palette (drives header / ad rails / footer) ---------- */
 :root{
-  --bg:#f5f0e8;
+  --bg: #F6F5EF;
+  --bg-elevated: #EFEDE3;
+  --bg-card: #FFFFFF;
+  --text: #20261C;
+  --text-dim: #5B6255;
+  --text-faint: #9AA091;
+  --accent: #6E9C1E;
+  --accent-dim: #557A16;
+  --accent-soft: #E7F1D4;
+  --amber: #C97A1B;
+  --line: #E1DDCF;
+  --radius: 8px;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: 'Space Grotesk', ui-sans-serif, sans-serif;
+}
+
+html,body{
+  min-height:100%;
+  background:var(--bg);
+  font-family:var(--mono);
+  color:var(--text);
+}
+
+a{ color:inherit; }
+
+/* ---------- Header (identical to homepage) ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: rgba(246, 245, 239, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.logo-mark { width: 55px; height: auto; display: block; }
+
+/* ---------- Ad rails (identical to homepage) ---------- */
+
+.layout {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.ad-rail {
+  flex: 0 0 160px;
+  margin: 0 10px;
+  position: sticky;
+  top: 78px;
+}
+
+.ad-slot {
+  border: 1px dashed #CBC6B4;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  color: var(--text-faint);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.ad-rail .ad-slot { height: 600px; }
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.main-inner {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+
+@media (max-width: 900px) {
+  .layout { flex-direction: column; }
+  .ad-rail { position: static; flex: none; width: 100%; margin: 10px 14px; }
+  .ad-rail.left { order: -1; }
+  .main-content { order: 0; }
+  .ad-rail.right { order: 1; }
+  .ad-rail .ad-slot { height: 90px; width: auto; }
+  .main-inner { padding: 0 14px; }
+}
+
+.back-link{
+  display:inline-block;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  margin:24px 4px 0;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--mono);
+  transition:border-color .15s,color .15s;
+}
+.back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
+
+/* ---------- Footer (identical to homepage) ---------- */
+
+footer {
+  text-align: center;
+  padding: 28px 24px 40px;
+  color: var(--text-faint);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+.footer-links a:hover { color: var(--accent-dim); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =====================================================================
+   GAME CONTENT — palette scoped to .game-wrap so it can't clash with
+   the site-wide variables above (e.g. this game's own --bg/--amber
+   only apply inside .game-wrap, not to the header/ad rails/footer).
+   ===================================================================== */
+
+.game-wrap{
   --card:#ddd8ce;
   --card-used:#4a9e5c;
   --black:#1a1a1a;
@@ -25,20 +186,20 @@
   --op-colour:#6b3e1e;
   --font-t:'Special Elite',cursive;
   --font-b:'Courier Prime',monospace;
+  --bg:#f5f0e8;
+
+  background:var(--bg);
+  font-family:var(--font-b);
+  color:var(--black);
+  border-radius:var(--radius);
+  margin-top:14px;
 }
 
-html,body{min-height:100%;background:var(--bg);font-family:var(--font-b);color:var(--black)}
-
-/* ── Layout ── */
-.site-nav{padding:16px 24px;border-bottom:1px solid #ccc8be;display:flex;justify-content:space-between;align-items:center;font-size:14px}
-.site-nav a{color:var(--grey);text-decoration:none}
-.site-nav a:hover{color:var(--black)}
-.page{display:flex;justify-content:center;min-height:100vh;padding:0 24px}
-.game-col{flex:0 0 580px;max-width:580px;padding:40px 24px 60px}
+.page{display:flex;justify-content:center;padding:0 24px}
+.game-col{flex:0 0 580px;max-width:580px;padding:32px 24px 60px}
 
 @media(max-width:960px){.page{padding:0 8px}.game-col{flex:0 0 auto;max-width:100%;width:100%;padding:20px 12px 40px}}
 
-/* ── Header ── */
 .title{font-family:var(--font-t);font-size:clamp(22px,4vw,38px);letter-spacing:.5px;line-height:1.2}
 .divider{border:none;height:2px;background:linear-gradient(to right,var(--amber),#e8c07a,var(--amber));margin:12px 0 16px;border-radius:2px;opacity:.7}
 .title-67{color:var(--amber)}
@@ -104,44 +265,76 @@ html,body{min-height:100%;background:var(--bg);font-family:var(--font-b);color:v
 </style>
 </head>
 <body>
+  <header class="site-header">
+    <a class="logo" href="../../index.html">
+      <img src="../../logo.png" alt="dailygametree logo" class="logo-mark" />
+      dailygametree
+    </a>
+  </header>
 
-<header class="site-nav">
-  <a href="../../index.html">&larr; dailygametree.com</a>
-  <span>games/67dle/</span>
-</header>
+  <div class="layout">
+    <aside class="ad-rail left">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
 
-<div class="page">
-  <div class="game-col">
-    <h1 class="title">The <span style="color:#4a9e5c">6</span><span style="color:#c0392b">7</span> Number Game</h1>
-    <hr class="divider">
+    <div class="main-content">
+      <div class="main-inner">
+        <main>
+          <a class="back-link" href="../../index.html">&larr; All games</a>
 
-    <div class="controls-row">
-      <div class="controls-right">
-        <button class="help-btn" id="helpBtn" title="How to play">?</button>
-        <button class="hint-btn" id="hintBtn">Hint</button>
-        <span class="timer" id="timerDisplay">00:00:00</span>
+          <div class="game-wrap">
+            <div class="page">
+              <div class="game-col">
+                <h1 class="title">The <span style="color:#4a9e5c">6</span><span style="color:#c0392b">7</span> Number Game</h1>
+                <hr class="divider">
+
+                <div class="controls-row">
+                  <div class="controls-right">
+                    <button class="help-btn" id="helpBtn" title="How to play">?</button>
+                    <button class="hint-btn" id="hintBtn">Hint</button>
+                    <span class="timer" id="timerDisplay">00:00:00</span>
+                  </div>
+                </div>
+
+                <div class="nums-row" id="numsRow"></div>
+                <div class="ops-row" id="opsRow"></div>
+
+                <div class="expr-area">
+                  <div class="expr-row">
+                    <div class="expr-box" id="exprBox"></div>
+                    <span class="eq-sign">=</span>
+                    <div class="result" id="resultDisplay">0</div>
+                  </div>
+                  <div class="error-msg" id="errorMsg"></div>
+                  <div class="action-row">
+                    <button class="action-btn" id="backBtn">⌫ Back</button>
+                    <button class="action-btn" id="clearBtn">✕ Clear</button>
+                  </div>
+                </div>
+
+                <div class="day-info" id="dayInfo"></div>
+              </div>
+            </div>
+          </div>
+
+        </main>
       </div>
     </div>
 
-    <div class="nums-row" id="numsRow"></div>
-    <div class="ops-row" id="opsRow"></div>
-
-    <div class="expr-area">
-      <div class="expr-row">
-        <div class="expr-box" id="exprBox"></div>
-        <span class="eq-sign">=</span>
-        <div class="result" id="resultDisplay">0</div>
-      </div>
-      <div class="error-msg" id="errorMsg"></div>
-      <div class="action-row">
-        <button class="action-btn" id="backBtn">⌫ Back</button>
-        <button class="action-btn" id="clearBtn">✕ Clear</button>
-      </div>
-    </div>
-
-    <div class="day-info" id="dayInfo"></div>
+    <aside class="ad-rail right">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
   </div>
-</div>
+
+  <footer>
+    <nav class="footer-links">
+      <a href="../../privacy.html">Privacy Policy</a>
+      <a href="../../terms.html">Terms and Conditions</a>
+      <a href="../../about.html">About Us</a>
+      <a href="../../contact.html">Contact</a>
+    </nav>
+    <p>&copy; <span id="year"></span> dailygametree.com</p>
+  </footer>
 
 <!-- Help popup -->
 <div class="overlay" id="helpOverlay">
@@ -190,6 +383,8 @@ html,body{min-height:100%;background:var(--bg);font-family:var(--font-b);color:v
 </div>
 
 <script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
 // ═══════════════════════════════════════════════
 //  PRE-BAKED PUZZLE LIST (2282 valid sets)
 // ═══════════════════════════════════════════════
@@ -210,18 +405,8 @@ function getTodaysPuzzle() {
 
 // ═══════════════════════════════════════════════
 //  EXPRESSION VALIDATOR & EVALUATOR
-//
-//  Rules:
-//  - Standard ops: +, -, *, /, ( ) — free use
-//  - ! : must be applied to a raw number token only  →  N!
-//  - ^ : exponent must be a raw number token only    →  expr ^ N
-//        (base can be anything)
-//
-//  We parse a token stream and build a simple recursive descent parser
-//  that enforces these restrictions, then evaluate.
 // ═══════════════════════════════════════════════
 
-// Tokenise the display expression (uses display chars ×, ÷, −)
 function tokenise(str) {
   const tokens = [];
   let i = 0;
@@ -240,12 +425,11 @@ function tokenise(str) {
     else if (c === '!') { tokens.push({ type: 'FACT' }); i++; }
     else if (c === '(') { tokens.push({ type: 'LPAREN' }); i++; }
     else if (c === ')') { tokens.push({ type: 'RPAREN' }); i++; }
-    else { return null; } // unknown char
+    else { return null; }
   }
   return tokens;
 }
 
-// Parser state
 let toks, pos;
 function peek() { return toks[pos]; }
 function consume() { return toks[pos++]; }
@@ -254,16 +438,6 @@ function expect(type) {
   if (!t || t.type !== type) throw new Error('Expected ' + type);
   return consume();
 }
-
-// Grammar (with rule enforcement):
-//
-// expr    → term (('+' | '-') term)*
-// term    → power_expr (('*' | '/') power_expr)*
-// power_expr → postfix ('^' RAW_NUM)?      ← exponent MUST be raw NUM
-// postfix → atom '!'?                      ← factorial MUST follow atom that is raw NUM
-// atom    → NUM | '(' expr ')' | '-' atom  (unary minus)
-//
-// "raw NUM" = a token that is of type NUM (a number tile digit, not a computed value)
 
 function parseExpr() { return parseAddSub(); }
 
@@ -293,13 +467,11 @@ function parseTerm() {
 function parsePower() {
   let base = parsePostfix();
   if (peek() && peek().type === 'POW') {
-    consume(); // eat ^
-    // Exponent MUST be a raw number token
+    consume();
     const t = peek();
     if (!t || t.type !== 'NUM') throw new Error('Rule violation: exponent after ^ must be a raw number');
     const expTok = consume();
     if (!usedRaw.has(expTok)) throw new Error('Exponent token not from puzzle numbers');
-    // Mark the raw number as used
     const expUsed = useRawNum(expTok);
     if (!expUsed) throw new Error('Number used more than once');
     const result = Math.pow(base.val, expTok.val);
@@ -312,8 +484,7 @@ function parsePower() {
 function parsePostfix() {
   let node = parseAtom();
   if (peek() && peek().type === 'FACT') {
-    consume(); // eat !
-    // The node being factorialised must be a raw number
+    consume();
     if (!node.isRaw) throw new Error('Rule violation: ! must follow a raw number, not a sub-expression');
     const n = node.val;
     if (!Number.isInteger(n) || n < 0 || n > 20) throw new Error('Factorial input must be 0–20');
@@ -327,14 +498,12 @@ function parseAtom() {
   const t = peek();
   if (!t) throw new Error('Unexpected end of expression');
 
-  // Unary minus
   if (t.type === 'OP' && t.val === '-') {
     consume();
     const node = parseAtom();
     return { val: -node.val, isRaw: false };
   }
 
-  // Number
   if (t.type === 'NUM') {
     consume();
     const used = useRawNum(t);
@@ -342,21 +511,18 @@ function parseAtom() {
     return { val: t.val, isRaw: true, tok: t };
   }
 
-  // Parenthesised expression
   if (t.type === 'LPAREN') {
     consume();
     const node = parseExpr();
     expect('RPAREN');
-    return { val: node.val, isRaw: false }; // sub-expr is never "raw"
+    return { val: node.val, isRaw: false };
   }
 
   throw new Error('Unexpected token: ' + JSON.stringify(t));
 }
 
-// Track raw number usage during parsing
-// puzzleNums is the sorted puzzle set; we must use each exactly once
-let remainingNums; // array of available counts
-let rawNumCounts;  // initial counts
+let remainingNums;
+let rawNumCounts;
 
 function setupRawCounts(nums) {
   rawNumCounts = {};
@@ -371,8 +537,7 @@ function useRawNum(tok) {
   return true;
 }
 
-// usedRaw is not needed; useRawNum handles it via counts
-let usedRaw; // dummy, kept for compatibility
+let usedRaw;
 
 function evaluate(exprStr, puzzleNums) {
   if (!exprStr.trim()) return { val: null, error: null, allUsed: false };
@@ -391,12 +556,10 @@ function evaluate(exprStr, puzzleNums) {
     return { val: null, error: e.message, allUsed: false };
   }
 
-  // Must consume all tokens
   if (pos < toks.length) {
     return { val: null, error: 'Unexpected token after expression', allUsed: false };
   }
 
-  // Check all puzzle numbers used
   const allUsed = Object.values(remainingNums).every(c => c === 0);
 
   if (!isFinite(val)) return { val: null, error: 'Result is not a finite number', allUsed: false };
@@ -408,12 +571,12 @@ function evaluate(exprStr, puzzleNums) {
 //  GAME STATE
 // ═══════════════════════════════════════════════
 let puzzleNums = [];
-let expression = '';    // display string (uses ×, ÷, −)
+let expression = '';
 let usedNumIndices = new Set();
 let timerInterval = null;
 let secondsElapsed = 0;
 let won = false;
-let lastValidResult = null; // last successfully evaluated result
+let lastValidResult = null;
 
 // ═══════════════════════════════════════════════
 //  TIMER
@@ -483,15 +646,12 @@ function updateDisplay() {
   if (error) {
     const hasNum = /\d/.test(expression);
     box.className = 'expr-box' + (hasNum ? ' err' : '');
-    // Show last valid result if we have one, otherwise show 0
     const displayVal = lastValidResult !== null ? lastValidResult : '0';
     resEl.textContent = displayVal;
     resEl.className = 'result';
     errEl.textContent = hasNum ? 'Error: ' + niceError(error) : '';
   } else {
-    // Valid result — store it, but only show win-check if all numbers used
     lastValidResult = val;
-    // Check "make 67 without using all numbers" — not allowed
     const allUsedCheck = allUsed;
     box.className = 'expr-box' + (val === 67 && allUsedCheck ? ' ok' : '');
     resEl.textContent = val;
@@ -531,17 +691,14 @@ function onOpClick(sym, tile) {
   updateDisplay();
 }
 
-// Smart backspace: removes last token (multi-digit num aware) and un-marks num if needed
 document.getElementById('backBtn').addEventListener('click', () => {
   if (won || !expression.length) return;
 
-  // Check if expression ends in a number
   const m = expression.match(/(\d+)$/);
   if (m) {
     const numStr = m[1];
     const num = parseInt(numStr);
     expression = expression.slice(0, -numStr.length);
-    // Un-mark one tile with this value
     for (let i = puzzleNums.length - 1; i >= 0; i--) {
       if (puzzleNums[i] === num && usedNumIndices.has(i)) {
         usedNumIndices.delete(i);
@@ -614,15 +771,12 @@ document.getElementById('hintBtn').addEventListener('click', () => {
   document.getElementById('hintOverlay').classList.add('on');
 });
 
-// Keyboard support
 document.addEventListener('keydown', e => {
   if (won) return;
   if (e.key === 'Backspace') { document.getElementById('backBtn').click(); return; }
   if (e.key === 'Escape') { document.getElementById('clearBtn').click(); return; }
-  // Number keys
   if (/^[0-9]$/.test(e.key)) {
     const digit = parseInt(e.key);
-    // find first unused tile that starts with this digit (single or double digit)
     for (let i = 0; i < puzzleNums.length; i++) {
       if (!usedNumIndices.has(i) && String(puzzleNums[i])[0] === e.key) {
         onNumClick(i); break;
