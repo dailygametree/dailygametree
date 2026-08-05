@@ -164,11 +164,13 @@ a { color: inherit; }
 }
 
 .cursor.blink {
-  animation: cursor-blink 1s steps(2, start) infinite;
+  animation: cursor-blink 1.2s ease-in-out infinite;
 }
 
 @keyframes cursor-blink {
-  to { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
 .hero .sub {
@@ -536,7 +538,7 @@ function initHeroTypewriter() {
   const dimText = 'tree';
   const totalChars = normalText.length + dimText.length;
   const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const typeDelay = reduceMotion ? 25 : 85;
+  const typeDelay = reduceMotion ? 50 : 100;
 
   // Reset to a known empty state every time this runs, so the cursor
   // never starts out already blinking before typing has finished.
