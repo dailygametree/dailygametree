@@ -157,23 +157,22 @@ a { color: inherit; }
 
 .hero h1 .dim { color: var(--text-faint); }
 
+/* The cursor's blink is driven entirely by JS toggling this class on an
+   interval (see initHeroTypewriter/startCursorBlink below), NOT by a CSS
+   @keyframes animation. This is intentional: the site has a global
+   prefers-reduced-motion override further up this file that collapses
+   CSS animations to a single near-instant frame, which made the blink
+   look static for anyone with "reduce motion" on. A plain class + opacity
+   swap isn't a CSS animation/transition, so that override can't touch it
+   and the cursor will always visibly blink. */
 .cursor {
   display: inline-block;
   color: var(--accent);
   opacity: 1;
 }
 
-.cursor.blink {
-  animation: cursor-blink 1.2s ease-in-out infinite;
-}
-
-@keyframes cursor-blink {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
+.cursor.cursor-hidden {
+  opacity: 0;
 }
 
 .hero .sub {
@@ -540,17 +539,16 @@ function initHeroTypewriter() {
   const normalText = 'dailygame';
   const dimText = 'tree';
   const totalChars = normalText.length + dimText.length;
-  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const typeDelay = reduceMotion ? 60 : 120;
+  const typeDelay = 110;
 
   // Reset to a known empty state every time this runs, so the cursor
   // never starts out already blinking before typing has finished.
   normalEl.textContent = '';
   dimEl.textContent = '';
-  cursorEl.classList.remove('blink');
+  cursorEl.classList.remove('cursor-hidden');
 
   let i = 0;
-  const timer = window.setInterval(() => {
+  const typeTimer = window.setInterval(() => {
     i += 1;
     if (i <= normalText.length) {
       normalEl.textContent = normalText.slice(0, i);
@@ -558,10 +556,22 @@ function initHeroTypewriter() {
       dimEl.textContent = dimText.slice(0, i - normalText.length);
     }
     if (i >= totalChars) {
-  window.clearInterval(timer);
-  cursorEl.classList.add('blink');
+      window.clearInterval(typeTimer);
+      startCursorBlink(cursorEl);
     }
   }, typeDelay);
+}
+
+// Toggles the cursor's visibility on a plain interval instead of using a
+// CSS @keyframes animation. This site has a global
+// `prefers-reduced-motion: reduce` override earlier in this stylesheet
+// that force-collapses animations to a single ~0-length frame, which is
+// what made the cursor look static instead of blinking. A setInterval +
+// class swap is not a CSS animation/transition, so it always keeps blinking.
+function startCursorBlink(cursorEl) {
+  window.setInterval(() => {
+    cursorEl.classList.toggle('cursor-hidden');
+  }, 530);
 }
 
 if (document.readyState === 'loading') {
