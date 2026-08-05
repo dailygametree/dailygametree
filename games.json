@@ -1,14 +1,14 @@
 [
   {
-    "id": "example-game",
-    "folder": "example-game",
-    "title": "Example Game",
-    "tagline": "A starter branch — replace me",
-    "description": "This is the template game. Duplicate its folder to start a new game, then delete this entry once you've added your own.",
-    "banner": "games/example-game/banner.svg",
-    "favicon": "games/example-game/favicon.svg",
-    "accent": "#6E9C1E",
-    "dateAdded": "2026-08-04",
-    "tags": ["puzzle", "template"]
+  "id": "67dle",
+  "folder": "67dle",
+  "title": "The 67 Number Game",
+  "tagline": "Use four numbers and maths to make 67",
+  "description": "A daily math puzzle — combine four numbers with +, −, ×, ÷, ^ and ! to hit exactly 67.",
+  "banner": "games/67dle/banner.svg",
+  "favicon": "games/67dle/favicon.svg",
+  "accent": "#4a9e5c",
+  "dateAdded": "2026-08-05",
+  "tags": ["puzzle", "math", "daily"]
   }
 ]
