@@ -29,6 +29,10 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 
+/* Prevents any stray overflow (e.g. from the ad rails) from ever creating
+   horizontal scroll / page shift on mobile. */
+html, body { overflow-x: hidden; }
+
 body {
   margin: 0;
   background: var(--bg);
@@ -129,12 +133,25 @@ a { color: inherit; }
 
 @media (max-width: 900px) {
   .layout { flex-direction: column; }
-  .ad-rail { position: static; flex: none; width: 100%; margin: 10px 14px; }
+  /* width: calc(...) instead of width: 100% — with a 100% width AND side
+     margins, the margins add on top of the full container width and the
+     rail overflows the viewport by 28px, which is what was pushing the
+     whole page into unwanted horizontal scroll. calc() keeps the outer
+     (margin) box exactly at 100%. */
+  .ad-rail { position: static; flex: none; width: calc(100% - 28px); margin: 10px 14px; }
   .ad-rail.left { order: -1; }
   .main-content { order: 0; }
   .ad-rail.right { order: 1; }
   .ad-rail .ad-slot { height: 90px; width: auto; }
   .main-inner { padding: 0 14px; }
+
+  .site-header { padding: 14px 16px; }
+  .hero { padding: 20px 20px 12px; }
+}
+
+@media (max-width: 480px) {
+  .logo-text { display: none; }
+  .logo { gap: 0; }
 }
 
 /* ---------- Hero ---------- */
@@ -430,7 +447,7 @@ footer {
   <header class="site-header">
     <a class="logo" href="index.html">
       <img src="logo.png" alt="dailygametree logo" class="logo-mark" />
-      dailygametree
+      <span class="logo-text">dailygametree</span>
     </a>
   </header>
 
@@ -496,37 +513,16 @@ const FALLBACK_GAMES = [
     "tags": ["puzzle", "template"]
   },
   {
-    "id": "word-sprout",
-    "folder": "word-sprout",
-    "title": "Word Sprout",
-    "tagline": "Grow a word, one letter at a time",
-    "description": "Guess the hidden word before the vine runs out of room to grow.",
-    "banner": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDUwIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgZmlsbD0iI0VGRTlGQiIvPjx0ZXh0IHg9IjQwMCIgeT0iMjM1IiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIxMjAiIGZpbGw9IiM2QjVGQzciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSI3MDAiPkFhPC90ZXh0Pjwvc3ZnPgo=",
-    "favicon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiM2QjVGQzciLz48dGV4dCB4PSIzMiIgeT0iNDIiIGZvbnQtZmFtaWx5PSJHZW9yZ2lhLHNlcmlmIiBmb250LXNpemU9IjI2IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNzAwIj5BYTwvdGV4dD48L3N2Zz4K",
-    "dateAdded": "2026-07-28",
-    "tags": ["word", "puzzle"]
-  },
-  {
-    "id": "number-nest",
-    "folder": "number-nest",
-    "title": "Number Nest",
-    "tagline": "Stack the right sums before time runs out",
-    "description": "A fast arithmetic sprint — match falling numbers to the target sum.",
-    "banner": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDUwIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgZmlsbD0iI0ZCRUVERCIvPjx0ZXh0IHg9IjQwMCIgeT0iMjU1IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNDAiIGZpbGw9IiNDOTdBMUIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtd2VpZ2h0PSI3MDAiPjQyPC90ZXh0Pjwvc3ZnPgo=",
-    "favicon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiNDOTdBMUIiLz48dGV4dCB4PSIzMiIgeT0iNDIiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjI0IiBmaWxsPSIjZmZmIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXdlaWdodD0iNzAwIj45PC90ZXh0Pjwvc3ZnPgo=",
-    "dateAdded": "2026-06-10",
-    "tags": ["number", "arcade"]
-  },
-  {
-    "id": "arcade-bloom",
-    "folder": "arcade-bloom",
-    "title": "Arcade Bloom",
-    "tagline": "Dodge, bounce, repeat",
-    "description": "A tiny reflex arcade game with one button and endless difficulty curves.",
-    "banner": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDUwIj48cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgZmlsbD0iI0UzRjRGMSIvPjxjaXJjbGUgY3g9IjMzMCIgY3k9IjIyNSIgcj0iNjAiIGZpbGw9IiMyRTlFOEYiLz48cmVjdCB4PSI0MzAiIHk9IjE3NSIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHJ4PSIxNiIgZmlsbD0iIzJFOUU4RiIvPjwvc3ZnPgo=",
-    "favicon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMyRTlFOEYiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxNCIgZmlsbD0iI2ZmZiIvPjwvc3ZnPgo=",
-    "dateAdded": "2026-05-02",
-    "tags": ["arcade"]
+    "id": "67dle",
+    "folder": "67dle",
+    "title": "The 67 Number Game",
+    "tagline": "Use four numbers and maths to make 67",
+    "description": "A daily math puzzle — combine four numbers with +, −, ×, ÷, ^ and ! to hit exactly 67.",
+    "banner": "games/67dle/banner.svg",
+    "favicon": "games/67dle/favicon.svg",
+    "accent": "#4a9e5c",
+    "dateAdded": "2026-08-05",
+    "tags": ["puzzle", "math", "daily"]
   }
 ];
 
@@ -541,8 +537,6 @@ function initHeroTypewriter() {
   const totalChars = normalText.length + dimText.length;
   const typeDelay = 110;
 
-  // Reset to a known empty state every time this runs, so the cursor
-  // never starts out already blinking before typing has finished.
   normalEl.textContent = '';
   dimEl.textContent = '';
   cursorEl.classList.remove('cursor-hidden');
@@ -562,12 +556,6 @@ function initHeroTypewriter() {
   }, typeDelay);
 }
 
-// Toggles the cursor's visibility on a plain interval instead of using a
-// CSS @keyframes animation. This site has a global
-// `prefers-reduced-motion: reduce` override earlier in this stylesheet
-// that force-collapses animations to a single ~0-length frame, which is
-// what made the cursor look static instead of blinking. A setInterval +
-// class swap is not a CSS animation/transition, so it always keeps blinking.
 function startCursorBlink(cursorEl) {
   window.setInterval(() => {
     cursorEl.classList.toggle('cursor-hidden');
@@ -690,6 +678,7 @@ function loadGames() {
       renderGrid(allGames);
     });
 }
+
 searchInput.addEventListener('input', applyFilters);
 loadGames();
 
