@@ -203,8 +203,11 @@ footer {
 .title{font-family:var(--font-t);font-size:clamp(22px,4vw,38px);letter-spacing:.5px;line-height:1.2}
 .divider{border:none;height:2px;background:linear-gradient(to right,var(--amber),#e8c07a,var(--amber));margin:12px 0 16px;border-radius:2px;opacity:.7}
 .title-67{color:var(--amber)}
-.controls-row{display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-bottom:32px}
+.controls-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:32px;flex-wrap:wrap}
+.controls-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .controls-right{display:flex;align-items:center;gap:22px;flex-shrink:0}
+.yest-btn{font-family:var(--font-b);font-size:15px;background:none;border:none;cursor:pointer;text-decoration:underline;color:var(--black);padding:0;white-space:nowrap}
+.yest-btn:hover{opacity:.65}
 .help-btn{width:32px;height:32px;border-radius:50%;border:2px solid var(--black);background:transparent;font-family:var(--font-b);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0}
 .help-btn:hover{background:var(--black);color:var(--bg)}
 
@@ -289,6 +292,10 @@ footer {
                 <hr class="divider">
 
                 <div class="controls-row">
+                  <div class="controls-left">
+                    <a class="yest-btn" href="yesterday.html">Yesterday's Puzzle</a>
+                    <a class="yest-btn" href="solutions-yesterday.html">Yesterday's Solution</a>
+                  </div>
                   <div class="controls-right">
                     <button class="help-btn" id="helpBtn" title="How to play">?</button>
                     <button class="hint-btn" id="hintBtn">Hint</button>
