@@ -36,6 +36,7 @@ html,body{
   background:var(--bg);
   font-family:var(--mono);
   color:var(--text);
+  overflow-x:hidden;
 }
 
 a{ color:inherit; }
@@ -115,12 +116,25 @@ a{ color:inherit; }
 
 @media (max-width: 900px) {
   .layout { flex-direction: column; }
-  .ad-rail { position: static; flex: none; width: 100%; margin: 10px 14px; }
+  /* width: calc(...) instead of width: 100% — with a 100% width AND side
+     margins, the margins add on top of the full container width and the
+     rail overflows the viewport by 28px, which pushes the whole page into
+     unwanted horizontal scroll. calc() keeps the outer (margin) box
+     exactly at 100%. */
+  .ad-rail { position: static; flex: none; width: calc(100% - 28px); margin: 10px 14px; }
   .ad-rail.left { order: -1; }
   .main-content { order: 0; }
   .ad-rail.right { order: 1; }
   .ad-rail .ad-slot { height: 90px; width: auto; }
   .main-inner { padding: 0 14px; }
+
+  .site-header { padding: 14px 16px; }
+  .back-link { margin: 12px 4px 0; }
+}
+
+@media (max-width: 480px) {
+  .logo-text { display: none; }
+  .logo { gap: 0; }
 }
 
 .back-link{
@@ -208,7 +222,7 @@ footer {
   <header class="site-header">
     <a class="logo" href="../../index.html">
       <img src="../../logo.png" alt="dailygametree logo" class="logo-mark" />
-      dailygametree
+      <span class="logo-text">dailygametree</span>
     </a>
   </header>
 
