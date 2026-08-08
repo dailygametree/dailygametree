@@ -118,7 +118,7 @@ a{ color:inherit; }
   html, body { height: 100dvh; overflow: hidden; }
   body { display: flex; flex-direction: column; }
   .site-header { display: none; }
-  .layout { flex: 1 1 auto; min-height: 0; flex-direction: column; overflow: hidden; }
+  .layout { flex: 1 1 auto; min-height: 0; flex-direction: column; align-items: stretch; overflow: hidden; }
   /* width: calc(...) instead of width: 100% — with a 100% width AND side
      margins, the margins add on top of the full container width and the
      rail overflows the viewport by 28px, which pushes the whole page into
@@ -218,22 +218,6 @@ footer {
 @media(max-width:960px){
   .page{padding:0 6px;height:100%}
   .game-col{flex:0 0 auto;max-width:100%;width:100%;height:100%;padding:12px 10px 10px;display:flex;flex-direction:column}
-  .title{font-size:clamp(17px,5.5vw,24px)}
-  .divider{margin:6px 0 8px}
-  .toolbar{margin-bottom:10px}
-  .icon-btn{width:28px;height:28px;font-size:13px}
-  .mode-btn{padding:4px 10px;font-size:11px}
-  .timer{font-size:12px;min-width:54px}
-  .nums-row{flex:1 1 auto;min-height:0;align-items:center;gap:8px;margin-bottom:10px}
-  .num-tile{max-width:clamp(56px,20vh,88px);font-size:clamp(16px,6vw,26px);border-radius:12px}
-  .ops-row{flex:0 0 auto;gap:6px;margin-bottom:10px}
-  .op-tile{width:clamp(32px,9vh,40px);height:clamp(32px,9vh,40px);font-size:clamp(14px,4vw,16px);border-radius:9px}
-  .expr-area{flex:0 0 auto;margin-bottom:0}
-  .expr-box{padding:8px 12px;font-size:15px;min-height:40px}
-  .result{font-size:17px;min-width:50px}
-  .action-row{margin-top:6px}
-  .action-btn{padding:5px 12px;font-size:11px}
-  .day-info{margin-top:8px;font-size:9.5px}
 }
 
 .title{font-family:var(--font-t);font-size:clamp(22px,4vw,38px);letter-spacing:.5px;line-height:1.2}
@@ -285,7 +269,47 @@ footer {
 .action-btn{font-family:var(--font-b);font-size:13px;padding:7px 18px;background:var(--card);border:1.5px solid #bbb;border-radius:8px;cursor:pointer;transition:background .12s}
 .action-btn:hover{background:#ccc8be}
 
+/* Dedicated mobile-only parenthesis buttons, anchored to the left of the
+   Back/Clear row. Hidden on desktop, where ( and ) stay inline in .ops-row. */
+.paren-group{display:none;gap:6px}
+.paren-tile{display:flex;align-items:center;justify-content:center;padding:0}
+
 .day-info{font-size:11px;color:#aaa;text-align:center;margin-top:20px;font-family:var(--font-b)}
+
+/* =====================================================================
+   MOBILE — placed AFTER the base rules above on purpose: an earlier
+   media query with the same selectors (equal specificity) sitting
+   before these base rules would lose the cascade and never apply.
+   ===================================================================== */
+@media(max-width:960px){
+  .title{font-size:clamp(17px,5.5vw,24px)}
+  .divider{margin:6px 0 8px}
+  .toolbar{margin-bottom:10px}
+  .icon-btn{width:28px;height:28px;font-size:13px}
+  .mode-btn{padding:4px 10px;font-size:11px}
+  .timer{font-size:12px;min-width:54px}
+  .nums-row{flex:1 1 auto;min-height:0;align-items:center;gap:8px;margin-bottom:10px}
+  .num-tile{max-width:clamp(56px,20vh,88px);font-size:clamp(16px,6vw,26px);border-radius:12px}
+
+  /* Operator row: ( and ) move down to the action row (see .paren-group),
+     which frees this row up to fit the rest on one line in Normal mode
+     (4 symbols) and two rows of three in Hard mode (6 symbols). */
+  .ops-row{display:grid;grid-template-columns:repeat(4,max-content);justify-content:center;flex:0 0 auto;gap:8px;margin-bottom:10px}
+  .ops-row.ops-hard{grid-template-columns:repeat(3,max-content)}
+  .op-tile{width:clamp(32px,9vh,42px);height:clamp(32px,9vh,42px);font-size:clamp(14px,4vw,16px);border-radius:9px}
+  .op-tile-paren{display:none}
+
+  .expr-area{flex:0 0 auto;margin-bottom:0}
+  .expr-box{padding:8px 12px;font-size:15px;min-height:40px}
+  .result{font-size:17px;min-width:50px}
+
+  .action-row{margin-top:6px;align-items:center}
+  .action-btn{padding:5px 12px;font-size:11px}
+  .paren-group{display:flex;margin-right:auto}
+  .paren-tile{width:25px;height:25px;font-size:13px;border-radius:7px}
+
+  .day-info{margin-top:8px;font-size:9.5px}
+}
 
 /* ── Popups ── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:200;align-items:center;justify-content:center;padding:16px}
@@ -356,6 +380,10 @@ footer {
                   </div>
                   <div class="error-msg" id="errorMsg"></div>
                   <div class="action-row">
+                    <div class="paren-group" id="parenGroup">
+                      <button class="op-tile paren-tile" id="mobileParenOpen">(</button>
+                      <button class="op-tile paren-tile" id="mobileParenClose">)</button>
+                    </div>
                     <button class="action-btn" id="backBtn">⌫ Back</button>
                     <button class="action-btn" id="clearBtn">✕ Clear</button>
                   </div>
@@ -796,9 +824,11 @@ function getOpsDisplay() {
 function renderOps() {
   const row = document.getElementById('opsRow');
   row.innerHTML = '';
+  row.classList.toggle('ops-hard', currentMode === 'hard');
   getOpsDisplay().forEach(sym => {
     const d = document.createElement('div');
     d.className = 'op-tile';
+    if (sym === '(' || sym === ')') d.classList.add('op-tile-paren');
     d.textContent = sym;
     d.addEventListener('click', () => onOpClick(sym, d));
     row.appendChild(d);
@@ -873,6 +903,9 @@ function onOpClick(sym, tile) {
   tile.classList.add('flash');
   updateDisplay();
 }
+
+document.getElementById('mobileParenOpen').addEventListener('click', function () { onOpClick('(', this); });
+document.getElementById('mobileParenClose').addEventListener('click', function () { onOpClick(')', this); });
 
 document.getElementById('backBtn').addEventListener('click', () => {
   if (won || !expression.length) return;
@@ -976,7 +1009,7 @@ document.addEventListener('keydown', e => {
     : { '+':'+', '-':'−', '*':'×', '/':'÷', '(':'(', ')':')' };
   if (opMap[e.key]) {
     const tiles = document.querySelectorAll('.op-tile');
-    tiles.forEach(t => { if (t.textContent === opMap[e.key]) t.click(); });
+    tiles.forEach(t => { if (t.textContent === opMap[e.key] && t.offsetParent !== null) t.click(); });
   }
 });
 
