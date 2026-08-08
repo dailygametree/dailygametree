@@ -121,15 +121,16 @@ a{ color:inherit; }
      rail overflows the viewport by 28px, which pushes the whole page into
      unwanted horizontal scroll. calc() keeps the outer (margin) box
      exactly at 100%. */
-  .ad-rail { position: static; flex: none; width: calc(100% - 28px); margin: 10px 14px; }
+  .ad-rail { position: static; flex: none; width: calc(100% - 20px); margin: 6px 10px; }
   .ad-rail.left { order: -1; }
   .main-content { order: 0; }
   .ad-rail.right { order: 1; }
-  .ad-rail .ad-slot { height: 90px; width: auto; }
+  .ad-rail .ad-slot { height: 40px; width: auto; font-size: 8px; }
   .main-inner { padding: 0 14px; }
 
-  .site-header { padding: 14px 16px; }
-  .back-link { margin: 12px 4px 0; }
+  .site-header { display: none; }
+  .back-link { margin: 10px 4px 0; }
+  footer { display: none; }
 }
 
 @media (max-width: 480px) {
