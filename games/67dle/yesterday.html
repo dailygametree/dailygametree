@@ -115,21 +115,24 @@ a{ color:inherit; }
 }
 
 @media (max-width: 900px) {
-  .layout { flex-direction: column; }
+  html, body { height: 100dvh; overflow: hidden; }
+  body { display: flex; flex-direction: column; }
+  .site-header { display: none; }
+  .layout { flex: 1 1 auto; min-height: 0; flex-direction: column; overflow: hidden; }
   /* width: calc(...) instead of width: 100% — with a 100% width AND side
      margins, the margins add on top of the full container width and the
      rail overflows the viewport by 28px, which pushes the whole page into
      unwanted horizontal scroll. calc() keeps the outer (margin) box
      exactly at 100%. */
-  .ad-rail { position: static; flex: none; width: calc(100% - 28px); margin: 10px 14px; }
+  .ad-rail { position: static; flex: 0 0 auto; width: calc(100% - 20px); margin: 6px 10px; }
   .ad-rail.left { order: -1; }
-  .main-content { order: 0; }
+  .main-content { order: 0; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
   .ad-rail.right { order: 1; }
-  .ad-rail .ad-slot { height: 90px; width: auto; }
-  .main-inner { padding: 0 14px; }
+  .ad-rail .ad-slot { height: 32px; width: auto; font-size: 8px; letter-spacing: .04em; }
+  .main-inner { padding: 0 12px; height: 100%; }
 
-  .site-header { padding: 14px 16px; }
-  .back-link { margin: 12px 4px 0; }
+  .back-link { display: none; }
+  footer { display: none; }
 }
 
 @media (max-width: 480px) {
@@ -212,29 +215,45 @@ footer {
 .page{display:flex;justify-content:center;padding:0 24px}
 .game-col{flex:0 0 580px;max-width:580px;padding:32px 24px 60px}
 
-@media(max-width:960px){.page{padding:0 8px}.game-col{flex:0 0 auto;max-width:100%;width:100%;padding:20px 12px 40px}}
+@media(max-width:960px){
+  .page{padding:0 6px;height:100%}
+  .game-col{flex:0 0 auto;max-width:100%;width:100%;height:100%;padding:12px 10px 10px;display:flex;flex-direction:column}
+  .title{font-size:clamp(17px,5.5vw,24px)}
+  .divider{margin:6px 0 8px}
+  .toolbar{margin-bottom:10px}
+  .icon-btn{width:28px;height:28px;font-size:13px}
+  .mode-btn{padding:4px 10px;font-size:11px}
+  .timer{font-size:12px;min-width:54px}
+  .nums-row{flex:1 1 auto;min-height:0;align-items:center;gap:8px;margin-bottom:10px}
+  .num-tile{max-width:clamp(56px,20vh,88px);font-size:clamp(16px,6vw,26px);border-radius:12px}
+  .ops-row{flex:0 0 auto;gap:6px;margin-bottom:10px}
+  .op-tile{width:clamp(32px,9vh,40px);height:clamp(32px,9vh,40px);font-size:clamp(14px,4vw,16px);border-radius:9px}
+  .expr-area{flex:0 0 auto;margin-bottom:0}
+  .expr-box{padding:8px 12px;font-size:15px;min-height:40px}
+  .result{font-size:17px;min-width:50px}
+  .action-row{margin-top:6px}
+  .action-btn{padding:5px 12px;font-size:11px}
+  .day-info{margin-top:8px;font-size:9.5px}
+}
 
 .title{font-family:var(--font-t);font-size:clamp(22px,4vw,38px);letter-spacing:.5px;line-height:1.2}
 .divider{border:none;height:2px;background:linear-gradient(to right,var(--amber),#e8c07a,var(--amber));margin:12px 0 16px;border-radius:2px;opacity:.7}
 .title-67{color:var(--amber)}
-.mode-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-.mode-label{font-size:12px;color:#888;letter-spacing:.5px}
-.mode-toggle{display:flex;border:2px solid var(--black);border-radius:999px;overflow:hidden}
-.mode-btn{font-family:var(--font-b);font-size:13px;font-weight:700;background:transparent;border:none;padding:6px 16px;cursor:pointer;color:var(--black);transition:background .15s,color .15s;letter-spacing:.5px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:26px;flex-wrap:nowrap}
+.toolbar-left{display:flex;align-items:center;gap:8px;min-width:0}
+.toolbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.mode-toggle{display:flex;border:2px solid var(--black);border-radius:999px;overflow:hidden;flex-shrink:0}
+.mode-btn{font-family:var(--font-b);font-size:13px;font-weight:700;background:transparent;border:none;padding:6px 14px;cursor:pointer;color:var(--black);transition:background .15s,color .15s;letter-spacing:.5px}
 .mode-btn.active{background:var(--black);color:var(--bg)}
 .mode-btn:not(.active):hover{background:var(--amber-light)}
-.controls-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:32px;flex-wrap:wrap}
-.controls-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.controls-right{display:flex;align-items:center;gap:22px;flex-shrink:0}
-.yest-btn{font-family:var(--font-b);font-size:15px;background:none;border:none;cursor:pointer;text-decoration:underline;color:var(--black);padding:0;white-space:nowrap}
-.yest-btn:hover{opacity:.65}
-.help-btn{width:32px;height:32px;border-radius:50%;border:2px solid var(--black);background:transparent;font-family:var(--font-b);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0}
-.help-btn:hover{background:var(--black);color:var(--bg)}
+.icon-btn{width:32px;height:32px;border-radius:50%;border:2px solid var(--black);background:transparent;font-family:var(--font-b);font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0;padding:0;line-height:1}
+.icon-btn:hover{background:var(--black);color:var(--bg)}
 
-.hint-btn{font-family:var(--font-b);font-size:15px;background:none;border:none;cursor:pointer;text-decoration:underline;color:var(--black);padding:0;white-space:nowrap}
-.hint-btn:hover{opacity:.65}
+.timer{font-family:var(--font-b);font-size:14px;letter-spacing:.5px;min-width:64px;text-align:right;color:var(--amber);flex-shrink:0}
 
-.timer{font-family:var(--font-b);font-size:15px;letter-spacing:1px;min-width:80px;text-align:right;color:var(--amber)}
+.history-links{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.history-link{display:block;padding:12px 14px;background:var(--card);border-radius:10px;font-family:var(--font-b);font-size:14px;color:var(--black);text-decoration:none;border:1.5px solid #ccc;transition:background .12s}
+.history-link:hover{background:#ccc8be}
 
 /* ── Number tiles ── */
 .nums-row{display:flex;gap:18px;justify-content:center;margin-bottom:28px}
@@ -311,22 +330,17 @@ footer {
                 <h1 class="title">The <span style="color:#4a9e5c">6</span><span style="color:#c0392b">7</span> Number Game</h1>
                 <hr class="divider">
 
-                <div class="mode-row">
-                  <span class="mode-label">MODE:</span>
-                  <div class="mode-toggle">
-                    <button class="mode-btn" id="modeNormalBtn" data-mode="normal">Normal</button>
-                    <button class="mode-btn" id="modeHardBtn" data-mode="hard">Hard</button>
+                <div class="toolbar">
+                  <div class="toolbar-left">
+                    <div class="mode-toggle">
+                      <button class="mode-btn" id="modeNormalBtn" data-mode="normal">Normal</button>
+                      <button class="mode-btn" id="modeHardBtn" data-mode="hard">Hard</button>
+                    </div>
                   </div>
-                </div>
-
-                <div class="controls-row">
-                  <div class="controls-left">
-                    <a class="yest-btn" href="index.html">Back to Today's Puzzle</a>
-                    <a class="yest-btn" href="solutions-yesterday.html">See Solution</a>
-                  </div>
-                  <div class="controls-right">
-                    <button class="help-btn" id="helpBtn" title="How to play">?</button>
-                    <button class="hint-btn" id="hintBtn">Hint</button>
+                  <div class="toolbar-right">
+                    <button class="icon-btn" id="historyBtn" title="Today's puzzle &amp; solution">🕘</button>
+                    <button class="icon-btn" id="hintBtn" title="Hint">💡</button>
+                    <button class="icon-btn" id="helpBtn" title="How to play">?</button>
                     <span class="timer" id="timerDisplay">00:00:00</span>
                   </div>
                 </div>
@@ -397,6 +411,18 @@ footer {
         ✅ <code>(a+b)^c</code>&nbsp;&nbsp; ❌ <code>a^(b+c)</code>&nbsp;&nbsp; ❌ <code>a^(b!)</code></p>
     </div>
     <p style="margin-top:10px;font-size:12px;color:#888">A new puzzle every day at midnight UTC, for each mode.</p>
+  </div>
+</div>
+
+<!-- History popup -->
+<div class="overlay" id="historyOverlay">
+  <div class="popup">
+    <button class="popup-close" id="historyClose">✕</button>
+    <h2>Today</h2>
+    <div class="history-links">
+      <a class="history-link" href="index.html">🏠 Back to Today's Puzzle</a>
+      <a class="history-link" href="solutions-yesterday.html">✅ See Solution</a>
+    </div>
   </div>
 </div>
 
@@ -517,8 +543,8 @@ function hintAllResults(nums) {
     for (const L of leftRes) {
       for (const R of rightRes) {
         hintPush(results, L.val + R.val, `(${L.expr}+${R.expr})`);
-        hintPush(results, L.val - R.val, `(${L.expr}-${R.expr})`);
-        hintPush(results, R.val - L.val, `(${R.expr}-${L.expr})`);
+        hintPush(results, L.val - R.val, `(${L.expr}−${R.expr})`);
+        hintPush(results, R.val - L.val, `(${R.expr}−${L.expr})`);
         hintPush(results, L.val * R.val, `(${L.expr}×${R.expr})`);
         if (R.val !== 0) hintPush(results, L.val / R.val, `(${L.expr}÷${R.expr})`);
         if (L.val !== 0) hintPush(results, R.val / L.val, `(${R.expr}÷${L.expr})`);
@@ -905,6 +931,7 @@ function setupPopup(btnId, overlayId, closeId) {
 
 setupPopup('helpBtn', 'helpOverlay', 'helpClose');
 setupPopup('hintClose', 'hintOverlay', 'hintClose');
+setupPopup('historyBtn', 'historyOverlay', 'historyClose');
 setupPopup('', 'winOverlay', '');
 document.getElementById('winOverlay').addEventListener('click', e => {
   if (e.target === e.currentTarget) e.currentTarget.classList.remove('on');
