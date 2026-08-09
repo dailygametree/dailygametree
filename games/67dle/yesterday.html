@@ -69,6 +69,15 @@ a{ color:inherit; }
 
 .logo-mark { width: 55px; height: auto; display: block; }
 
+/* top-bar wraps the back-link (and, on mobile, the game logo). On desktop
+   it collapses out of the layout via display:contents so .back-link behaves
+   exactly as before; on mobile the query below turns it into the flex row
+   that keeps the link from stretching to the full width while anchoring
+   the logo to the right. These defaults must come BEFORE the mobile media
+   query below — same specificity, so source order decides the winner. */
+.top-bar{ display: contents; }
+.mobile-brand{ display: none; }
+
 /* ---------- Ad rails (identical to homepage) ---------- */
 
 .layout {
@@ -155,13 +164,6 @@ a{ color:inherit; }
   transition:border-color .15s,color .15s;
 }
 .back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
-
-/* top-bar wraps the back-link (and, on mobile, the game logo). On desktop
-   it collapses out of the layout via display:contents so .back-link behaves
-   exactly as before; on mobile it becomes the flex row that keeps the link
-   from stretching to the full width while anchoring the logo to the right. */
-.top-bar{ display: contents; }
-.mobile-brand{ display: none; }
 
 /* ---------- Footer (identical to homepage) ---------- */
 
