@@ -9,6 +9,7 @@
   "favicon": "games/67dle/favicon.png",
   "accent": "#4a9e5c",
   "dateAdded": "2026-08-05",
-  "tags": ["puzzle", "math", "daily"]
+  "tags": ["puzzle", "math", "daily"],
+  "hiddenTags": ["6", "7", "67", "six", "seven", "sixty seven", "sixty-seven", "arithmetic", "numbers game", "wordle" , "67dle", "67-dle" , "sixsevendle" , "sixseven-dle"]
   }
 ]
