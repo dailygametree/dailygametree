@@ -3,9 +3,47 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>dailygametree</title>
-<meta name="description" content="A growing collection of small browser games, one folder per game." />
-<link rel="icon" href="favicon.png" type="image/png"/>
+<title>DailyGameTree</title>
+<meta name="description" content="Your home for free daily browser games. Stay rooted with the games you already love, or branch out and play something new every day." />
+<meta name="keywords" content="daily games, free daily games, browser games, free browser games, daily game tree, dailygametree, wordle spinoffs, wordle alternatives, online puzzle games, daily puzzle games" />
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#F6F5EF" />
+<link rel="canonical" href="https://dailygametree.com/" />
+
+<!-- Favicon / search result icon — replace these files with your own artwork -->
+<link rel="icon" href="favicon.png" type="image/png" sizes="any"/>
+<link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32"/>
+<link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+
+<!-- Open Graph (Facebook, LinkedIn, Discord, etc.) -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="DailyGameTree" />
+<meta property="og:title" content="DailyGameTree — Free Daily Browser Games" />
+<meta property="og:description" content="Your home for free daily browser games. Stay rooted with the games you already love, or branch out and play something new every day." />
+<meta property="og:url" content="https://dailygametree.com/" />
+<meta property="og:image" content="https://dailygametree.com/social-preview.png" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="DailyGameTree — Free Daily Browser Games" />
+<meta name="twitter:description" content="Your home for free daily browser games. Stay rooted with the games you already love, or branch out and play something new every day." />
+<meta name="twitter:image" content="https://dailygametree.com/social-preview.png" />
+
+<!-- Structured data so search engines understand this is a games site -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "DailyGameTree",
+  "url": "https://dailygametree.com/",
+  "description": "Your home for free daily browser games. Stay rooted with the games you already love, or branch out and play something new every day.",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://dailygametree.com/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
@@ -172,25 +210,9 @@ a { color: inherit; }
   color: var(--text);
 }
 
-.hero h1 .dim { color: var(--text-faint); }
-
-/* The cursor's blink is driven entirely by JS toggling this class on an
-   interval (see initHeroTypewriter/startCursorBlink below), NOT by a CSS
-   @keyframes animation. This is intentional: the site has a global
-   prefers-reduced-motion override further up this file that collapses
-   CSS animations to a single near-instant frame, which made the blink
-   look static for anyone with "reduce motion" on. A plain class + opacity
-   swap isn't a CSS animation/transition, so that override can't touch it
-   and the cursor will always visibly blink. */
-.cursor {
-  display: inline-block;
-  color: var(--accent);
-  opacity: 1;
-}
-
-.cursor.cursor-hidden {
-  opacity: 0;
-}
+.hero h1 .at { color: #9aa091; }
+.hero h1 .brand { color: #7e5645; }
+.hero h1 .tree { color: #689c1e; }
 
 .hero .sub {
   color: var(--text-dim);
@@ -460,7 +482,7 @@ footer {
       <div class="main-inner">
         <main>
           <section class="hero">
-            <h1><span id="typed-normal"></span><span id="typed-dim" class="dim"></span><span class="cursor" id="hero-cursor">_</span></h1>
+            <h1><span class="at">@</span><span id="typed-normal" class="brand"></span><span id="typed-dim" class="tree"></span></h1>
             <p class="sub">Your home for free daily browser games. Stay rooted with the games you already love, or branch out and play something new every day.</p>
           </section>
 
@@ -529,8 +551,7 @@ const FALLBACK_GAMES = [
 function initHeroTypewriter() {
   const normalEl = document.getElementById('typed-normal');
   const dimEl = document.getElementById('typed-dim');
-  const cursorEl = document.getElementById('hero-cursor');
-  if (!normalEl || !dimEl || !cursorEl) return;
+  if (!normalEl || !dimEl) return;
 
   const normalText = 'dailygame';
   const dimText = 'tree';
@@ -539,7 +560,6 @@ function initHeroTypewriter() {
 
   normalEl.textContent = '';
   dimEl.textContent = '';
-  cursorEl.classList.remove('cursor-hidden');
 
   let i = 0;
   const typeTimer = window.setInterval(() => {
@@ -551,15 +571,8 @@ function initHeroTypewriter() {
     }
     if (i >= totalChars) {
       window.clearInterval(typeTimer);
-      startCursorBlink(cursorEl);
     }
   }, typeDelay);
-}
-
-function startCursorBlink(cursorEl) {
-  window.setInterval(() => {
-    cursorEl.classList.toggle('cursor-hidden');
-  }, 530);
 }
 
 if (document.readyState === 'loading') {
