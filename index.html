@@ -128,7 +128,7 @@ a { color: inherit; }
 
 .layout {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
 }
 
@@ -137,6 +137,12 @@ a { color: inherit; }
   margin: 0 10px;
   position: sticky;
   top: 78px;
+  align-self: stretch;
+  display: flex;
+  /* Sticky elements are bounded by their own box. With align-items:stretch
+     on .layout, this rail's height now matches the tallest column
+     (main-content), instead of a fixed px value — so the ad fills all the
+     way down to the footer with no gap, and grows/shrinks with the page. */
 }
 
 .ad-slot {
@@ -152,9 +158,9 @@ a { color: inherit; }
   justify-content: center;
   text-align: center;
   line-height: 1.6;
+  flex: 1 1 auto;
+  width: 100%;
 }
-
-.ad-rail .ad-slot { height: 600px; }
 
 .main-content {
   flex: 1;
@@ -176,7 +182,7 @@ a { color: inherit; }
      rail overflows the viewport by 28px, which is what was pushing the
      whole page into unwanted horizontal scroll. calc() keeps the outer
      (margin) box exactly at 100%. */
-  .ad-rail { position: static; flex: none; width: calc(100% - 28px); margin: 10px 14px; }
+  .ad-rail { position: static; flex: none; width: calc(100% - 28px); margin: 10px 14px; align-self: auto; display: block; }
   .ad-rail.left { order: -1; }
   .main-content { order: 0; }
   .ad-rail.right { order: 1; }
@@ -388,7 +394,7 @@ a { color: inherit; }
   text-transform: uppercase;
 }
 
-.game-info { padding: 14px 16px 16px; }
+.game-info { padding: 14px 16px 16px; border-top: 1px solid var(--line); }
 
 .game-title {
   font-family: var(--display);
@@ -544,7 +550,8 @@ const FALLBACK_GAMES = [
     "favicon": "games/67dle/favicon.png",
     "accent": "#4a9e5c",
     "dateAdded": "2026-08-05",
-    "tags": ["puzzle", "math", "daily"]
+    "tags": ["puzzle", "math", "daily"],
+    "hiddenTags": ["6", "7", "67", "six", "seven", "sixty seven", "sixty-seven", "arithmetic", "numbers game", "wordle"]
   }
 ];
 
@@ -629,7 +636,8 @@ function applyFilters() {
       !query ||
       game.title.toLowerCase().includes(query) ||
       (game.description || '').toLowerCase().includes(query) ||
-      (game.tags || []).some((t) => t.toLowerCase().includes(query));
+      (game.tags || []).some((t) => t.toLowerCase().includes(query)) ||
+      (game.hiddenTags || []).some((t) => t.toLowerCase().includes(query));
     const matchesTags =
       activeTags.size === 0 || (game.tags || []).some((t) => activeTags.has(t));
     return matchesQuery && matchesTags;
