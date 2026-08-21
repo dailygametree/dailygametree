@@ -2,9 +2,9 @@
   {
   "id": "67dle",
   "folder": "67dle",
-  "title": "The 67 Number Game",
+  "title": "67dle - The 67 Number Game",
   "tagline": "Use four numbers and maths to make 67",
-  "description": "A daily math puzzle — combine four numbers with +, −, ×, ÷, ^ and ! to hit exactly 67.",
+  "description": "A daily math puzzle. Combine four numbers with +, −, ×, ÷, ^ and ! to hit exactly 67.",
   "banner": "games/67dle/banner.png",
   "favicon": "games/67dle/favicon.png",
   "accent": "#4a9e5c",
@@ -15,7 +15,7 @@
   {
   "id": "yeardle",
   "folder": "yeardle",
-  "title": "Yeardle",
+  "title": "Yeardle - Guess the year",
   "tagline": "Guess the year a historical event happened",
   "description": "A daily history puzzle — read the clue on the flashcard and guess the year in 4 tries.",
   "banner": "games/yeardle/banner.png",
