@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Yeardle — dailygametree</title>
+<meta name="description" content="Guess the year a historical event happened. A new Yeardle every day.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ---------- Site-wide palette (drives header / ad rails / footer) ---------- */
+:root{
+  --bg: #F6F5EF;
+  --bg-elevated: #EFEDE3;
+  --bg-card: #FFFFFF;
+  --text: #20261C;
+  --text-dim: #5B6255;
+  --text-faint: #9AA091;
+  --accent: #6E9C1E;
+  --accent-dim: #557A16;
+  --accent-soft: #E7F1D4;
+  --amber: #C97A1B;
+  --line: #E1DDCF;
+  --radius: 8px;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: 'Space Grotesk', ui-sans-serif, sans-serif;
+}
+
+html,body{
+  min-height:100%;
+  background:var(--bg);
+  font-family:var(--mono), ui-sans-serif;
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+a{ color:inherit; }
+
+/* ---------- Header (identical to homepage) ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: rgba(246, 245, 239, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--display), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.logo-mark { width: 55px; height: auto; display: block; }
+
+/* ---------- Ad rails (identical to homepage) ---------- */
+
+.layout {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.ad-rail {
+  flex: 0 0 160px;
+  margin: 0 10px;
+  position: sticky;
+  top: 78px;
+}
+
+.ad-slot {
+  border: 1px dashed #CBC6B4;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  color: var(--text-faint);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.ad-rail .ad-slot { height: 600px; }
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.main-inner {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+
+@media (max-width: 900px) {
+  /* Simple, robust stacking — no forced viewport heights or clipped
+     overflow. The page just flows top-to-bottom and scrolls normally,
+     which is far less fragile than trying to cram everything into one
+     screen height (that approach is what caused elements to overlap). */
+  .layout { flex-direction: column; align-items: stretch; }
+  .ad-rail { position: static; flex: 0 0 auto; width: 100%; margin: 10px 0; }
+  .ad-rail.left { order: -1; }
+  .main-content { order: 0; }
+  .ad-rail.right { order: 1; }
+  .ad-rail .ad-slot { height: 50px; font-size: 9px; letter-spacing: .04em; }
+  .main-inner { padding: 0 14px; }
+}
+
+@media (max-width: 480px) {
+  .logo-text { display: none; }
+  .logo { gap: 0; }
+}
+
+.back-link{
+  display:inline-block;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  margin:24px 4px 0;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--mono);
+  transition:border-color .15s,color .15s;
+}
+.back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
+
+/* ---------- Footer (identical to homepage) ---------- */
+
+footer {
+  text-align: center;
+  padding: 28px 24px 40px;
+  color: var(--text-faint);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+.footer-links a:hover { color: var(--accent-dim); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =====================================================================
+   YEARDLE GAME — palette scoped to .game-wrap so it can't clash with
+   the site-wide variables above.
+   ===================================================================== */
+
+.game-wrap{
+  --paper: #FBF7EE;
+  --card: #FFFDF7;
+  --ink: #2B2B26;
+  --ink-dim: #6b6558;
+  --tile-empty: #D9D2C0;
+  --tile-filled: #A69D86;
+  --green: #5C9A57;
+  --green-dark: #4a7f46;
+  --red: #C14E3A;
+  --red-dark: #a53f2e;
+  --key-bg: #E4DECD;
+  --key-bg-hover: #d8d0ba;
+  --accent: #B25B2F;
+  --accent-soft: #f0ddc9;
+  --font-hand: 'Kalam', cursive;
+  --font-ui: 'Nunito', ui-sans-serif, sans-serif;
+
+  background:var(--paper);
+  font-family:var(--font-ui);
+  color:var(--ink);
+  border-radius:var(--radius);
+  margin-top:14px;
+}
+
+.page{display:flex;justify-content:center;padding:0 24px}
+.game-col{flex:0 0 520px;max-width:520px;padding:28px 24px 56px;width:100%}
+
+@media(max-width:640px){
+  .page{padding:0 6px}
+  .game-col{flex:0 0 auto;max-width:100%;width:100%;padding:14px 12px 32px}
+}
+
+/* ---- Toolbar / title ---- */
+.title-block{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:4px}
+.title{font-family:var(--font-hand);font-weight:700;font-size:clamp(28px,6vw,40px);letter-spacing:.5px;color:var(--ink)}
+.title .title-accent{color:var(--accent)}
+.subtitle{font-size:12px;color:var(--ink-dim);letter-spacing:.04em;margin-top:2px;text-transform:uppercase}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 18px}
+.toolbar-left,.toolbar-right{display:flex;align-items:center;gap:8px}
+.icon-btn{width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);background:transparent;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0;padding:0;line-height:1;color:var(--ink)}
+.icon-btn:hover{background:var(--ink);color:var(--paper)}
+.puzzle-num{font-size:12px;color:var(--ink-dim);font-weight:700;letter-spacing:.03em}
+
+@media(max-width:960px){
+  .title{font-size:clamp(22px,7vw,30px)}
+  .toolbar{margin:8px 0 12px}
+  .icon-btn{width:29px;height:29px;font-size:13px}
+}
+
+/* ---- Flashcard ---- */
+.flashcard-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:22px}
+.flashcard{
+  position:relative;
+  background:var(--card);
+  border-radius:10px;
+  padding:26px 26px 22px;
+  width:100%;
+  max-width:400px;
+  min-height:150px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  transform:rotate(-1deg);
+  box-shadow:0 10px 24px rgba(43,43,38,.16), 0 2px 5px rgba(43,43,38,.10);
+  border:1px solid rgba(43,43,38,.06);
+}
+.flashcard::before{
+  /* washi-tape effect */
+  content:'';
+  position:absolute;
+  top:-14px;
+  left:50%;
+  transform:translateX(-50%) rotate(-3deg);
+  width:86px;
+  height:26px;
+  background:rgba(201,122,27,.35);
+  border:1px solid rgba(201,122,27,.15);
+  box-shadow:0 2px 4px rgba(0,0,0,.08);
+}
+.flashcard-art{
+  width:100%;
+  max-width:220px;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.flashcard-art img{max-width:100%;display:block}
+.flashcard-clue{
+  font-family:var(--font-hand);
+  font-size:clamp(16px,2.6vw,20px);
+  line-height:1.5;
+  text-align:center;
+  color:var(--ink);
+}
+.flashcard-meta{margin-top:10px;font-size:11.5px;color:var(--ink-dim);text-align:center}
+
+@media(max-width:960px){
+  .flashcard-wrap{margin-bottom:14px}
+  .flashcard{padding:18px 18px 16px;min-height:0}
+  .flashcard-clue{font-size:clamp(14px,4vw,17px)}
+}
+
+/* ---- Guess grid ---- */
+.board{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:22px}
+.row{display:flex;gap:8px}
+.row.shake{animation:shakeRow .5s}
+.row.winner .tile{animation:bounceTile .55s ease}
+.row.winner .tile:nth-child(1){animation-delay:.02s}
+.row.winner .tile:nth-child(2){animation-delay:.10s}
+.row.winner .tile:nth-child(3){animation-delay:.18s}
+.row.winner .tile:nth-child(4){animation-delay:.26s}
+
+.tile{
+  width:60px;height:60px;
+  border:2px solid var(--tile-empty);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-ui);
+  font-weight:800;
+  font-size:26px;
+  color:var(--ink);
+  background:var(--card);
+  transition:border-color .1s;
+  user-select:none;
+}
+.tile.filled{border-color:var(--tile-filled)}
+.tile.flip{animation:flipTile .5s ease forwards}
+.tile.green{background:var(--green);border-color:var(--green);color:#fff}
+.tile.red{background:var(--red);border-color:var(--red);color:#fff}
+
+@media(max-width:960px){
+  .board{gap:6px;margin-bottom:10px}
+  .row{gap:6px}
+  .tile{width:clamp(44px,14vw,58px);height:clamp(44px,14vw,58px);font-size:clamp(18px,5.5vw,24px);border-radius:7px}
+}
+
+@keyframes flipTile{
+  0%{transform:rotateX(0)}
+  50%{transform:rotateX(90deg)}
+  100%{transform:rotateX(0)}
+}
+@keyframes bounceTile{
+  0%,20%{transform:translateY(0)}
+  40%{transform:translateY(-16px)}
+  50%{transform:translateY(0)}
+  60%{transform:translateY(-8px)}
+  80%,100%{transform:translateY(0)}
+}
+@keyframes shakeRow{
+  10%,90%{transform:translateX(-1px)}
+  20%,80%{transform:translateX(2px)}
+  30%,50%,70%{transform:translateX(-4px)}
+  40%,60%{transform:translateX(4px)}
+}
+
+/* ---- Keyboard ---- */
+.keyboard{display:flex;flex-direction:column;align-items:center;gap:8px}
+.key-row{display:flex;gap:6px;justify-content:center;width:100%;max-width:480px}
+.key{
+  flex:1;
+  height:52px;
+  min-width:0;
+  border:none;
+  border-radius:6px;
+  background:var(--key-bg);
+  color:var(--ink);
+  font-family:var(--font-ui);
+  font-weight:800;
+  font-size:17px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .12s,transform .08s;
+  user-select:none;
+}
+.key:hover{background:var(--key-bg-hover)}
+.key:active{transform:scale(.94)}
+.key.wide{flex:1.6;font-size:12.5px;letter-spacing:.03em}
+.key.green{background:var(--green);color:#fff}
+.key.red{background:var(--red);color:#fff}
+.key:disabled{opacity:.45;cursor:default}
+
+@media(max-width:960px){
+  .keyboard{gap:6px}
+  .key{height:44px;font-size:15px;border-radius:5px}
+  .key.wide{font-size:10.5px}
+}
+
+.day-info{font-size:11px;color:var(--ink-dim);text-align:center;margin-top:16px}
+@media(max-width:960px){.day-info{margin-top:6px;font-size:9px}}
+
+/* ---- Popups ---- */
+.overlay{display:none;position:fixed;inset:0;background:rgba(43,43,38,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+.overlay.on{display:flex}
+.popup{background:var(--paper,var(--bg));border-radius:14px;padding:26px 26px 22px;max-width:400px;width:100%;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.28);font-family:var(--font-ui,var(--mono));color:var(--ink,var(--text))}
+.popup h2{font-family:var(--font-hand,inherit);font-size:22px;margin-bottom:12px;color:var(--ink,var(--text))}
+.popup p,.popup li{font-size:13.5px;line-height:1.7}
+.popup ul{padding-left:16px;margin-top:6px}
+.popup ul li{margin-bottom:3px}
+.popup-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:inherit;line-height:1;padding:2px 4px}
+.popup-close:hover{opacity:.55}
+.popup .example-row{display:flex;gap:4px;margin:8px 0}
+.popup .example-tile{width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff}
+.popup code{background:#e4dfd4;border-radius:3px;padding:1px 4px;font-family:monospace;font-size:12px}
+
+.end-popup h2{text-align:center;font-size:26px}
+.end-popup .end-answer{font-size:15px;text-align:center;margin-top:2px}
+.end-popup .end-year{font-size:34px;font-weight:800;font-family:var(--font-hand);color:var(--accent);text-align:center;margin:6px 0}
+.end-popup .end-event{font-size:13px;text-align:center;color:var(--ink-dim);font-style:italic;margin-top:2px}
+.end-popup .end-grid{display:flex;flex-direction:column;gap:4px;align-items:center;margin:16px 0}
+.end-popup .end-grid-row{display:flex;gap:4px}
+.end-popup .end-grid-row span{width:22px;height:22px;border-radius:4px;display:inline-block}
+.end-popup .countdown{text-align:center;font-size:12px;color:var(--ink-dim);margin-top:6px}
+.end-popup .countdown-val{font-weight:800;font-size:16px;color:var(--ink);display:block;margin-top:2px}
+.share-btn{display:block;margin:14px auto 0;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:var(--font-ui);font-weight:800;font-size:14px;cursor:pointer}
+.share-btn:hover{opacity:.9}
+
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="../../index.html">
+      <img src="../../logo.png" alt="dailygametree logo" class="logo-mark" />
+      <span class="logo-text">dailygametree</span>
+    </a>
+  </header>
+
+  <div class="layout">
+    <aside class="ad-rail left">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+
+    <div class="main-content">
+      <div class="main-inner">
+        <main>
+          <a class="back-link" href="../../index.html">&larr; All games</a>
+
+          <div class="game-wrap">
+            <div class="page">
+              <div class="game-col">
+
+                <div class="title-block">
+                  <h1 class="title">Year<span class="title-accent">dle</span></h1>
+                  <div class="subtitle">Guess the year, one clue a day</div>
+                </div>
+
+                <div class="toolbar">
+                  <div class="toolbar-left">
+                    <span class="puzzle-num" id="puzzleNum">No. 1</span>
+                  </div>
+                  <div class="toolbar-right">
+                    <button class="icon-btn" id="helpBtn" title="How to play">?</button>
+                  </div>
+                </div>
+
+                <div class="flashcard-wrap">
+                  <div class="flashcard" id="flashcard">
+                    <!-- Future: drop a transparent-background image here (e.g. <img src="..."> )
+                         so it reads as hand-drawn on the card. -->
+                    <div class="flashcard-art" id="flashcardArt"></div>
+                    <p class="flashcard-clue" id="clueText">Loading today's clue&hellip;</p>
+                  </div>
+                  <div class="flashcard-meta" id="flashcardMeta"></div>
+                </div>
+
+                <div class="board" id="board"></div>
+
+                <div class="keyboard" id="keyboard"></div>
+
+                <div class="day-info" id="dayInfo"></div>
+
+              </div>
+            </div>
+
+            <!-- Popups live inside .game-wrap so they inherit its palette
+                 (--green/--red/--accent/etc). They're position:fixed, so
+                 nesting here doesn't affect where they appear on screen. -->
+
+            <!-- Help popup -->
+            <div class="overlay" id="helpOverlay">
+              <div class="popup">
+                <button class="popup-close" id="helpClose">✕</button>
+                <h2>How to Play</h2>
+                <p>Read the clue on the flashcard and guess the <strong>year</strong> the event happened. You have <strong>4 tries</strong>. Each guess must be a 4-digit year — tap the number keys, then <strong>Enter</strong>.</p>
+                <p style="margin-top:8px">After each guess, the tiles change colour to show how close you were:</p>
+                <div class="example-row">
+                  <div class="example-tile" style="background:var(--red)">0</div>
+                  <div class="example-tile" style="background:var(--red)">8</div>
+                  <div class="example-tile" style="background:var(--green)">3</div>
+                  <div class="example-tile" style="background:var(--red)">1</div>
+                </div>
+                <p><strong>Green</strong> — that digit is correct <em>and</em> in the right spot.<br>
+                   <strong>Red</strong> — that digit is wrong for that spot (even if it appears elsewhere in the year).</p>
+                <p style="margin-top:8px">In the example above the year was <strong>1932</strong> — only the 3 landed in the right place.</p>
+                <p style="margin-top:10px;font-size:12px;color:var(--ink-dim)">Some very old events happened before the year 1000, so their year is padded with leading zeros — e.g. the year 9 CE is entered as <code>0009</code>.</p>
+                <p style="margin-top:10px;font-size:12px;color:var(--ink-dim)">A new Yeardle unlocks every day at midnight UTC.</p>
+              </div>
+            </div>
+
+            <!-- End of game popup -->
+            <div class="overlay" id="endOverlay">
+              <div class="popup end-popup">
+                <button class="popup-close" id="endClose">✕</button>
+                <h2 id="endTitle">🎉 Nailed it!</h2>
+                <p class="end-answer">The year was</p>
+                <div class="end-year" id="endYear"></div>
+                <p class="end-event" id="endEvent"></p>
+                <div class="end-grid" id="endGrid"></div>
+                <button class="share-btn" id="shareBtn">Share Result</button>
+                <div class="countdown">
+                  Next Yeardle in
+                  <span class="countdown-val" id="countdownVal">--:--:--</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </main>
+      </div>
+    </div>
+
+    <aside class="ad-rail right">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+  </div>
+
+  <footer>
+    <nav class="footer-links">
+      <a href="../../privacy.html">Privacy Policy</a>
+      <a href="../../terms.html">Terms and Conditions</a>
+      <a href="../../about.html">About Us</a>
+      <a href="../../contact.html">Contact</a>
+    </nav>
+    <p>&copy; <span id="year"></span> dailygametree.com</p>
+  </footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ═══════════════════════════════════════════════
+//  HISTORICAL EVENTS DATA — [id, year, event text]
+// ═══════════════════════════════════════════════
+const EVENTS = [[1,9,"Germanic tribes annihilate three Roman legions at the Battle of the Teutoburg Forest, halting Roman expansion east of the Rhine."],[2,30,"Jesus of Nazareth is crucified in Jerusalem under Roman prefect Pontius Pilate, an event foundational to Christianity."],[3,43,"The Roman conquest of Britain begins under Emperor Claudius."],[4,48,"The Great Library of Alexandria suffers major damage during Julius Caesar's civil war campaign in Egypt, though its decline is centuries-long."],[5,64,"The Great Fire of Rome devastates the city, later blamed on Christians by Emperor Nero."],[6,70,"Roman forces under Titus destroy the Second Temple in Jerusalem, ending the Jewish revolt."],[7,79,"Mount Vesuvius erupts, burying the Roman cities of Pompeii and Herculaneum."],[8,96,"The Roman Senate names Nerva emperor, beginning the era of the 'Five Good Emperors.'"],[9,105,"Papermaking is refined and reported to the Chinese imperial court by Cai Lun, transforming record-keeping."],[10,117,"The Roman Empire reaches its greatest territorial extent under Emperor Trajan."],[11,122,"Construction begins on Hadrian's Wall in Roman Britain to mark the empire's northern frontier."],[12,165,"The Antonine Plague spreads through the Roman Empire, killing millions over the following years."],[13,180,"The death of Marcus Aurelius ends the period historians call the Pax Romana."],[14,184,"The Yellow Turban Rebellion breaks out in Han China, weakening the dynasty."],[15,220,"The Han Dynasty collapses, ushering in China's turbulent Three Kingdoms period."],[16,224,"The Sasanian Empire is founded in Persia after Ardashir I overthrows the Parthians."],[17,250,"Rome faces widespread persecution of Christians under Emperor Decius."],[18,268,"Gothic invasions and civil war plunge the Roman Empire into the Crisis of the Third Century's worst years."],[19,280,"China is reunified under the Western Jin Dynasty after decades of division."],[20,286,"Diocletian splits the Roman Empire into eastern and western administrative halves under the Tetrarchy."],[21,301,"The Kingdom of Armenia becomes the first state to adopt Christianity as its official religion."],[22,313,"The Edict of Milan, issued by Constantine and Licinius, grants religious tolerance to Christians throughout the Roman Empire."],[23,320,"The Gupta Empire is founded in India, ushering in a classical golden age of art and science."],[24,325,"The First Council of Nicaea convenes, producing the Nicene Creed and shaping Christian doctrine."],[25,330,"Constantine the Great dedicates Constantinople as the new capital of the Roman Empire."],[26,360,"Hindu-Arabic numeral concepts and the concept of zero develop further within Gupta-era Indian mathematics."],[27,376,"Gothic tribes cross the Danube into Roman territory, fleeing the advancing Huns."],[28,380,"The Edict of Thessalonica makes Nicene Christianity the official state religion of the Roman Empire."],[29,391,"Emperor Theodosius I bans pagan religious practices throughout the Roman Empire."],[30,395,"The Roman Empire is permanently divided into Western and Eastern halves after the death of Theodosius I."],[31,410,"Visigoths under Alaric I sack the city of Rome, shocking the ancient world."],[32,415,"Philosopher Hypatia is killed by a mob in Alexandria amid religious and political turmoil."],[33,432,"Saint Patrick begins his mission to spread Christianity in Ireland, according to tradition."],[34,439,"The Vandals capture Carthage, establishing a kingdom in North Africa."],[35,451,"The Battle of the Catalaunian Plains halts Attila the Hun's invasion of Gaul."],[36,455,"Vandal forces sack Rome, further weakening the Western Roman Empire."],[37,476,"The last Western Roman emperor, Romulus Augustulus, is deposed, marking the traditional end of the Western Roman Empire."],[38,481,"Clovis I becomes king of the Salian Franks at age fifteen, beginning the Merovingian dynasty's rise."],[39,486,"Clovis I defeats the last Roman governor in Gaul at Soissons, founding the Frankish kingdom."],[40,496,"Clovis I converts to Catholic Christianity, aligning the Frankish kingdom with Rome."],[41,529,"Emperor Justinian I issues the Corpus Juris Civilis, a landmark codification of Roman law."],[42,537,"The Hagia Sophia is completed in Constantinople under Justinian I."],[43,552,"Buddhism is formally introduced to Japan from Korea, according to traditional accounts."],[44,570,"The Prophet Muhammad is born in Mecca, according to Islamic tradition."],[45,589,"The Sui Dynasty reunifies China after centuries of division following the Han collapse."],[46,610,"Muhammad receives what Muslims believe to be his first revelation, marking the start of Islam."],[47,618,"The Tang Dynasty is founded in China, beginning one of its most prosperous eras."],[48,622,"Muhammad's migration from Mecca to Medina, the Hijra, marks year one of the Islamic calendar."],[49,627,"Emperor Taizong's reign begins in Tang China, ushering in the celebrated 'Reign of Zhenguan.'"],[50,632,"The Prophet Muhammad dies, and the caliphate begins under Abu Bakr."],[51,635,"Nestorian Christian missionaries reach the Tang capital of Chang'an, marking early East-West religious exchange."],[52,636,"The Battle of Yarmouk gives Muslim armies a decisive victory over the Byzantine Empire in the Levant."],[53,642,"The Battle of Nahavand ends organized Sasanian resistance to the Muslim conquest of Persia."],[54,661,"The Umayyad Caliphate is established, moving the Islamic capital to Damascus."],[55,674,"The first Arab siege of Constantinople begins, testing Byzantine defenses with 'Greek fire.'"],[56,700,"The Polynesian settlement of the Pacific islands, including Hawaii, is underway through long-distance voyaging."],[57,710,"Japan establishes its first permanent capital at Nara, beginning the Nara period."],[58,711,"Umayyad forces cross into Spain, beginning the Muslim conquest of the Iberian Peninsula."],[59,717,"Byzantine forces repel a major Arab siege of Constantinople, preserving the empire."],[60,732,"Frankish leader Charles Martel halts the Umayyad advance into Europe at the Battle of Tours."],[61,750,"The Abbasid Revolution overthrows the Umayyads and shifts the Islamic capital to Baghdad."],[62,751,"The Battle of Talas between Abbasid and Tang forces reportedly spreads papermaking technology westward."],[63,756,"The Abbasid-appointed governor's fall lets Abd al-Rahman I establish the independent Emirate of Córdoba in Spain."],[64,768,"Charlemagne becomes King of the Franks, beginning decades of territorial expansion."],[65,793,"A Viking raid on the monastery of Lindisfarne is traditionally seen as the beginning of the Viking Age."],[66,794,"Japan's capital moves to Heian-kyo (modern Kyoto), beginning the Heian period."],[67,800,"Pope Leo III crowns Charlemagne as Holy Roman Emperor in Rome on Christmas Day."],[68,814,"Charlemagne dies, and his Carolingian Empire begins to fracture among his heirs."],[69,843,"The Treaty of Verdun divides Charlemagne's empire into three kingdoms, shaping future European borders."],[70,862,"Rurik establishes rule in Novgorod, traditionally marking the founding of the Rurikid dynasty."],[71,868,"The Diamond Sutra is printed in China, becoming the world's oldest dated printed book."],[72,871,"Alfred the Great becomes King of Wessex and later checks Viking expansion in England."],[73,882,"Kievan Rus' is founded when Oleg of Novgorod unites Slavic tribes with Kiev as capital."],[74,909,"The Fatimid Caliphate is established in North Africa, claiming descent from the Prophet's daughter Fatima."],[75,910,"The Benedictine monastery of Cluny is founded, sparking a major reform movement in Western monasticism."],[76,936,"Otto I is crowned King of Germany, laying groundwork for the Holy Roman Empire."],[77,960,"The Song Dynasty is founded, ushering in a golden age of Chinese economic and technological growth."],[78,969,"The Fatimids conquer Egypt and found the city of Cairo as their new capital."],[79,988,"Vladimir the Great adopts Orthodox Christianity as the religion of Kievan Rus'."],[80,1000,"Norse explorer Leif Erikson is believed to have reached North America, centuries before Columbus."],[81,1000,"The Kingdom of Hungary is established as Stephen I is crowned its first Christian king."],[82,1040,"Bi Sheng invents movable-type printing in Song Dynasty China."],[83,1054,"The Great Schism formally divides the Christian church into Roman Catholic and Eastern Orthodox branches."],[84,1054,"Seljuk Turks establish growing dominance over Baghdad, becoming protectors of the Abbasid Caliphate."],[85,1054,"Astronomers across the world observe the supernova that creates the Crab Nebula."],[86,1066,"William the Conqueror defeats King Harold II at the Battle of Hastings, beginning Norman rule in England."],[87,1071,"The Battle of Manzikert opens Anatolia to Turkish settlement, weakening Byzantine power."],[88,1086,"William the Conqueror commissions the Domesday Book, a sweeping survey of English land and resources."],[89,1088,"The University of Bologna is founded, considered the oldest university in continuous operation."],[90,1095,"Pope Urban II calls for the First Crusade at the Council of Clermont."],[91,1099,"Crusader forces capture Jerusalem, establishing the Kingdom of Jerusalem."],[92,1100,"The Great Zimbabwe civilization begins its rise as a major trading center in southern Africa."],[93,1120,"The Knights Templar military order is founded to protect Christian pilgrims in the Holy Land."],[94,1147,"The Second Crusade is launched in response to the fall of the County of Edessa."],[95,1150,"The Angkor Wat temple complex is completed in the Khmer Empire."],[96,1170,"Archbishop Thomas Becket is murdered in Canterbury Cathedral, shocking Christian Europe."],[97,1185,"The Kamakura shogunate begins in Japan, starting centuries of samurai-led military government."],[98,1187,"Saladin recaptures Jerusalem from the Crusaders at the Battle of Hattin's aftermath."],[99,1204,"Crusaders of the Fourth Crusade sack Constantinople instead of reaching the Holy Land."],[100,1206,"Genghis Khan is proclaimed ruler of a unified Mongol nation, launching the Mongol conquests."],[101,1206,"The Delhi Sultanate is established, beginning centuries of Muslim rule in northern India."],[102,1215,"Genghis Khan's Mongol army captures Beijing (Zhongdu) from the Jin dynasty."],[103,1215,"English barons force King John to seal the Magna Carta, limiting royal power."],[104,1231,"The Papal Inquisition is formally established to combat heresy in Europe."],[105,1231,"The Mongols begin their conquest of Korea, launching decades of invasions."],[106,1235,"The Mali Empire rises in West Africa under Sundiata Keita, becoming a major trade power."],[107,1241,"Mongol forces defeat combined European armies at the Battle of Legnica, then withdraw eastward."],[108,1258,"Mongol forces sack Baghdad, ending the Abbasid Caliphate."],[109,1258,"The Mamluks halt the Mongol advance at the Battle of Ain Jalut, saving Egypt and the Levant."],[110,1266,"Kublai Khan begins constructing his new capital at what becomes Beijing."],[111,1271,"Marco Polo begins his journey along the Silk Road to the court of Kublai Khan."],[112,1279,"The Mongols complete their conquest of Song China, founding the Yuan Dynasty."],[113,1291,"The fall of Acre ends major Crusader presence in the Holy Land."],[114,1295,"The Model Parliament convenes in England, broadening representation in governance."],[115,1315,"The Great Famine strikes Northern Europe, killing large portions of the population before the Black Death."],[116,1324,"Mansa Musa of Mali makes his famed pilgrimage to Mecca, displaying immense wealth that stuns the Islamic world."],[117,1325,"The Aztecs found their capital city of Tenochtitlan in the Valley of Mexico."],[118,1325,"Ibn Battuta begins his decades-long journeys across the Islamic world and beyond."],[119,1337,"The Hundred Years' War begins between England and France."],[120,1338,"The Ashikaga shogunate is established in Japan following civil conflict."],[121,1347,"The Black Death arrives in Europe, eventually killing an estimated third of the population."],[122,1347,"Genoese ships fleeing Crimea are blamed for carrying the Black Death into Sicily and onward into Europe."],[123,1350,"The Black Death reaches its peak mortality across Europe, reshaping labor and social structures."],[124,1368,"The Ming Dynasty is founded, ending Mongol Yuan rule in China."],[125,1370,"Timur (Tamerlane) begins building a vast Central Asian empire from his capital at Samarkand."],[126,1378,"The Western Schism splits the Catholic Church, with rival popes claiming legitimacy."],[127,1381,"The Peasants' Revolt erupts in England, challenging feudal obligations after the plague."],[128,1389,"The Battle of Kosovo cements Ottoman dominance over the Balkans."],[129,1396,"Ottoman forces crush a crusading army at the Battle of Nicopolis, securing dominance in the Balkans."],[130,1405,"Admiral Zheng He begins the first of his major maritime voyages for the Ming Dynasty."],[131,1405,"Timur (Tamerlane) dies while preparing to invade Ming China, ending his campaigns of conquest."],[132,1415,"English forces win a stunning victory over the French at the Battle of Agincourt."],[133,1420,"Portuguese explorers establish a settlement on Madeira, an early step in the Age of Exploration."],[134,1428,"The Aztec Triple Alliance is formed, establishing the Aztec Empire's dominance in central Mexico."],[135,1431,"Joan of Arc is burned at the stake in Rouen after being convicted of heresy."],[136,1439,"Johannes Gutenberg develops a practical movable-type printing press in Europe."],[137,1440,"The Aztec Empire begins major territorial expansion under Moctezuma I."],[138,1440,"Casimir IV becomes King of Poland, later uniting Poland and Lithuania more closely."],[139,1453,"Ottoman forces under Mehmed II capture Constantinople, ending the Byzantine Empire."],[140,1454,"The Peace of Lodi stabilizes relations among Italian city-states, fostering Renaissance culture."],[141,1455,"The Wars of the Roses begin between the houses of Lancaster and York in England."],[142,1455,"The Gutenberg Bible becomes the first major book printed in Europe using movable type."],[143,1467,"The Onin War breaks out in Japan, beginning over a century of civil conflict known as the Sengoku period."],[144,1478,"The Spanish Inquisition is formally established by Ferdinand and Isabella."],[145,1485,"The Wars of the Roses conclude with Henry Tudor's victory at Bosworth Field, founding the Tudor dynasty."],[146,1487,"Bartolomeu Dias becomes the first European to round the Cape of Good Hope."],[147,1492,"The Reconquista concludes as Spanish forces capture Granada, ending Muslim rule in Iberia."],[148,1492,"Christopher Columbus reaches the Americas, initiating sustained European contact with the New World."],[149,1494,"The Treaty of Tordesillas divides newly discovered lands outside Europe between Spain and Portugal."],[150,1497,"Vasco da Gama sets sail on the voyage that would open a sea route from Europe to India."],[151,1497,"John Cabot reaches the coast of North America on behalf of England."],[152,1498,"Vasco da Gama's fleet reaches India, opening a direct sea route between Europe and Asia."],[153,1501,"Michelangelo begins sculpting his statue of David in Florence."],[154,1503,"Leonardo da Vinci begins painting the Mona Lisa."],[155,1509,"Henry VIII becomes King of England, whose reign will reshape English religion and governance."],[156,1510,"The Portuguese establish a colonial foothold at Goa, expanding their Indian Ocean trade empire."],[157,1517,"The Ottomans conquer Egypt, ending Mamluk rule and gaining control of Mecca and Medina."],[158,1517,"Martin Luther posts his Ninety-Five Theses, sparking the Protestant Reformation."],[159,1519,"Hernán Cortés begins his conquest of the Aztec Empire in Mexico."],[160,1520,"Suleiman the Magnificent becomes Ottoman Sultan, beginning the empire's golden age."],[161,1521,"Ferdinand Magellan's expedition completes the first circumnavigation of the globe, though Magellan dies en route."],[162,1521,"Hernán Cortés completes the conquest of Tenochtitlan, ending the Aztec Empire."],[163,1526,"The Mughal Empire is founded in India after Babur's victory at the First Battle of Panipat."],[164,1533,"Francisco Pizarro captures the Inca emperor Atahualpa, beginning the Spanish conquest of the Inca Empire."],[165,1533,"Ivan the Terrible becomes Grand Prince of Moscow, later becoming Russia's first tsar."],[166,1534,"King Henry VIII breaks from the Catholic Church, establishing the Church of England."],[167,1541,"John Calvin establishes a theocratic government in Geneva, advancing the Reformed tradition."],[168,1543,"Nicolaus Copernicus publishes his heliocentric theory in 'De revolutionibus orbium coelestium.'"],[169,1545,"The Council of Trent convenes, launching the Catholic Counter-Reformation."],[170,1571,"Manila is founded by the Spanish, becoming a key hub in trans-Pacific galleon trade."],[171,1571,"The Holy League defeats the Ottoman navy at the Battle of Lepanto, halting Ottoman expansion in the Mediterranean."],[172,1588,"The English navy defeats the Spanish Armada, securing English naval power."],[173,1588,"Toyotomi Hideyoshi's Sword Hunt Edict disarms the Japanese peasantry, consolidating samurai control."],[174,1592,"Japan invades Korea under Toyotomi Hideyoshi, beginning a costly seven-year war."],[175,1598,"The Edict of Nantes grants religious toleration to French Protestants, ending decades of religious war."],[176,1600,"The Battle of Sekigahara secures Tokugawa Ieyasu's dominance, paving the way for the Tokugawa shogunate."],[177,1600,"The British East India Company is chartered, beginning centuries of British commercial expansion in Asia."],[178,1602,"The Dutch East India Company is founded, often considered the first multinational corporation."],[179,1603,"Tokugawa Ieyasu establishes the Tokugawa shogunate, beginning over 250 years of Japanese isolation and stability."],[180,1607,"Jamestown is established as the first permanent English settlement in North America."],[181,1609,"Galileo Galilei improves the telescope and begins his revolutionary astronomical observations."],[182,1613,"Michael I is crowned Tsar of Russia, founding the Romanov dynasty."],[183,1618,"The Thirty Years' War begins in Central Europe following the Defenestration of Prague."],[184,1619,"The first recorded Africans are brought to English North America as enslaved laborers at Point Comfort, Virginia."],[185,1620,"The Mayflower brings Pilgrim settlers to Plymouth in present-day Massachusetts."],[186,1633,"Galileo Galilei is tried by the Roman Inquisition for supporting heliocentrism."],[187,1636,"Harvard College is founded, becoming the first institution of higher learning in British North America."],[188,1642,"The English Civil War begins between Parliamentarians and Royalists."],[189,1644,"The Manchu-led Qing Dynasty conquers Beijing, beginning nearly three centuries of rule in China."],[190,1648,"The Peace of Westphalia ends the Thirty Years' War and establishes the modern concept of state sovereignty."],[191,1649,"King Charles I of England is executed after being convicted of treason."],[192,1652,"The Dutch East India Company establishes a resupply station at the Cape of Good Hope."],[193,1658,"Oliver Cromwell dies, and England's republican Commonwealth soon gives way to the restored monarchy."],[194,1660,"The Royal Society is founded in London, becoming one of the world's oldest scientific institutions."],[195,1666,"The Great Fire of London destroys much of the medieval city."],[196,1683,"The Ottoman siege of Vienna is broken, marking the high-water mark of Ottoman expansion into Europe."],[197,1685,"Louis XIV revokes the Edict of Nantes, triggering the mass exodus of French Protestants."],[198,1687,"Isaac Newton publishes the 'Principia Mathematica,' laying out the laws of motion and universal gravitation."],[199,1688,"The Glorious Revolution replaces James II with William and Mary, strengthening parliamentary power in England."],[200,1690,"John Locke publishes his 'Two Treatises of Government,' influencing Enlightenment political thought."],[201,1701,"The War of the Spanish Succession begins, reshaping the balance of power in Europe."],[202,1701,"Yaa Asantewaa's Ashanti Empire consolidates power in West Africa through military expansion."],[203,1707,"The Acts of Union merge England and Scotland into the Kingdom of Great Britain."],[204,1712,"Thomas Newcomen builds the first practical steam engine, an early step toward industrialization."],[205,1721,"Robert Walpole becomes Britain's first de facto Prime Minister."],[206,1721,"Johann Sebastian Bach completes the Brandenburg Concertos, landmarks of Baroque music."],[207,1735,"Carl Linnaeus publishes 'Systema Naturae,' establishing modern biological taxonomy."],[208,1739,"Nader Shah of Persia sacks Delhi, dealing a crippling blow to Mughal power."],[209,1740,"Frederick the Great becomes King of Prussia and begins transforming it into a major European power."],[210,1751,"Denis Diderot begins publishing the Encyclopédie, a landmark work of the Enlightenment."],[211,1755,"Carl Linnaeus's classification system for living organisms gains wide scientific adoption."],[212,1755,"The Lisbon earthquake and tsunami devastate Portugal, killing tens of thousands."],[213,1756,"The Seven Years' War begins, becoming a global conflict fought across multiple continents."],[214,1757,"The British East India Company's victory at the Battle of Plassey opens the way to colonial control of Bengal."],[215,1762,"Catherine the Great becomes Empress of Russia, beginning a reign of major expansion and reform."],[216,1764,"James Hargreaves invents the spinning jenny, accelerating the textile industry's mechanization."],[217,1768,"James Cook departs on the first of his three Pacific voyages of exploration."],[218,1769,"James Watt patents a significantly improved steam engine, powering the Industrial Revolution."],[219,1770,"Captain James Cook charts the eastern coast of Australia and claims it for Britain."],[220,1772,"The First Partition of Poland begins the dismantling of the Polish-Lithuanian Commonwealth."],[221,1773,"American colonists stage the Boston Tea Party in protest of British taxation."],[222,1775,"Fighting breaks out between British troops and colonial militia at Lexington and Concord, beginning the American Revolutionary War."],[223,1776,"Adam Smith publishes 'The Wealth of Nations,' a foundational text of modern economics."],[224,1776,"The Second Continental Congress adopts the Declaration of Independence, founding the United States."],[225,1779,"Captain James Cook is killed in a conflict with Native Hawaiians during his third Pacific voyage."],[226,1781,"British forces surrender at Yorktown, effectively ending major fighting in the American Revolution."],[227,1783,"The Montgolfier brothers launch the first manned hot air balloon flight."],[228,1783,"The Treaty of Paris formally ends the American Revolutionary War and recognizes U.S. independence."],[229,1787,"Delegates sign the United States Constitution in Philadelphia, establishing a new framework of government."],[230,1789,"George Washington is inaugurated as the first President of the United States."],[231,1789,"Revolutionaries storm the Bastille in Paris, marking the start of the French Revolution."],[232,1791,"The Haitian Revolution begins, eventually leading to the first successful slave-led independence movement."],[233,1791,"The Bill of Rights is ratified, adding fundamental protections to the U.S. Constitution."],[234,1792,"France is declared a republic, abolishing the monarchy amid the Revolution."],[235,1793,"Eli Whitney invents the cotton gin, transforming and expanding American slavery-based agriculture."],[236,1793,"King Louis XVI of France is executed by guillotine during the Revolution's Reign of Terror."],[237,1794,"The Reign of Terror ends with the execution of Maximilien Robespierre."],[238,1796,"Edward Jenner develops the first successful smallpox vaccine."],[239,1798,"Napoleon invades Egypt, and his soldiers discover the Rosetta Stone."],[240,1798,"Edward Jenner publishes his research on vaccination against smallpox."],[241,1799,"Napoleon Bonaparte seizes power in France in the Coup of 18 Brumaire."],[242,1803,"The Louisiana Purchase doubles the size of the United States through a land deal with France."],[243,1803,"The Haitian Revolution's forces decisively defeat Napoleon's army at the Battle of Vertières."],[244,1804,"Toussaint Louverture's successors declare Haiti's independence, ending French colonial rule."],[245,1804,"Napoleon crowns himself Emperor of the French, consolidating his rule."],[246,1806,"Napoleon dissolves the Holy Roman Empire after thirteen centuries of nominal existence."],[247,1807,"Britain passes the Slave Trade Act, abolishing the transatlantic slave trade within its empire."],[248,1807,"Robert Fulton's steamboat Clermont makes its successful voyage on the Hudson River."],[249,1808,"The Peninsular War begins as Napoleon's forces occupy Spain and Portugal."],[250,1810,"Mexican priest Miguel Hidalgo issues his 'Cry of Dolores,' beginning Mexico's war of independence."],[251,1812,"Napoleon invades Russia with the Grande Armée, a campaign that ends in catastrophic retreat."],[252,1814,"The Congress of Vienna convenes to redraw Europe's map after the Napoleonic Wars."],[253,1814,"George Stephenson builds his first successful steam locomotive."],[254,1815,"Napoleon is decisively defeated at the Battle of Waterloo, ending his rule."],[255,1817,"Construction begins on the Erie Canal, later transforming U.S. commerce."],[256,1819,"The Peterloo Massacre in Manchester galvanizes the British movement for parliamentary reform."],[257,1821,"Simón Bolívar's forces secure victory at Carabobo, cementing Venezuelan independence from Spain."],[258,1821,"Greek revolutionaries rise against Ottoman rule, beginning the Greek War of Independence."],[259,1821,"Mexico achieves independence from Spain after over a decade of conflict."],[260,1822,"Brazil declares independence from Portugal."],[261,1823,"The United States articulates the Monroe Doctrine, opposing European colonization in the Americas."],[262,1825,"The Stockton and Darlington Railway opens as the world's first public railway to use steam locomotives."],[263,1825,"Sudden collapse of major British banks triggers one of the first modern financial panics."],[264,1830,"The July Revolution in France replaces King Charles X with Louis Philippe."],[265,1830,"The first regular steam-powered passenger railway, the Liverpool and Manchester Railway, opens."],[266,1830,"France begins its conquest and colonization of Algeria."],[267,1830,"Charles Lyell publishes 'Principles of Geology,' influencing Darwin and reshaping earth science."],[268,1833,"The British Parliament passes the Slavery Abolition Act, ending slavery across most of the British Empire."],[269,1836,"The Battle of the Alamo becomes a rallying point in the Texas Revolution against Mexico."],[270,1837,"Queen Victoria ascends the British throne, beginning a 63-year reign."],[271,1838,"The Trail of Tears forced relocation of Cherokee and other Native peoples reaches its deadliest phase."],[272,1839,"The First Opium War begins between Britain and Qing China over trade and opium imports."],[273,1839,"Louis Daguerre publicly announces the daguerreotype photographic process."],[274,1840,"Britain and Māori chiefs sign the Treaty of Waitangi, founding modern New Zealand."],[275,1842,"The Treaty of Nanking ends the First Opium War and cedes Hong Kong to Britain."],[276,1844,"Samuel Morse sends the first long-distance telegraph message, revolutionizing communication."],[277,1845,"The Great Famine begins in Ireland, causing mass death and emigration over the following years."],[278,1846,"The Mexican-American War begins, eventually resulting in vast U.S. territorial gains."],[279,1848,"A wave of revolutions sweeps across Europe demanding liberal reforms."],[280,1848,"Karl Marx and Friedrich Engels publish 'The Communist Manifesto.'"],[281,1848,"Gold is discovered at Sutter's Mill, triggering the California Gold Rush."],[282,1849,"The Seneca Falls Convention's aftermath fuels the growing women's suffrage movement in the U.S."],[283,1850,"The Taiping Rebellion breaks out in China, becoming one of history's deadliest civil wars."],[284,1851,"The Great Exhibition opens in London's Crystal Palace, showcasing global industrial achievement."],[285,1853,"Commodore Matthew Perry's expedition forces the opening of Japan to Western trade."],[286,1853,"The Crimean War begins, pitting Russia against an alliance including Britain, France, and the Ottomans."],[287,1854,"Commodore Perry's treaty formally opens Japanese ports to American trade."],[288,1854,"John Snow traces a London cholera outbreak to a contaminated water pump, founding modern epidemiology."],[289,1857,"The Indian Rebellion against East India Company rule breaks out, reshaping British colonial policy."],[290,1858,"The Indian Rebellion's aftermath leads to the British Crown formally assuming direct control of India."],[291,1859,"Charles Darwin publishes 'On the Origin of Species,' introducing the theory of evolution by natural selection."],[292,1859,"Edwin Drake drills the first commercially successful oil well in Pennsylvania."],[293,1859,"The world's first modern oil well begins production in Titusville, Pennsylvania."],[294,1860,"Abraham Lincoln is elected President, prompting Southern states to begin seceding from the Union."],[295,1861,"The American Civil War begins after the Confederate attack on Fort Sumter."],[296,1862,"Otto von Bismarck becomes Minister President of Prussia and begins his campaign for German unification."],[297,1863,"President Abraham Lincoln issues the Emancipation Proclamation, declaring enslaved people in Confederate states free."],[298,1863,"The Battle of Gettysburg becomes the turning point of the American Civil War."],[299,1865,"The American Civil War ends with the Confederate surrender at Appomattox Court House."],[300,1865,"President Abraham Lincoln is assassinated by John Wilkes Booth."],[301,1866,"Gregor Mendel publishes his laws of inheritance, founding the science of genetics."],[302,1867,"Russia sells Alaska to the United States for $7.2 million."],[303,1867,"Alfred Nobel patents dynamite, revolutionizing construction, mining, and warfare."],[304,1867,"Canada becomes a self-governing dominion within the British Empire."],[305,1868,"The Meiji Restoration begins in Japan, launching rapid modernization and industrialization."],[306,1869,"The transcontinental railroad is completed in the United States at Promontory Summit."],[307,1869,"The Suez Canal opens, connecting the Mediterranean and Red Seas."],[308,1870,"Italian unification is completed with the capture of Rome."],[309,1871,"The Paris Commune briefly governs the French capital before being violently suppressed."],[310,1871,"Otto von Bismarck proclaims the unification of Germany at the Palace of Versailles."],[311,1873,"A global economic downturn known as the Long Depression begins after a financial panic."],[312,1876,"Chief Sitting Bull and allied Plains tribes defeat Custer's forces at Little Bighorn."],[313,1876,"Alexander Graham Bell is awarded a patent for the telephone."],[314,1876,"Sioux and Cheyenne warriors defeat U.S. forces at the Battle of the Little Bighorn."],[315,1877,"Thomas Edison invents the phonograph, the first device to record and reproduce sound."],[316,1878,"The Congress of Berlin redraws the map of the Balkans following Ottoman decline."],[317,1879,"Thomas Edison demonstrates a practical incandescent light bulb."],[318,1879,"The Anglo-Zulu War sees Zulu forces win a stunning early victory at Isandlwana before eventual defeat."],[319,1884,"The Berlin Conference regulates European colonization and trade in Africa, accelerating the 'Scramble for Africa.'"],[320,1884,"The International Meridian Conference establishes Greenwich as the world's prime meridian."],[321,1884,"Charles Parsons invents the steam turbine, later revolutionizing electricity generation and ship propulsion."],[322,1885,"Karl Benz builds the first practical automobile powered by an internal combustion engine."],[323,1885,"The Berlin Conference concludes, formalizing the European colonial partition of Africa."],[324,1886,"The Statue of Liberty is dedicated in New York Harbor."],[325,1889,"The Eiffel Tower opens as the centerpiece of the Paris World's Fair."],[326,1890,"U.S. troops kill hundreds of Lakota at Wounded Knee, marking a brutal end to the American Indian Wars."],[327,1893,"New Zealand becomes the first self-governing country to grant women the right to vote."],[328,1894,"The First Sino-Japanese War breaks out over influence in Korea."],[329,1895,"Wilhelm Röntgen discovers X-rays, opening a new field of medical imaging."],[330,1895,"Wilhelm Conrad Röntgen's discovery of X-rays earns him the first Nobel Prize in Physics."],[331,1896,"The first modern Olympic Games open in Athens."],[332,1896,"Guglielmo Marconi develops early practical wireless radio telegraphy."],[333,1898,"The Spanish–American War results in the U.S. gaining control of Puerto Rico, Guam, and the Philippines."],[334,1898,"Marie and Pierre Curie discover the radioactive elements polonium and radium."],[335,1899,"The Second Boer War begins between Britain and Boer republics in South Africa."],[336,1900,"The Boxer Rebellion against foreign influence in China is suppressed by an international coalition."],[337,1900,"Max Planck introduces quantum theory, laying groundwork for modern physics."],[338,1901,"Guglielmo Marconi transmits the first transatlantic radio signal."],[339,1903,"The Wright brothers achieve the first powered, controlled flight at Kitty Hawk."],[340,1904,"The Russo-Japanese War begins, marking the first major modern military victory of an Asian power over a European one."],[341,1905,"The 1905 Russian Revolution forces Tsar Nicholas II to concede limited constitutional reforms."],[342,1905,"A German colonial genocide of the Herero and Nama peoples begins in South-West Africa."],[343,1905,"Albert Einstein's 'miracle year' produces four papers that transform physics, including special relativity."],[344,1908,"Henry Ford introduces the Model T, making automobiles affordable for the mass market."],[345,1908,"Bulgaria declares independence from the Ottoman Empire amid the empire's continued decline."],[346,1908,"The Young Turk Revolution restores constitutional rule in the Ottoman Empire."],[347,1909,"Robert Peary's expedition claims to reach the North Pole."],[348,1910,"The Mexican Revolution begins, leading to a decade of upheaval and social reform."],[349,1911,"The Xinhai Revolution overthrows the Qing Dynasty, ending over two millennia of imperial rule in China."],[350,1911,"Roald Amundsen and his team become the first to reach the geographic South Pole."],[351,1912,"China's imperial system formally ends as the Republic of China is established."],[352,1912,"The RMS Titanic sinks after striking an iceberg, killing over 1,500 people."],[353,1913,"Henry Ford introduces the moving assembly line, revolutionizing mass production."],[354,1914,"The assassination of Archduke Franz Ferdinand in Sarajevo triggers the outbreak of World War I."],[355,1915,"The Ottoman government begins the mass deportation and killing of Armenians, an event recognized by many as genocide."],[356,1915,"Albert Einstein publishes his general theory of relativity."],[357,1916,"The Battle of the Somme becomes one of the bloodiest battles in human history."],[358,1916,"The secret Sykes-Picot Agreement divides Ottoman territories between Britain and France."],[359,1916,"The Easter Rising in Dublin sets the stage for Irish independence."],[360,1917,"The Bolsheviks seize power in Russia in the October Revolution, founding the world's first communist state."],[361,1917,"The United States enters World War I on the side of the Allies."],[362,1917,"The Balfour Declaration expresses British support for a Jewish homeland in Palestine."],[363,1918,"The influenza pandemic, one of history's deadliest, kills tens of millions worldwide."],[364,1918,"World War I ends with the signing of the Armistice of Compiègne."],[365,1919,"Mahatma Gandhi launches his campaign of nonviolent resistance against British rule in India."],[366,1919,"The Treaty of Versailles formally ends World War I and imposes harsh terms on Germany."],[367,1920,"The League of Nations is established as the first worldwide intergovernmental organization."],[368,1920,"The 19th Amendment grants women the right to vote in the United States."],[369,1921,"Frederick Banting and colleagues discover insulin, transforming diabetes treatment."],[370,1921,"Adolf Hitler becomes leader of the Nazi Party in Germany."],[371,1922,"Benito Mussolini's March on Rome brings the Fascist Party to power in Italy."],[372,1922,"The Ottoman Empire is formally abolished, and Mustafa Kemal Atatürk founds modern Turkey."],[373,1922,"Howard Carter discovers the tomb of Tutankhamun in Egypt's Valley of the Kings."],[374,1923,"Hyperinflation in Weimar Germany peaks, devastating the German economy."],[375,1925,"The Scopes Trial in Tennessee puts the teaching of evolution on national trial in the U.S."],[376,1927,"The first talking motion picture, 'The Jazz Singer,' premieres."],[377,1927,"Werner Heisenberg formulates the uncertainty principle, a cornerstone of quantum mechanics."],[378,1927,"Charles Lindbergh completes the first solo nonstop transatlantic flight."],[379,1928,"Alexander Fleming discovers penicillin, launching the age of antibiotics."],[380,1929,"Alexander Fleming's laboratory observation of mold killing bacteria leads toward the discovery of penicillin."],[381,1929,"The Wall Street Crash triggers the beginning of the Great Depression."],[382,1931,"Japan invades Manchuria, beginning a period of aggressive expansion in Asia."],[383,1932,"The Holodomor famine begins in Soviet Ukraine, killing millions under Stalin's collectivization policy."],[384,1933,"Franklin D. Roosevelt launches the New Deal to combat the Great Depression."],[385,1933,"Franklin D. Roosevelt is inaugurated president amid the depths of the Great Depression."],[386,1933,"Adolf Hitler is appointed Chancellor of Germany, beginning the Nazi regime."],[387,1935,"The Nuremberg Laws institutionalize racial persecution of Jews in Nazi Germany."],[388,1935,"Persia is officially renamed Iran, reflecting a modernizing nationalist government."],[389,1936,"The Spanish Civil War begins, becoming a testing ground for tactics used in World War II."],[390,1936,"Jesse Owens wins four gold medals at the Berlin Olympics, undermining Nazi racial ideology."],[391,1936,"Germany and Italy form the Rome-Berlin Axis, foreshadowing their World War II alliance."],[392,1937,"Japanese forces commit mass atrocities during the Nanjing Massacre following the invasion of China."],[393,1938,"Nazi Germany orchestrates Kristallnacht, a violent pogrom against Jews across Germany and Austria."],[394,1939,"Germany invades Poland, precipitating the outbreak of World War II."],[395,1939,"Britain and France declare war on Germany after its invasion of Poland."],[396,1940,"The Battle of Britain sees the Royal Air Force repel the Luftwaffe's air campaign."],[397,1941,"Nazi Germany launches Operation Barbarossa, invading the Soviet Union."],[398,1941,"Japan attacks the U.S. naval base at Pearl Harbor, bringing the United States into World War II."],[399,1942,"The Battle of Stalingrad turns the tide of World War II against Nazi Germany."],[400,1942,"The Battle of Midway becomes a decisive U.S. naval victory over Japan in the Pacific."],[401,1942,"The Wannsee Conference formalizes Nazi Germany's plan for the systematic mass murder of Europe's Jews."],[402,1943,"Allied forces invade Sicily, opening a new front against Axis powers in Europe."],[403,1943,"Soviet forces achieve a decisive victory at Stalingrad, forcing a major German surrender."],[404,1944,"The Bretton Woods Conference establishes the IMF and World Bank to stabilize the postwar economy."],[405,1944,"Allied forces land in Normandy on D-Day, opening a decisive western front in Europe."],[406,1945,"Soviet forces liberate the Auschwitz concentration camp, revealing the scale of the Holocaust."],[407,1945,"Nazi Germany surrenders unconditionally, ending the war in Europe on V-E Day."],[408,1945,"The San Francisco Conference finalizes the United Nations Charter."],[409,1945,"The United States drops atomic bombs on Hiroshima and Nagasaki, hastening Japan's surrender."],[410,1945,"World War II formally ends with Japan's surrender aboard the USS Missouri."],[411,1945,"The United Nations is founded to promote international cooperation and prevent future wars."],[412,1946,"The Nuremberg Trials conclude, holding Nazi leaders accountable for war crimes."],[413,1946,"Winston Churchill delivers his 'Iron Curtain' speech, signaling the start of Cold War rhetoric."],[414,1947,"The Marshall Plan is announced to fund the reconstruction of war-torn Western Europe."],[415,1947,"The transistor is invented at Bell Labs, laying the foundation for modern electronics."],[416,1947,"India and Pakistan achieve independence from British rule amid mass, violent partition."],[417,1948,"The Soviet Union blockades West Berlin, prompting the Berlin Airlift."],[418,1948,"Apartheid is formally instituted as government policy in South Africa."],[419,1948,"Mahatma Gandhi is assassinated in New Delhi."],[420,1948,"The State of Israel declares independence, and neighboring Arab states launch an invasion."],[421,1948,"The United Nations adopts the Universal Declaration of Human Rights."],[422,1949,"The Soviet Union successfully tests its first atomic bomb, ending the U.S. nuclear monopoly."],[423,1949,"NATO is founded as a collective defense alliance among North American and European states."],[424,1949,"The Soviet blockade of Berlin ends after the successful Allied airlift."],[425,1949,"Mao Zedong proclaims the founding of the People's Republic of China."],[426,1950,"The People's Republic of China intervenes in the Korean War after UN forces approach the Yalu River."],[427,1950,"The People's Republic of China annexes Tibet, asserting direct control."],[428,1950,"North Korean forces invade South Korea, starting the Korean War."],[429,1952,"The United Kingdom becomes the third nation to test a nuclear weapon."],[430,1952,"The United States tests the first hydrogen bomb, dramatically escalating the nuclear arms race."],[431,1953,"James Watson and Francis Crick describe the double-helix structure of DNA."],[432,1953,"Jonas Salk announces a successful vaccine trial against polio."],[433,1953,"Britain and the U.S. help orchestrate a coup that overthrows Iran's Prime Minister Mohammad Mosaddegh."],[434,1953,"Edmund Hillary and Tenzing Norgay become the first climbers confirmed to reach the summit of Mount Everest."],[435,1954,"France's defeat at Dien Bien Phu ends French colonial rule in Indochina."],[436,1954,"The Geneva Accords temporarily divide Vietnam at the 17th parallel following French defeat."],[437,1954,"The U.S. Supreme Court rules in Brown v. Board of Education that racial segregation in public schools is unconstitutional."],[438,1955,"The Bandung Conference brings together newly independent Asian and African nations, launching the Non-Aligned Movement."],[439,1955,"Rosa Parks' arrest for refusing to give up her bus seat sparks the Montgomery Bus Boycott."],[440,1956,"The Suez Crisis erupts after Egypt nationalizes the Suez Canal."],[441,1956,"Soviet tanks crush the Hungarian Revolution against communist rule."],[442,1957,"The Treaty of Rome establishes the European Economic Community, forerunner of the EU."],[443,1957,"Ghana becomes the first sub-Saharan African colony to achieve independence."],[444,1957,"The Soviet Union launches Sputnik 1, the first artificial satellite, beginning the Space Race."],[445,1959,"Fidel Castro's revolutionaries overthrow the Batista government in Cuba."],[446,1959,"The Antarctic Treaty sets aside the continent as a scientific preserve free of military activity."],[447,1960,"Seventeen African nations achieve independence in what becomes known as the 'Year of Africa.'"],[448,1960,"The contraceptive pill is approved for use in the United States, transforming reproductive rights."],[449,1961,"The Bay of Pigs invasion, a failed CIA-backed attempt to overthrow Fidel Castro, embarrasses the United States."],[450,1961,"Soviet cosmonaut Yuri Gagarin becomes the first human in space."],[451,1961,"Construction of the Berlin Wall begins, physically dividing East and West Berlin."],[452,1962,"The Cuban Missile Crisis brings the U.S. and Soviet Union to the brink of nuclear war."],[453,1962,"Algeria achieves independence from France after a long and brutal war."],[454,1962,"Rachel Carson publishes 'Silent Spring,' galvanizing the modern environmental movement."],[455,1963,"The Partial Nuclear Test Ban Treaty is signed by the U.S., UK, and Soviet Union."],[456,1963,"Martin Luther King Jr. delivers his 'I Have a Dream' speech during the March on Washington."],[457,1963,"President John F. Kennedy is assassinated in Dallas, Texas."],[458,1964,"Nelson Mandela is sentenced to life imprisonment at the Rivonia Trial in South Africa."],[459,1964,"The U.S. Civil Rights Act outlaws discrimination based on race, color, religion, sex, or national origin."],[460,1965,"The U.S. begins sustained bombing of North Vietnam and deploys ground combat troops."],[461,1965,"The U.S. Voting Rights Act outlaws discriminatory voting practices used to disenfranchise Black Americans."],[462,1966,"China's Cultural Revolution begins, leading to a decade of political upheaval under Mao Zedong."],[463,1967,"Israel wins a decisive victory in the Six-Day War, reshaping regional borders."],[464,1967,"The first human heart transplant is performed by Dr. Christiaan Barnard in South Africa."],[465,1968,"The Tet Offensive shifts American public opinion against the Vietnam War."],[466,1968,"Soviet-led Warsaw Pact forces invade Czechoslovakia, crushing the Prague Spring reforms."],[467,1968,"Martin Luther King Jr. is assassinated in Memphis, Tennessee."],[468,1969,"The Woodstock music festival becomes a defining moment of 1960s counterculture."],[469,1969,"ARPANET, the precursor to the internet, sends its first message between university computers."],[470,1969,"The Stonewall riots in New York City galvanize the modern LGBTQ rights movement."],[471,1969,"NASA's Apollo 11 mission lands the first humans on the Moon."],[472,1971,"East Pakistan secedes to become the independent nation of Bangladesh after a brutal war."],[473,1971,"Intel releases the first commercial microprocessor, the 4004, enabling the personal computer revolution."],[474,1972,"U.S. President Richard Nixon visits China, beginning the normalization of Sino-American relations."],[475,1972,"The Munich Olympics are marred by a hostage crisis and massacre of Israeli athletes."],[476,1973,"The Yom Kippur War and subsequent oil embargo trigger a global energy crisis."],[477,1973,"The Endangered Species Act is signed into law in the United States, shaping global conservation policy."],[478,1973,"The Chilean military, led by Augusto Pinochet, overthrows President Salvador Allende in a coup."],[479,1974,"Ethiopian Emperor Haile Selassie is deposed, ending a monarchy dating back centuries."],[480,1974,"President Richard Nixon resigns following the Watergate scandal."],[481,1975,"The Khmer Rouge seizes power in Cambodia, beginning a genocidal regime."],[482,1975,"Civil war engulfs Angola and Mozambique as Portugal's African colonies gain independence."],[483,1975,"The Vietnam War ends with the fall of Saigon to North Vietnamese forces."],[484,1976,"Apple I is designed by Steve Wozniak, beginning Apple's rise in personal computing."],[485,1976,"Students in Soweto, South Africa, launch protests against apartheid education policy that turn deadly."],[486,1977,"Apple Computer is incorporated, helping launch the personal computer revolution."],[487,1978,"The Camp David Accords lay the groundwork for peace between Egypt and Israel."],[488,1978,"China begins market-oriented economic reforms under Deng Xiaoping, transforming its economy."],[489,1979,"The Iranian Revolution overthrows the Shah and establishes an Islamic republic."],[490,1979,"The Soviet Union invades Afghanistan, beginning a decade-long war."],[491,1979,"Margaret Thatcher becomes the first female Prime Minister of the United Kingdom."],[492,1979,"Margaret Thatcher's election win begins a decade of major economic restructuring in Britain."],[493,1980,"The Iran-Iraq War begins, becoming one of the longest conventional wars of the 20th century."],[494,1980,"Poland's Solidarity movement emerges as the first independent trade union in the Soviet bloc."],[495,1981,"The first identified cases of what becomes known as AIDS are reported in the United States."],[496,1981,"IBM releases its first personal computer, standardizing much of the PC industry."],[497,1982,"The Falklands War is fought between the United Kingdom and Argentina."],[498,1983,"The first commercial mobile phone call is made, beginning the cellular communication era."],[499,1984,"A gas leak at a Union Carbide plant in Bhopal, India, becomes one of history's worst industrial disasters."],[500,1985,"Mikhail Gorbachev becomes Soviet leader and begins reforms of glasnost and perestroika."],[501,1986,"The Single European Act deepens economic integration among European Community members."],[502,1986,"The Chernobyl nuclear disaster releases massive radioactive contamination across Europe."],[503,1988,"Iran and Iraq agree to a ceasefire, ending their eight-year war."],[504,1989,"Massive pro-democracy demonstrations sweep Eastern Europe, toppling communist governments."],[505,1989,"Pro-democracy protests in Beijing's Tiananmen Square are violently suppressed by the Chinese military."],[506,1989,"The fall of the Berlin Wall symbolizes the collapse of communist rule in Eastern Europe."],[507,1990,"Nelson Mandela is released from prison after 27 years, hastening the end of apartheid."],[508,1990,"Iraq invades Kuwait, prompting the U.S.-led Gulf War coalition."],[509,1990,"East and West Germany are formally reunified."],[510,1991,"The Gulf War concludes with the liberation of Kuwait from Iraqi occupation."],[511,1991,"The World Wide Web's first public webpage goes live, created by Tim Berners-Lee."],[512,1991,"The Soviet Union formally dissolves, ending the Cold War era."],[513,1992,"The Bosnian War begins after Bosnia and Herzegovina's declaration of independence, including the start of the Siege of Sarajevo."],[514,1993,"The World Wide Web is released into the public domain, opening the internet to mass use."],[515,1993,"Israel and the PLO sign the Oslo Accords, establishing limited Palestinian self-rule."],[516,1993,"The World Trade Center in New York is bombed by terrorists, foreshadowing later attacks."],[517,1994,"Nelson Mandela is elected President in South Africa's first fully democratic elections."],[518,1994,"The Rwandan genocide kills an estimated 800,000 people over roughly 100 days."],[519,1994,"The North American Free Trade Agreement takes effect, integrating the economies of the U.S., Canada, and Mexico."],[520,1995,"The World Trade Organization is established to govern international trade rules."],[521,1995,"The Srebrenica massacre becomes the worst atrocity in Europe since World War II."],[522,1996,"The Taliban capture Kabul and impose strict Islamist rule over most of Afghanistan."],[523,1997,"Scottish scientists announce the cloning of Dolly the sheep, the first mammal cloned from an adult cell."],[524,1997,"Hong Kong is handed over from British to Chinese sovereignty."],[525,1998,"Google is founded, later becoming the dominant global internet search engine."],[526,1998,"The Good Friday Agreement largely ends decades of sectarian conflict in Northern Ireland."],[527,1999,"The euro is introduced as a virtual currency among eleven European Union member states."],[528,1999,"NATO conducts air strikes against Yugoslavia over the Kosovo conflict."],[529,2000,"The Human Genome Project announces a working draft of the complete human genetic sequence."],[530,2001,"Coordinated terrorist attacks strike the World Trade Center and Pentagon on September 11."],[531,2002,"Euro banknotes and coins enter circulation, replacing national currencies across much of the EU."],[532,2003,"China becomes the third nation to independently send a human into space."],[533,2003,"A U.S.-led coalition invades Iraq, toppling the government of Saddam Hussein."],[534,2004,"Facebook is founded, later becoming the world's largest social media platform."],[535,2004,"Facebook and other early social networks begin reshaping global communication."],[536,2004,"A massive undersea earthquake triggers the Indian Ocean tsunami, killing over 230,000 people."],[537,2005,"Hurricane Katrina devastates New Orleans and the U.S. Gulf Coast."],[538,2006,"North Korea conducts its first confirmed nuclear weapons test."],[539,2007,"Apple releases the first iPhone, transforming mobile computing and communication."],[540,2008,"China hosts the Beijing Summer Olympics, symbolizing its emergence as a global power."],[541,2008,"The collapse of Lehman Brothers triggers a global financial crisis."],[542,2008,"Barack Obama is elected the first Black President of the United States."],[543,2009,"A global swine flu (H1N1) pandemic prompts the WHO's first pandemic declaration in decades."],[544,2009,"The Treaty of Lisbon enters into force, restructuring the European Union's institutions and creating a permanent EU Council presidency."],[545,2010,"The Deepwater Horizon oil spill becomes the largest marine oil spill in history."],[546,2010,"A street vendor's self-immolation in Tunisia sparks the Arab Spring uprisings across the Middle East."],[547,2011,"Popular uprisings topple longtime rulers in Tunisia and Egypt during the Arab Spring."],[548,2011,"A massive earthquake and tsunami trigger the Fukushima nuclear disaster in Japan."],[549,2011,"U.S. special forces kill al-Qaeda leader Osama bin Laden in Pakistan."],[550,2011,"South Sudan becomes the world's newest independent nation."],[551,2012,"The Battle of Aleppo begins in Syria's civil war, becoming one of the most destructive urban battles of the conflict."],[552,2012,"The Higgs boson particle is confirmed at CERN's Large Hadron Collider, validating the Standard Model of physics."],[553,2013,"Pope Francis is elected as the first pope from the Americas."],[554,2014,"Russia annexes Crimea from Ukraine following a disputed referendum."],[555,2014,"The Ebola epidemic in West Africa becomes the deadliest outbreak of the virus on record."],[556,2015,"The Islamic State group captures the ancient city of Palmyra and destroys many of its monuments."],[557,2015,"Same-sex marriage is legalized nationwide in the United States by Supreme Court ruling."],[558,2015,"Nearly 200 nations adopt the Paris Agreement on climate change."],[559,2016,"The United Kingdom votes in a referendum to leave the European Union."],[560,2016,"Donald Trump is elected President of the United States in a major political upset."],[561,2017,"New York Times reporting on sexual abuse allegations against film producer Harvey Weinstein ignites the global #MeToo movement."],[562,2019,"Cases of a novel coronavirus are first identified in Wuhan, China."],[563,2019,"Notre-Dame Cathedral in Paris suffers major fire damage."],[564,2019,"Greta Thunberg-inspired global climate strikes draw an estimated four million participants across more than 150 countries."],[565,2020,"Global lockdowns are imposed as the COVID-19 pandemic spreads worldwide, disrupting economies and societies."],[566,2020,"The World Health Organization declares COVID-19 a global pandemic."],[567,2021,"mRNA-based COVID-19 vaccines are administered on a mass scale for the first time."],[568,2021,"The Suez Canal is blocked for nearly a week after a container ship runs aground, disrupting global trade."],[569,2021,"The United States and allies complete a chaotic withdrawal from Afghanistan as the Taliban retakes control."],[570,2022,"Russia launches a full-scale invasion of Ukraine, triggering Europe's largest conflict since WWII."],[571,2022,"OpenAI releases ChatGPT, accelerating mainstream adoption of generative artificial intelligence."],[572,2023,"The Kahramanmaraş earthquake strikes southern Turkey and northern Syria, killing over 50,000 people."],[573,2023,"Hamas launches a large-scale attack on Israel, triggering a devastating war in Gaza."],[574,2024,"Donald Trump is elected to a second, non-consecutive term as President of the United States."],[575,2024,"Rebel forces capture Damascus and topple Bashar al-Assad's government, ending over five decades of Assad family rule in Syria."]];
+
+// ═══════════════════════════════════════════════
+//  DETERMINISTIC DAILY SELECTION
+//  A fixed shuffle order (seeded) is cycled through by day index, so
+//  every player sees the same clue on the same day, events appear in
+//  a shuffled (not dataset) order, and the full set is exhausted once
+//  before the cycle restarts.
+// ═══════════════════════════════════════════════
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, seed){
+  const rand = mulberry32(seed);
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const SHUFFLE_SEED = 20260101;
+const SHUFFLED_ORDER = seededShuffle([...Array(EVENTS.length).keys()], SHUFFLE_SEED);
+
+function getTodaysPuzzle(){
+  const epoch = Date.UTC(2025, 0, 1);
+  const now = new Date();
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const dayIndex = Math.max(0, Math.floor((today - epoch) / 86400000));
+  const puzzleIndex = dayIndex % EVENTS.length;
+  const eventIndex = SHUFFLED_ORDER[puzzleIndex];
+  const event = EVENTS[eventIndex];
+  return {
+    dayIndex,
+    // Bounded 1..EVENTS.length (which clue out of the set this is), rather
+    // than an ever-climbing day count — that stayed sensible only until the
+    // cycle first wrapped, after which numbers like "No. 598" looked wrong
+    // for a set of 575 clues.
+    puzzleNum: puzzleIndex + 1,
+    eventId: event[0],
+    year: event[1],
+    text: event[2],
+    answer: String(event[1]).padStart(4, '0')
+  };
+}
+
+// ═══════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════
+const puzzle = getTodaysPuzzle();
+const MAX_GUESSES = 4;
+const STATE_KEY = 'yeardle_state_v1';
+
+let guesses = [];        // [{digits:'0831', results:['red','red','green','red']}]
+let currentGuess = [];
+let currentRow = 0;
+let gameOver = false;
+let status = 'playing';  // 'playing' | 'won' | 'lost'
+let keyState = {};        // digit -> 'green' | 'red'
+let animating = false;
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed.dayIndex !== puzzle.dayIndex) return null;
+    return parsed;
+  }catch(e){ return null; }
+}
+function saveState(){
+  try{
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+      dayIndex: puzzle.dayIndex,
+      guesses,
+      status
+    }));
+  }catch(e){}
+}
+// ═══════════════════════════════════════════════
+//  EVALUATION — green if digit matches its position,
+//  red otherwise (no partial "wrong place" signal).
+// ═══════════════════════════════════════════════
+function evaluate(guessStr, answerStr){
+  const out = [];
+  for (let i = 0; i < 4; i++){
+    out.push(guessStr[i] === answerStr[i] ? 'green' : 'red');
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER: BOARD
+// ═══════════════════════════════════════════════
+const boardEl = document.getElementById('board');
+const rowEls = [];
+const tileEls = [];
+
+function buildBoard(){
+  boardEl.innerHTML = '';
+  for (let r = 0; r < MAX_GUESSES; r++){
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.id = 'row-' + r;
+    const tiles = [];
+    for (let c = 0; c < 4; c++){
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.id = 'tile-' + r + '-' + c;
+      row.appendChild(tile);
+      tiles.push(tile);
+    }
+    boardEl.appendChild(row);
+    rowEls.push(row);
+    tileEls.push(tiles);
+  }
+}
+
+function renderCurrentRow(){
+  if (currentRow >= MAX_GUESSES) return;
+  for (let c = 0; c < 4; c++){
+    const tile = tileEls[currentRow][c];
+    const digit = currentGuess[c];
+    tile.textContent = digit !== undefined ? digit : '';
+    tile.classList.toggle('filled', digit !== undefined);
+  }
+}
+
+function paintSubmittedRow(rowIndex, digits, results, animate){
+  const tiles = tileEls[rowIndex];
+  for (let c = 0; c < 4; c++){
+    tiles[c].textContent = digits[c];
+    tiles[c].classList.add('filled');
+  }
+  if (!animate){
+    for (let c = 0; c < 4; c++){
+      tiles[c].classList.remove('filled');
+      tiles[c].classList.add(results[c]);
+    }
+    return;
+  }
+  animating = true;
+  results.forEach((res, c) => {
+    setTimeout(() => {
+      const tile = tiles[c];
+      tile.classList.add('flip');
+      setTimeout(() => {
+        tile.classList.remove('filled');
+        tile.classList.add(res);
+      }, 250);
+      setTimeout(() => {
+        tile.classList.remove('flip');
+      }, 500);
+    }, c * 260);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER: KEYBOARD
+// ═══════════════════════════════════════════════
+const keyboardEl = document.getElementById('keyboard');
+const keyEls = {};
+
+function buildKeyboard(){
+  keyboardEl.innerHTML = '';
+  const row = document.createElement('div');
+  row.className = 'key-row';
+
+  const enterBtn = document.createElement('button');
+  enterBtn.className = 'key wide';
+  enterBtn.textContent = 'ENTER';
+  enterBtn.addEventListener('click', pressEnter);
+  row.appendChild(enterBtn);
+
+  ['1','2','3','4','5','6','7','8','9','0'].forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'key';
+    btn.textContent = d;
+    btn.addEventListener('click', () => pressDigit(d));
+    keyEls[d] = btn;
+    row.appendChild(btn);
+  });
+
+  const backBtn = document.createElement('button');
+  backBtn.className = 'key wide';
+  backBtn.textContent = '⌫';
+  backBtn.addEventListener('click', pressBack);
+  row.appendChild(backBtn);
+
+  keyboardEl.appendChild(row);
+}
+
+function updateKeyboardColors(){
+  Object.keys(keyState).forEach(d => {
+    const el = keyEls[d];
+    if (!el) return;
+    el.classList.remove('green', 'red');
+    el.classList.add(keyState[d]);
+  });
+}
+
+function setKeyboardDisabled(disabled){
+  Object.values(keyEls).forEach(el => el.disabled = disabled);
+}
+
+// ═══════════════════════════════════════════════
+//  INPUT HANDLERS
+// ═══════════════════════════════════════════════
+function pressDigit(d){
+  if (gameOver || animating) return;
+  if (currentGuess.length >= 4) return;
+  currentGuess.push(d);
+  renderCurrentRow();
+}
+
+function pressBack(){
+  if (gameOver || animating) return;
+  if (!currentGuess.length) return;
+  currentGuess.pop();
+  renderCurrentRow();
+}
+
+function pressEnter(){
+  if (gameOver || animating) return;
+  if (currentGuess.length < 4){
+    const row = rowEls[currentRow];
+    row.classList.remove('shake');
+    void row.offsetWidth;
+    row.classList.add('shake');
+    return;
+  }
+  submitGuess();
+}
+
+document.addEventListener('keydown', e => {
+  if (gameOver || animating) return;
+  if (e.key === 'Backspace'){ pressBack(); return; }
+  if (e.key === 'Enter'){ pressEnter(); return; }
+  if (/^[0-9]$/.test(e.key)) pressDigit(e.key);
+});
+
+// ═══════════════════════════════════════════════
+//  SUBMIT
+// ═══════════════════════════════════════════════
+function submitGuess(){
+  const digitsStr = currentGuess.join('');
+  const results = evaluate(digitsStr, puzzle.answer);
+  const rowIndex = currentRow;
+
+  paintSubmittedRow(rowIndex, currentGuess.slice(), results, true);
+
+  const totalDelay = 4 * 260 + 550;
+  setTimeout(() => {
+    animating = false;
+
+    currentGuess.forEach((d, i) => {
+      const res = results[i];
+      if (keyState[d] === 'green') return;
+      keyState[d] = res === 'green' ? 'green' : (keyState[d] === undefined ? 'red' : keyState[d]);
+    });
+    updateKeyboardColors();
+
+    guesses.push({ digits: digitsStr, results });
+    const won = digitsStr === puzzle.answer;
+
+    if (won){
+      status = 'won';
+      gameOver = true;
+      rowEls[rowIndex].classList.add('winner');
+      saveState();
+      setKeyboardDisabled(true);
+      setTimeout(showEndPopup, 700);
+    } else if (guesses.length >= MAX_GUESSES){
+      status = 'lost';
+      gameOver = true;
+      saveState();
+      setKeyboardDisabled(true);
+      setTimeout(showEndPopup, 300);
+    } else {
+      currentRow++;
+      currentGuess = [];
+      saveState();
+    }
+  }, totalDelay);
+}
+
+// ═══════════════════════════════════════════════
+//  END POPUP
+// ═══════════════════════════════════════════════
+let countdownInterval = null;
+
+function showEndPopup(){
+  const title = document.getElementById('endTitle');
+  const yearEl = document.getElementById('endYear');
+  const eventEl = document.getElementById('endEvent');
+  const gridEl = document.getElementById('endGrid');
+
+  title.textContent = status === 'won' ? '🎉 Nailed it!' : '📅 So close!';
+  yearEl.textContent = puzzle.year;
+  eventEl.textContent = puzzle.text;
+
+  gridEl.innerHTML = '';
+  guesses.forEach(g => {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'end-grid-row';
+    g.results.forEach(res => {
+      const sq = document.createElement('span');
+      sq.style.background = res === 'green' ? 'var(--green)' : 'var(--red)';
+      rowDiv.appendChild(sq);
+    });
+    gridEl.appendChild(rowDiv);
+  });
+
+  document.getElementById('endOverlay').classList.add('on');
+  startCountdown();
+}
+
+function startCountdown(){
+  const el = document.getElementById('countdownVal');
+  function tick(){
+    const now = new Date();
+    const nextMidnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+    let diff = Math.max(0, nextMidnight - now.getTime());
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = [h, m, s].map(x => String(x).padStart(2, '0')).join(':');
+  }
+  tick();
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(tick, 1000);
+}
+
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const scoreLabel = status === 'won' ? guesses.length + '/4' : 'X/4';
+  const lines = guesses.map(g => g.results.map(r => r === 'green' ? '🟩' : '🟥').join(''));
+  const text = `Yeardle #${puzzle.puzzleNum} ${scoreLabel}\n\n${lines.join('\n')}`;
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('shareBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    }).catch(() => {});
+  }
+});
+
+// ═══════════════════════════════════════════════
+//  POPUP WIRING
+// ═══════════════════════════════════════════════
+function setupPopup(btnId, overlayId, closeId){
+  document.getElementById(btnId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.add('on'));
+  document.getElementById(closeId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.remove('on'));
+  document.getElementById(overlayId)?.addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('on');
+  });
+}
+setupPopup('helpBtn', 'helpOverlay', 'helpClose');
+setupPopup(null, 'endOverlay', 'endClose');
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+function replaySavedState(saved){
+  guesses = saved.guesses || [];
+  status = saved.status || 'playing';
+  gameOver = status !== 'playing';
+  currentRow = guesses.length;
+
+  guesses.forEach((g, i) => {
+    paintSubmittedRow(i, g.digits.split(''), g.results, false);
+    g.digits.split('').forEach((d, idx) => {
+      const res = g.results[idx];
+      if (keyState[d] === 'green') return;
+      keyState[d] = res === 'green' ? 'green' : (keyState[d] === undefined ? 'red' : keyState[d]);
+    });
+  });
+  updateKeyboardColors();
+
+  if (status === 'won' && currentRow > 0){
+    rowEls[currentRow - 1].classList.add('winner');
+  }
+  if (gameOver){
+    setKeyboardDisabled(true);
+    setTimeout(showEndPopup, 400);
+  }
+}
+
+function init(){
+  document.getElementById('clueText').textContent = puzzle.text;
+  document.getElementById('puzzleNum').textContent = 'No. ' + puzzle.puzzleNum;
+  document.getElementById('flashcardMeta').textContent = 'Clue for Yeardle #' + puzzle.puzzleNum;
+  document.getElementById('dayInfo').textContent = 'Yeardle #' + puzzle.puzzleNum + ' · New clue daily at midnight UTC';
+
+  buildBoard();
+  buildKeyboard();
+
+  const saved = loadState();
+  if (saved){
+    replaySavedState(saved);
+  }
+  renderCurrentRow();
+}
+
+init();
+</script>
+</body>
+</html>
