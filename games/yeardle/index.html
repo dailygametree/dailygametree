@@ -288,7 +288,8 @@ footer {
 
 /* ---- Guess grid ---- */
 .board{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:28px}
-.row{display:flex;gap:8px;align-items:center}
+.row{position:relative;display:flex}
+.tile-group{display:flex;gap:8px}
 .row.shake{animation:shakeRow .5s}
 .row.winner .tile{animation:bounceTile .55s ease}
 .row.winner .tile:nth-child(1){animation-delay:.02s}
@@ -314,29 +315,35 @@ footer {
 .tile.green{background:var(--green);border-color:var(--green);color:#fff}
 .tile.red{background:var(--red);border-color:var(--red);color:#fff}
 
-/* ---- Higher/Lower row hint (appears right of each submitted row) ---- */
+/* ---- Higher/Lower row hint ----
+   Positioned absolutely, hanging off the right edge of the row, so it
+   never affects the row's own width — the tile-group stays perfectly
+   centered under the flashcard whether or not a hint is showing. */
 .row-hint{
+  position:absolute;
+  left:100%;
+  top:50%;
+  margin-left:12px;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   gap:2px;
-  width:36px;
-  flex-shrink:0;
-  margin-left:2px;
+  width:46px;
+  pointer-events:none;
   opacity:0;
-  transform:translateX(-4px);
+  transform:translate(-4px,-50%);
   transition:opacity .25s ease, transform .25s ease;
 }
-.row-hint.show{opacity:1;transform:translateX(0)}
+.row-hint.show{opacity:1;transform:translate(0,-50%)}
 .row-hint .hint-tri{font-size:17px;line-height:1;color:var(--accent)}
-.row-hint .hint-label{font-size:9px;font-weight:800;letter-spacing:.04em;color:var(--accent);white-space:nowrap}
+.row-hint .hint-label{font-size:9px;font-weight:800;letter-spacing:.02em;color:var(--accent);white-space:nowrap}
 
 @media(max-width:960px){
   .board{gap:8px;margin-bottom:18px}
-  .row{gap:6px}
+  .tile-group{gap:6px}
   .tile{width:clamp(44px,14vw,58px);height:clamp(44px,14vw,58px);font-size:clamp(18px,5.5vw,24px);border-radius:7px}
-  .row-hint{width:26px;margin-left:0}
+  .row-hint{width:36px;margin-left:6px}
   .row-hint .hint-tri{font-size:13px}
   .row-hint .hint-label{font-size:7px}
 }
@@ -660,14 +667,19 @@ function buildBoard(){
     const row = document.createElement('div');
     row.className = 'row';
     row.id = 'row-' + r;
+
+    const tileGroup = document.createElement('div');
+    tileGroup.className = 'tile-group';
     const tiles = [];
     for (let c = 0; c < 4; c++){
       const tile = document.createElement('div');
       tile.className = 'tile';
       tile.id = 'tile-' + r + '-' + c;
-      row.appendChild(tile);
+      tileGroup.appendChild(tile);
       tiles.push(tile);
     }
+    row.appendChild(tileGroup);
+
     const hint = document.createElement('div');
     hint.className = 'row-hint';
     hint.id = 'hint-' + r;
