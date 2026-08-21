@@ -71,7 +71,7 @@ a{ color:inherit; }
 
 .layout {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
 }
 
@@ -80,6 +80,12 @@ a{ color:inherit; }
   margin: 0 10px;
   position: sticky;
   top: 78px;
+  align-self: stretch;
+  display: flex;
+  /* Sticky elements are bounded by their own box. With align-items:stretch
+     on .layout, this rail's height now matches the tallest column
+     (main-content), instead of a fixed px value — so the ad fills all the
+     way down to the footer with no gap, and grows/shrinks with the page. */
 }
 
 .ad-slot {
@@ -95,9 +101,9 @@ a{ color:inherit; }
   justify-content: center;
   text-align: center;
   line-height: 1.6;
+  flex: 1 1 auto;
+  width: 100%;
 }
-
-.ad-rail .ad-slot { height: 600px; }
 
 .main-content {
   flex: 1;
@@ -118,7 +124,7 @@ a{ color:inherit; }
      which is far less fragile than trying to cram everything into one
      screen height (that approach is what caused elements to overlap). */
   .layout { flex-direction: column; align-items: stretch; }
-  .ad-rail { position: static; flex: 0 0 auto; width: 100%; margin: 10px 0; }
+  .ad-rail { position: static; flex: 0 0 auto; width: 100%; margin: 10px 0; align-self: auto; display: block; }
   .ad-rail.left { order: -1; }
   .main-content { order: 0; }
   .ad-rail.right { order: 1; }
@@ -215,9 +221,8 @@ footer {
 
 /* ---- Toolbar / title ---- */
 .title-block{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:4px}
-.title{font-family:var(--font-hand);font-weight:700;font-size:clamp(28px,6vw,40px);letter-spacing:.5px;color:var(--ink)}
-.title .title-accent{color:var(--accent)}
-.subtitle{font-size:12px;color:var(--ink-dim);letter-spacing:.04em;margin-top:2px;text-transform:uppercase}
+.title-logo{width:100%;max-width:280px;height:auto;display:block;margin:0 auto}
+.subtitle{font-size:12px;color:var(--ink-dim);letter-spacing:.04em;margin-top:6px;text-transform:uppercase}
 
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 22px}
 .toolbar-left,.toolbar-right{display:flex;align-items:center;gap:8px}
@@ -226,7 +231,7 @@ footer {
 .puzzle-num{font-size:12px;color:var(--ink-dim);font-weight:700;letter-spacing:.03em}
 
 @media(max-width:960px){
-  .title{font-size:clamp(22px,7vw,30px)}
+  .title-logo{max-width:210px}
   .toolbar{margin:12px 0 18px}
   .icon-btn{width:29px;height:29px;font-size:13px}
 }
@@ -456,7 +461,7 @@ footer {
               <div class="game-col">
 
                 <div class="title-block">
-                  <h1 class="title">Year<span class="title-accent">dle</span></h1>
+                  <h1 class="title"><img src="logo.png" alt="Yeardle" class="title-logo"></h1>
                   <div class="subtitle">Guess the year, one clue a day</div>
                 </div>
 
