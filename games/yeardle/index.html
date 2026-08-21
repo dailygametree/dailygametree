@@ -219,7 +219,7 @@ footer {
 .title .title-accent{color:var(--accent)}
 .subtitle{font-size:12px;color:var(--ink-dim);letter-spacing:.04em;margin-top:2px;text-transform:uppercase}
 
-.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 18px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 22px}
 .toolbar-left,.toolbar-right{display:flex;align-items:center;gap:8px}
 .icon-btn{width:34px;height:34px;border-radius:50%;border:2px solid var(--ink);background:transparent;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0;padding:0;line-height:1;color:var(--ink)}
 .icon-btn:hover{background:var(--ink);color:var(--paper)}
@@ -227,7 +227,7 @@ footer {
 
 @media(max-width:960px){
   .title{font-size:clamp(22px,7vw,30px)}
-  .toolbar{margin:8px 0 12px}
+  .toolbar{margin:12px 0 18px}
   .icon-btn{width:29px;height:29px;font-size:13px}
 }
 
@@ -281,14 +281,14 @@ footer {
 .flashcard-meta{margin-top:10px;font-size:11.5px;color:var(--ink-dim);text-align:center}
 
 @media(max-width:960px){
-  .flashcard-wrap{margin-bottom:14px}
+  .flashcard-wrap{margin-bottom:22px}
   .flashcard{padding:18px 18px 16px;min-height:0}
   .flashcard-clue{font-size:clamp(14px,4vw,17px)}
 }
 
 /* ---- Guess grid ---- */
-.board{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:22px}
-.row{display:flex;gap:8px}
+.board{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:28px}
+.row{display:flex;gap:8px;align-items:center}
 .row.shake{animation:shakeRow .5s}
 .row.winner .tile{animation:bounceTile .55s ease}
 .row.winner .tile:nth-child(1){animation-delay:.02s}
@@ -314,10 +314,31 @@ footer {
 .tile.green{background:var(--green);border-color:var(--green);color:#fff}
 .tile.red{background:var(--red);border-color:var(--red);color:#fff}
 
+/* ---- Higher/Lower row hint (appears right of each submitted row) ---- */
+.row-hint{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:2px;
+  width:36px;
+  flex-shrink:0;
+  margin-left:2px;
+  opacity:0;
+  transform:translateX(-4px);
+  transition:opacity .25s ease, transform .25s ease;
+}
+.row-hint.show{opacity:1;transform:translateX(0)}
+.row-hint .hint-tri{font-size:17px;line-height:1;color:var(--accent)}
+.row-hint .hint-label{font-size:9px;font-weight:800;letter-spacing:.04em;color:var(--accent);white-space:nowrap}
+
 @media(max-width:960px){
-  .board{gap:6px;margin-bottom:10px}
+  .board{gap:8px;margin-bottom:18px}
   .row{gap:6px}
   .tile{width:clamp(44px,14vw,58px);height:clamp(44px,14vw,58px);font-size:clamp(18px,5.5vw,24px);border-radius:7px}
+  .row-hint{width:26px;margin-left:0}
+  .row-hint .hint-tri{font-size:13px}
+  .row-hint .hint-label{font-size:7px}
 }
 
 @keyframes flipTile{
@@ -339,40 +360,43 @@ footer {
   40%,60%{transform:translateX(4px)}
 }
 
-/* ---- Keyboard ---- */
-.keyboard{display:flex;flex-direction:column;align-items:center;gap:8px}
-.key-row{display:flex;gap:6px;justify-content:center;width:100%;max-width:480px}
+/* ---- Keyboard (two rows, six keys each, for larger touch targets) ---- */
+.keyboard{display:flex;flex-direction:column;align-items:center;gap:12px}
+.key-row{display:flex;gap:8px;justify-content:center;width:100%;max-width:460px}
 .key{
   flex:1;
-  height:52px;
+  height:64px;
   min-width:0;
   border:none;
-  border-radius:6px;
+  border-radius:10px;
   background:var(--key-bg);
   color:var(--ink);
   font-family:var(--font-ui);
   font-weight:800;
-  font-size:17px;
+  font-size:23px;
   cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  transition:background .12s,transform .08s;
+  padding:0 4px;
+  white-space:nowrap;
+  box-shadow:0 3px 0 rgba(43,43,38,.14);
+  transition:background .12s,transform .08s,box-shadow .08s;
   user-select:none;
 }
 .key:hover{background:var(--key-bg-hover)}
-.key:active{transform:scale(.94)}
-.key.wide{flex:1.6;font-size:12.5px;letter-spacing:.03em}
+.key:active{transform:translateY(2px) scale(.98);box-shadow:0 1px 0 rgba(43,43,38,.14)}
+.key.wide{flex:1.35;font-size:15px;letter-spacing:.02em}
 .key.green{background:var(--green);color:#fff}
-.key.red{background:var(--red);color:#fff}
 .key:disabled{opacity:.45;cursor:default}
 
 @media(max-width:960px){
-  .keyboard{gap:6px}
-  .key{height:44px;font-size:15px;border-radius:5px}
-  .key.wide{font-size:10.5px}
+  .keyboard{gap:8px}
+  .key-row{gap:6px}
+  .key{height:52px;font-size:19px;border-radius:8px}
+  .key.wide{font-size:12px}
 }
 
-.day-info{font-size:11px;color:var(--ink-dim);text-align:center;margin-top:16px}
-@media(max-width:960px){.day-info{margin-top:6px;font-size:9px}}
+.day-info{font-size:11px;color:var(--ink-dim);text-align:center;margin-top:22px}
+@media(max-width:960px){.day-info{margin-top:16px;font-size:9px}}
 
 /* ---- Popups ---- */
 .overlay{display:none;position:fixed;inset:0;background:rgba(43,43,38,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
@@ -644,10 +668,33 @@ function buildBoard(){
       row.appendChild(tile);
       tiles.push(tile);
     }
+    const hint = document.createElement('div');
+    hint.className = 'row-hint';
+    hint.id = 'hint-' + r;
+    row.appendChild(hint);
     boardEl.appendChild(row);
     rowEls.push(row);
     tileEls.push(tiles);
   }
+}
+
+// Shows a small triangle + label to the right of a submitted row,
+// pointing toward where the answer lies relative to that guess.
+// No indicator when the guess was exactly correct.
+function setRowHint(rowIndex, guessedYear, answerYear){
+  const hint = document.getElementById('hint-' + rowIndex);
+  if (!hint) return;
+  if (answerYear === guessedYear){
+    hint.innerHTML = '';
+    hint.classList.remove('show');
+    return;
+  }
+  if (answerYear > guessedYear){
+    hint.innerHTML = '<div class="hint-tri">&#9650;</div><div class="hint-label">HIGHER</div>';
+  } else {
+    hint.innerHTML = '<div class="hint-label">LOWER</div><div class="hint-tri">&#9660;</div>';
+  }
+  hint.classList.add('show');
 }
 
 function renderCurrentRow(){
@@ -697,31 +744,37 @@ const keyEls = {};
 
 function buildKeyboard(){
   keyboardEl.innerHTML = '';
-  const row = document.createElement('div');
-  row.className = 'key-row';
 
-  const enterBtn = document.createElement('button');
-  enterBtn.className = 'key wide';
-  enterBtn.textContent = 'ENTER';
-  enterBtn.addEventListener('click', pressEnter);
-  row.appendChild(enterBtn);
+  // Whole keyboard collapsed to two rows so every key can be bigger:
+  // digits 1-5 + Backspace on top, digits 6-0 + Enter on the bottom.
+  const layout = [
+    ['1','2','3','4','5','back'],
+    ['6','7','8','9','0','enter']
+  ];
 
-  ['1','2','3','4','5','6','7','8','9','0'].forEach(d => {
-    const btn = document.createElement('button');
-    btn.className = 'key';
-    btn.textContent = d;
-    btn.addEventListener('click', () => pressDigit(d));
-    keyEls[d] = btn;
-    row.appendChild(btn);
+  layout.forEach(keys => {
+    const row = document.createElement('div');
+    row.className = 'key-row';
+    keys.forEach(k => {
+      const btn = document.createElement('button');
+      if (k === 'enter'){
+        btn.className = 'key wide';
+        btn.textContent = 'ENTER';
+        btn.addEventListener('click', pressEnter);
+      } else if (k === 'back'){
+        btn.className = 'key wide';
+        btn.textContent = '⌫';
+        btn.addEventListener('click', pressBack);
+      } else {
+        btn.className = 'key';
+        btn.textContent = k;
+        btn.addEventListener('click', () => pressDigit(k));
+        keyEls[k] = btn;
+      }
+      row.appendChild(btn);
+    });
+    keyboardEl.appendChild(row);
   });
-
-  const backBtn = document.createElement('button');
-  backBtn.className = 'key wide';
-  backBtn.textContent = '⌫';
-  backBtn.addEventListener('click', pressBack);
-  row.appendChild(backBtn);
-
-  keyboardEl.appendChild(row);
 }
 
 function updateKeyboardColors(){
@@ -788,14 +841,13 @@ function submitGuess(){
     animating = false;
 
     currentGuess.forEach((d, i) => {
-      const res = results[i];
-      if (keyState[d] === 'green') return;
-      keyState[d] = res === 'green' ? 'green' : (keyState[d] === undefined ? 'red' : keyState[d]);
+      if (results[i] === 'green') keyState[d] = 'green';
     });
     updateKeyboardColors();
 
     guesses.push({ digits: digitsStr, results });
     const won = digitsStr === puzzle.answer;
+    setRowHint(rowIndex, parseInt(digitsStr, 10), puzzle.year);
 
     if (won){
       status = 'won';
@@ -905,10 +957,9 @@ function replaySavedState(saved){
 
   guesses.forEach((g, i) => {
     paintSubmittedRow(i, g.digits.split(''), g.results, false);
+    setRowHint(i, parseInt(g.digits, 10), puzzle.year);
     g.digits.split('').forEach((d, idx) => {
-      const res = g.results[idx];
-      if (keyState[d] === 'green') return;
-      keyState[d] = res === 'green' ? 'green' : (keyState[d] === undefined ? 'red' : keyState[d]);
+      if (g.results[idx] === 'green') keyState[d] = 'green';
     });
   });
   updateKeyboardColors();
