@@ -894,8 +894,24 @@ function niceError(msg) {
 // ═══════════════════════════════════════════════
 //  INTERACTIONS
 // ═══════════════════════════════════════════════
+let inputErrorTimeout = null;
+function showInputError(msg) {
+  const box = document.getElementById('exprBox');
+  const errEl = document.getElementById('errorMsg');
+  box.classList.add('err');
+  errEl.textContent = msg;
+  clearTimeout(inputErrorTimeout);
+  inputErrorTimeout = setTimeout(() => {
+    updateDisplay();
+  }, 1200);
+}
+
 function onNumClick(i) {
   if (won || usedNumIndices.has(i)) return;
+  if (expression && /\d$/.test(expression)) {
+    showInputError('Add an operator between numbers');
+    return;
+  }
   usedNumIndices.add(i);
   expression += puzzleNums[i];
   renderNums();
@@ -937,10 +953,20 @@ document.getElementById('backBtn').addEventListener('click', () => {
 });
 
 document.getElementById('clearBtn').addEventListener('click', () => {
-  if (won) return;
+  const wasWon = won;
   expression = '';
   usedNumIndices.clear();
   lastValidResult = null;
+
+  if (wasWon) {
+    won = false;
+    document.getElementById('winOverlay').classList.remove('on');
+    clearInterval(timerInterval);
+    secondsElapsed = 0;
+    document.getElementById('timerDisplay').textContent = fmt(0);
+    startTimer();
+  }
+
   renderNums();
   updateDisplay();
 });
