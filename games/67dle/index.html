@@ -73,7 +73,7 @@ a{ color:inherit; }
 
 .layout {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
 }
 
@@ -82,6 +82,12 @@ a{ color:inherit; }
   margin: 0 10px;
   position: sticky;
   top: 78px;
+  align-self: stretch;
+  display: flex;
+  /* Sticky elements are bounded by their own box. With align-items:stretch
+     on .layout, this rail's height now matches the tallest column
+     (main-content), instead of a fixed px value — so the ad fills all the
+     way down to the footer with no gap, and grows/shrinks with the page. */
 }
 
 .ad-slot {
@@ -97,9 +103,9 @@ a{ color:inherit; }
   justify-content: center;
   text-align: center;
   line-height: 1.6;
+  flex: 1 1 auto;
+  width: 100%;
 }
-
-.ad-rail .ad-slot { height: 600px; }
 
 .main-content {
   flex: 1;
@@ -124,7 +130,7 @@ a{ color:inherit; }
      rail overflows the viewport by 28px, which pushes the whole page into
      unwanted horizontal scroll. calc() keeps the outer (margin) box
      exactly at 100%. */
-  .ad-rail { position: static; flex: 0 0 auto; width: calc(100% - 20px); margin: 6px 10px; }
+  .ad-rail { position: static; flex: 0 0 auto; width: calc(100% - 20px); margin: 6px 10px; align-self: auto; }
   .ad-rail.left { order: -1; }
   .main-content { order: 0; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
   .ad-rail.right { order: 1; }
@@ -894,22 +900,11 @@ function niceError(msg) {
 // ═══════════════════════════════════════════════
 //  INTERACTIONS
 // ═══════════════════════════════════════════════
-let inputErrorTimeout = null;
-function showInputError(msg) {
-  const box = document.getElementById('exprBox');
-  const errEl = document.getElementById('errorMsg');
-  box.classList.add('err');
-  errEl.textContent = msg;
-  clearTimeout(inputErrorTimeout);
-  inputErrorTimeout = setTimeout(() => {
-    updateDisplay();
-  }, 1200);
-}
-
 function onNumClick(i) {
   if (won || usedNumIndices.has(i)) return;
-  if (expression && /\d$/.test(expression)) {
-    showInputError('Add an operator between numbers');
+  if (/\d$/.test(expression)) {
+    document.getElementById('exprBox').className = 'expr-box err';
+    document.getElementById('errorMsg').textContent = 'Error: Add an operator between numbers';
     return;
   }
   usedNumIndices.add(i);
@@ -953,20 +948,10 @@ document.getElementById('backBtn').addEventListener('click', () => {
 });
 
 document.getElementById('clearBtn').addEventListener('click', () => {
-  const wasWon = won;
+  if (won) return;
   expression = '';
   usedNumIndices.clear();
   lastValidResult = null;
-
-  if (wasWon) {
-    won = false;
-    document.getElementById('winOverlay').classList.remove('on');
-    clearInterval(timerInterval);
-    secondsElapsed = 0;
-    document.getElementById('timerDisplay').textContent = fmt(0);
-    startTimer();
-  }
-
   renderNums();
   updateDisplay();
 });
