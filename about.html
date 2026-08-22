@@ -10,7 +10,7 @@
 <link rel="icon" href="favicon.png" type="image/png" sizes="any"/>
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -27,14 +27,15 @@
   --amber: #C97A1B;
   --line: #E1DDCF;
   --radius: 8px;
-  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --display: 'Space Grotesk', ui-sans-serif, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: 'Fraunces', serif;
+  --body: 'Public Sans', ui-sans-serif, sans-serif;
 }
 
 html,body{
   min-height:100%;
   background:var(--bg);
-  font-family:var(--mono);
+  font-family:var(--body);
   color:var(--text);
   overflow-x:hidden;
 }
@@ -141,7 +142,7 @@ a{ color:inherit; }
   border:1px solid var(--line);
   border-radius:999px;
   padding:5px 12px;
-  font-family:var(--mono);
+  font-family:var(--body);
   transition:border-color .15s,color .15s;
 }
 .back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
@@ -278,7 +279,7 @@ footer {
   background: var(--accent);
   color: #fff;
   text-decoration: none;
-  font-family: var(--mono);
+  font-family: var(--body);
   font-weight: 700;
   font-size: 13.5px;
   padding: 10px 20px;
@@ -313,7 +314,7 @@ footer {
 
 <p>DailyGameTree is a small, independent home for free daily browser
 puzzle games. It started in 2026 as a personal project: a love of the
-daily-puzzle format games, and a want to build
+daily-puzzle format popularised by games like Wordle, and a want to build
 a few original spins on it rather than just play someone else's.</p>
 
 <p>The idea behind the name is simple. Some visitors come back every day
@@ -328,7 +329,7 @@ numbers with arithmetic (and, in Hard mode, factorials and powers) to hit
 exactly 67.</li>
 <li><strong>Yeardle</strong> — a daily history puzzle where you read a
 short clue about a real historical event and guess the year it happened
-in.</li>
+in, Wordle-style.</li>
 </ul>
 
 <p>More games are planned. Each one is built from scratch, aims to be fair
