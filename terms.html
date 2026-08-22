@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Terms and Conditions — dailygametree</title>
+<meta name="description" content="The terms that govern your use of dailygametree.com and its daily puzzle games." />
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#F6F5EF" />
+<link rel="icon" href="favicon.png" type="image/png" sizes="any"/>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg: #F6F5EF;
+  --bg-elevated: #EFEDE3;
+  --bg-card: #FFFFFF;
+  --text: #20261C;
+  --text-dim: #5B6255;
+  --text-faint: #9AA091;
+  --accent: #6E9C1E;
+  --accent-dim: #557A16;
+  --accent-soft: #E7F1D4;
+  --amber: #C97A1B;
+  --line: #E1DDCF;
+  --radius: 8px;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: 'Space Grotesk', ui-sans-serif, sans-serif;
+}
+
+html,body{
+  min-height:100%;
+  background:var(--bg);
+  font-family:var(--mono);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+a{ color:inherit; }
+
+/* ---------- Header (identical to homepage) ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: rgba(246, 245, 239, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.logo-mark { width: 55px; height: auto; display: block; }
+
+/* ---------- Ad rails (identical to homepage) ---------- */
+
+.layout {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.ad-rail {
+  flex: 0 0 160px;
+  margin: 0 10px;
+  position: sticky;
+  top: 78px;
+  align-self: stretch;
+  display: flex;
+}
+
+.ad-slot {
+  border: 1px dashed #CBC6B4;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  color: var(--text-faint);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.6;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.main-inner {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+
+@media (max-width: 900px) {
+  .layout { flex-direction: column; }
+  .ad-rail { position: static; flex: none; width: calc(100% - 28px); margin: 10px 14px; align-self: auto; display: block; }
+  .ad-rail.left { order: -1; }
+  .main-content { order: 0; }
+  .ad-rail.right { order: 1; }
+  .ad-rail .ad-slot { height: 90px; width: auto; }
+  .main-inner { padding: 0 14px; }
+  .site-header { padding: 14px 16px; }
+}
+
+@media (max-width: 480px) {
+  .logo-text { display: none; }
+  .logo { gap: 0; }
+}
+
+.back-link{
+  display:inline-block;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  margin:24px 4px 0;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--mono);
+  transition:border-color .15s,color .15s;
+}
+.back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
+
+/* ---------- Footer (identical to homepage) ---------- */
+
+footer {
+  text-align: center;
+  padding: 28px 24px 40px;
+  color: var(--text-faint);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+.footer-links a:hover { color: var(--accent-dim); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =====================================================================
+   LEGAL / STATIC CONTENT PAGES
+   ===================================================================== */
+
+.legal-wrap{
+  background: var(--bg-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin: 18px 0 60px;
+  padding: 36px 40px 44px;
+}
+
+@media (max-width: 640px) {
+  .legal-wrap{ padding: 22px 18px 30px; }
+}
+
+.legal-wrap h1{
+  font-family: var(--display);
+  font-size: clamp(26px, 5vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.legal-updated{
+  color: var(--text-faint);
+  font-size: 12.5px;
+  margin-bottom: 28px;
+}
+
+.legal-wrap h2{
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+  margin: 30px 0 10px;
+  color: var(--text);
+}
+
+.legal-wrap h2:first-of-type{ margin-top: 0; }
+
+.legal-wrap p{
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.legal-wrap ul, .legal-wrap ol{
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--text);
+  margin: 0 0 14px 20px;
+}
+
+.legal-wrap li{ margin-bottom: 6px; }
+
+.legal-wrap a{
+  color: var(--accent-dim);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 2px;
+}
+.legal-wrap a:hover{ text-decoration-color: var(--accent-dim); }
+
+.legal-wrap strong{ color: var(--text); }
+
+.legal-note{
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text-dim);
+  margin: 18px 0 24px;
+}
+
+.legal-note strong{ color: var(--accent-dim); }
+
+.contact-card{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin: 18px 0 26px;
+}
+
+.contact-email{
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--text);
+}
+
+.contact-btn{
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  text-decoration: none;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  transition: background .15s;
+}
+.contact-btn:hover{ background: var(--accent-dim); }
+
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="index.html">
+      <img src="logo.png" alt="dailygametree logo" class="logo-mark" />
+      <span class="logo-text">dailygametree</span>
+    </a>
+  </header>
+
+  <div class="layout">
+    <aside class="ad-rail left">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+
+    <div class="main-content">
+      <div class="main-inner">
+        <main>
+          <a class="back-link" href="index.html">&larr; All games</a>
+
+          <div class="legal-wrap">
+
+<h1>Terms and Conditions</h1>
+<p class="legal-updated">Last updated: 22 August 2026</p>
+
+<p>These Terms and Conditions ("Terms") govern your use of
+dailygametree.com and the games hosted on it (currently including 67dle and
+Yeardle, with more to follow). By visiting or playing on the site, you
+agree to these Terms. If you don't agree, please don't use the site.</p>
+
+<h2>1. Who We Are</h2>
+<p>DailyGameTree is operated by an individual based in the United Kingdom.
+It isn't operated by a registered company. You can reach us at
+<a href="mailto:dailygametree@gmail.com">dailygametree@gmail.com</a>. In
+these Terms, "we", "us", and "our" refer to the operator of
+dailygametree.com.</p>
+
+<h2>2. The Service</h2>
+<p>DailyGameTree provides free, browser-based daily puzzle games. Each
+game typically presents a new puzzle once per day (resetting at midnight
+UTC unless a game says otherwise). We may add, remove, or change games,
+puzzles, features, or content at any time, without notice, and we don't
+guarantee that any particular game, puzzle history, or feature will remain
+available indefinitely.</p>
+
+<h2>3. Eligibility</h2>
+<p>DailyGameTree is intended for a general audience and is not directed at
+children under 13. If you are under the age of 18, you should have a
+parent or guardian's permission to use the site. By using the site, you
+confirm that you meet these requirements or are using the site with
+appropriate permission.</p>
+
+<h2>4. Acceptable Use</h2>
+<p>You agree not to:</p>
+<ul>
+<li>Use bots, scripts, or automated tools to solve puzzles, scrape
+content, or interact with the site in ways a normal human visitor
+wouldn't;</li>
+<li>Attempt to gain unauthorized access to any part of the site, its
+infrastructure, or other users' data;</li>
+<li>Interfere with, disrupt, or place undue load on the site or the
+services it depends on;</li>
+<li>Circumvent, disable, or otherwise interfere with advertising shown on
+the site;</li>
+<li>Copy, scrape, reproduce, or redistribute the site's puzzles, code,
+text, or other content except as allowed under Section 5; or</li>
+<li>Use the site for any unlawful purpose or in a way that violates any
+applicable law or regulation.</li>
+</ul>
+
+<h2>5. Intellectual Property</h2>
+<p>Unless otherwise stated, all content on this site — including game
+code, puzzle designs and answers, puzzle datasets, text, graphics, logos,
+and the names "DailyGameTree", "67dle", and "Yeardle" — is owned by us or
+our licensors and is protected by copyright and other intellectual
+property laws. All rights are reserved. You may play the games and view
+the site for your own personal, non-commercial enjoyment, but you may not
+otherwise copy, modify, distribute, publicly perform, create derivative
+works from, or commercially exploit any part of the site's content without
+our prior written permission.</p>
+
+<h2>6. Advertising and Third-Party Content</h2>
+<p>The site may display advertisements, including through Google AdSense
+and other advertising partners, to help support the cost of running it
+for free. We don't control the specific content of third-party ads, and
+any transaction or interaction you have with an advertiser is solely
+between you and that advertiser. See our
+<a href="privacy.html">Privacy Policy</a> for more on how advertising
+partners may use data.</p>
+
+<h2>7. No Warranty</h2>
+<p>The site and games are provided "as is" and "as available", without
+warranties of any kind, whether express or implied, including but not
+limited to warranties of merchantability, fitness for a particular
+purpose, non-infringement, or that the site will be uninterrupted, secure,
+timely, or error-free. We don't warrant that puzzles will always be
+solvable-as-intended, bug-free, or available at any particular time,
+though we'll do our best.</p>
+
+<h2>8. Limitation of Liability</h2>
+<p>To the fullest extent permitted by law, we won't be liable for any
+indirect, incidental, special, consequential, or punitive damages, or any
+loss of data, arising out of or related to your use of (or inability to
+use) the site, even if we've been advised of the possibility of such
+damages. Nothing in these Terms excludes or limits liability that cannot
+lawfully be excluded or limited (for example, liability for death or
+personal injury caused by negligence, or fraud), and nothing here affects
+any statutory rights you may have as a consumer that can't be waived under
+the law of your country of residence.</p>
+
+<h2>9. Changes to the Service or These Terms</h2>
+<p>We may update these Terms from time to time, and we'll update the "Last
+updated" date above when we do. Continuing to use the site after changes
+are posted means you accept the updated Terms. We may also change, suspend,
+or discontinue the site or any part of it at any time, without liability
+to you.</p>
+
+<h2>10. Termination</h2>
+<p>We may restrict or terminate your access to the site at any time,
+without notice, if we reasonably believe you've violated these Terms or
+used the site in a way that could harm us, other visitors, or the site
+itself.</p>
+
+<h2>11. Governing Law</h2>
+<p>These Terms are governed by the laws of England and Wales, and the
+courts of England and Wales will have non-exclusive jurisdiction over any
+dispute arising from them, without prejudice to any mandatory consumer
+protection rights you may have under the law of the country in which you
+live. Since visitors access this site from all over the world, nothing
+here is intended to override protections you're entitled to under your
+own local law.</p>
+
+<h2>12. Severability</h2>
+<p>If any provision of these Terms is found to be unenforceable, the rest
+will remain in full effect, and the unenforceable provision will be
+replaced with one that most closely reflects its original intent.</p>
+
+<h2>13. Contact Us</h2>
+<p>Questions about these Terms? Email us at
+<a href="mailto:dailygametree@gmail.com">dailygametree@gmail.com</a>.</p>
+
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <aside class="ad-rail right">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+  </div>
+
+  <footer>
+    <nav class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms and Conditions</a>
+      <a href="about.html">About Us</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <p>&copy; <span id="year"></span> dailygametree.com</p>
+  </footer>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+</body>
+</html>
