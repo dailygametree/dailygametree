@@ -10,7 +10,7 @@
 <link rel="icon" href="favicon.png" type="image/png" sizes="any"/>
 <style>
 
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -27,14 +27,15 @@
   --amber: #C97A1B;
   --line: #E1DDCF;
   --radius: 8px;
-  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --display: 'Space Grotesk', ui-sans-serif, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: 'Fraunces', serif;
+  --body: 'Public Sans', ui-sans-serif, sans-serif;
 }
 
 html,body{
   min-height:100%;
   background:var(--bg);
-  font-family:var(--mono);
+  font-family:var(--body);
   color:var(--text);
   overflow-x:hidden;
 }
@@ -141,7 +142,7 @@ a{ color:inherit; }
   border:1px solid var(--line);
   border-radius:999px;
   padding:5px 12px;
-  font-family:var(--mono);
+  font-family:var(--body);
   transition:border-color .15s,color .15s;
 }
 .back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
@@ -278,7 +279,7 @@ footer {
   background: var(--accent);
   color: #fff;
   text-decoration: none;
-  font-family: var(--mono);
+  font-family: var(--body);
   font-weight: 700;
   font-size: 13.5px;
   padding: 10px 20px;
@@ -316,7 +317,7 @@ or an advertising or business inquiry? We'd like to hear from you.</p>
 
 <div class="contact-card">
   <span class="contact-email">dailygametree@gmail.com</span>
-  <a class="contact-btn" style="color: #fff" href="mailto:dailygametree@gmail.com">Send an email</a>
+  <a class="contact-btn" style ="color: #fff" href="mailto:dailygametree@gmail.com">Send an email</a>
 </div>
 
 <p>DailyGameTree is currently run by one person in their spare time,
