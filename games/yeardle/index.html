@@ -498,7 +498,7 @@ footer {
               <div class="popup">
                 <button class="popup-close" id="helpClose">✕</button>
                 <h2>How to Play</h2>
-                <p>Read the clue on the flashcard and guess the <strong>year</strong> the event happened. You have <strong>4 tries</strong>. Each guess must be a 4-digit year — tap the number keys, then <strong>Enter</strong>.</p>
+                <p>Read the clue on the flashcard and guess the <strong>year</strong> the event happened. You have <strong>5 tries</strong>. Each guess must be a 4-digit year — tap the number keys, then <strong>Enter</strong>.</p>
                 <p style="margin-top:8px">After each guess, the tiles change colour to show how close you were:</p>
                 <div class="example-row">
                   <div class="example-tile" style="background:var(--red)">0</div>
@@ -614,7 +614,7 @@ function getTodaysPuzzle(){
 //  GAME STATE
 // ═══════════════════════════════════════════════
 const puzzle = getTodaysPuzzle();
-const MAX_GUESSES = 4;
+const MAX_GUESSES = 5;
 const STATE_KEY = 'yeardle_state_v1';
 
 let guesses = [];        // [{digits:'0831', results:['red','red','green','red']}]
@@ -931,7 +931,7 @@ function startCountdown(){
 }
 
 document.getElementById('shareBtn').addEventListener('click', () => {
-  const scoreLabel = status === 'won' ? guesses.length + '/4' : 'X/4';
+  const scoreLabel = status === 'won' ? guesses.length + '/' + MAX_GUESSES : 'X/' + MAX_GUESSES;
   const lines = guesses.map(g => g.results.map(r => r === 'green' ? '🟩' : '🟥').join(''));
   const text = `Yeardle #${puzzle.puzzleNum} ${scoreLabel}\n\n${lines.join('\n')}`;
   if (navigator.clipboard && navigator.clipboard.writeText){
