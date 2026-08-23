@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shikaku — dailygametree</title>
+<meta name="description" content="A daily rectangle-division logic puzzle. Every number is the area of the rectangle it belongs to — partition the grid so every piece fits its clue.">
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#F6F5EF" />
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="canonical" href="https://dailygametree.com/shikaku/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="DailyGameTree" />
+<meta property="og:title" content="Shikaku — dailygametree" />
+<meta property="og:description" content="A daily rectangle-division logic puzzle. Every number is the area of the rectangle it belongs to." />
+<meta property="og:url" content="https://dailygametree.com/shikaku/" />
+<meta property="og:image" content="https://dailygametree.com/shikaku/banner.png" />
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ---------- Site-wide palette (drives header / ad rails / footer) ---------- */
+:root{
+  --bg: #F6F5EF;
+  --bg-elevated: #EFEDE3;
+  --bg-card: #FFFFFF;
+  --text: #20261C;
+  --text-dim: #5B6255;
+  --text-faint: #9AA091;
+  --accent: #6E9C1E;
+  --accent-dim: #557A16;
+  --accent-soft: #E7F1D4;
+  --amber: #C97A1B;
+  --line: #E1DDCF;
+  --radius: 8px;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: 'Fraunces', serif;
+  --body: 'Public Sans', ui-sans-serif, sans-serif;
+}
+
+html,body{
+  min-height:100%;
+  background:var(--bg);
+  font-family:var(--body);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+a{ color:inherit; }
+
+/* ---------- Header (identical to homepage) ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: rgba(246, 245, 239, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--display), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.logo-mark { width: 55px; height: auto; display: block; }
+
+/* ---------- Ad rails (identical to homepage) ---------- */
+
+.layout {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.ad-rail {
+  flex: 0 0 160px;
+  margin: 0 10px;
+  position: sticky;
+  top: 78px;
+  align-self: stretch;
+  display: flex;
+}
+
+.ad-slot {
+  border: 1px dashed #CBC6B4;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  color: var(--text-faint);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.6;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.main-inner {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+
+@media (max-width: 900px) {
+  .layout { flex-direction: column; align-items: stretch; }
+  .ad-rail { position: static; flex: 0 0 auto; width: 100%; margin: 10px 0; align-self: auto; display: block; }
+  .ad-rail.left { order: -1; }
+  .main-content { order: 0; }
+  .ad-rail.right { order: 1; }
+  .ad-rail .ad-slot { height: 50px; font-size: 9px; letter-spacing: .04em; }
+  .main-inner { padding: 0 14px; }
+}
+
+@media (max-width: 480px) {
+  .logo-text { display: none; }
+  .logo { gap: 0; }
+}
+
+.back-link{
+  display:inline-block;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  margin:24px 4px 0;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--body);
+  transition:border-color .15s,color .15s;
+}
+.back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
+
+/* ---------- Footer (identical to homepage) ---------- */
+
+footer {
+  text-align: center;
+  padding: 28px 24px 40px;
+  color: var(--text-faint);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+.footer-links a:hover { color: var(--accent-dim); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- Popups (shared pattern) ---- */
+.overlay{display:none;position:fixed;inset:0;background:rgba(32,38,28,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+.overlay.on{display:flex}
+.popup{background:var(--bg-card);border-radius:14px;padding:26px 26px 22px;max-width:400px;width:100%;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.28);color:var(--text)}
+.popup h2{font-family:var(--display);font-size:20px;margin-bottom:10px}
+.popup p{font-size:13.5px;line-height:1.6;color:var(--text-dim)}
+.popup p + p{margin-top:8px}
+.popup code{font-family:var(--mono);background:var(--bg-elevated);padding:1px 5px;border-radius:4px;font-size:12px}
+.popup-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:inherit;line-height:1;padding:2px 4px}
+.popup-close:hover{opacity:.55}
+
+/* =====================================================================
+   SHIKAKU GAME
+   ===================================================================== */
+
+.game-wrap{
+  --shk-accent: #3E6E92;
+  --shk-accent-dim: #2F5570;
+  --shk-accent-soft: #DDEAF2;
+  --shk-ink: #20261C;
+  --shk-line: #C9C3B0;
+  --shk-grid-bg: #FFFEFA;
+  margin-top: 14px;
+}
+
+.page{display:flex;justify-content:center;padding:0 24px}
+.game-col{flex:0 0 560px;max-width:560px;padding:28px 24px 56px;width:100%}
+
+@media(max-width:640px){
+  .page{padding:0 6px}
+  .game-col{flex:0 0 auto;max-width:100%;width:100%;padding:14px 12px 32px}
+}
+
+/* ---- Title ---- */
+.title-block{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:14px}
+.title{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,40px);letter-spacing:-0.02em;color:var(--text)}
+.title .dle{color:var(--shk-accent);font-style:italic}
+.subtitle{font-size:12.5px;color:var(--text-dim);margin-top:6px;max-width:380px}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:16px 0 18px}
+.toolbar-left,.toolbar-right{display:flex;align-items:center;gap:8px}
+.puzzle-num{font-family:var(--mono);font-size:12px;color:var(--text-dim);font-weight:600;letter-spacing:.02em}
+.icon-btn{width:34px;height:34px;border-radius:50%;border:2px solid var(--text);background:transparent;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0;padding:0;line-height:1;color:var(--text)}
+.icon-btn:hover{background:var(--text);color:var(--bg)}
+
+.timer{font-family:var(--mono);font-size:13px;color:var(--text-dim);background:var(--bg-elevated);border-radius:999px;padding:6px 12px;letter-spacing:.02em;min-width:64px;text-align:center}
+.timer.won{color:#fff;background:var(--shk-accent)}
+
+/* ---- Board ---- */
+.board-frame{
+  background: var(--shk-grid-bg);
+  border: 1px solid var(--shk-line);
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 8px 22px rgba(32,38,28,.08);
+}
+
+.board{
+  position: relative;
+  display: grid;
+  width: 100%;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--shk-grid-bg);
+}
+
+.cell{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: clamp(11px, 2.6vw, 18px);
+  color: var(--shk-ink);
+  border: 1px solid var(--shk-line);
+  transition: background-color .1s ease;
+}
+
+.cell.sel{ background-color: var(--shk-accent-soft); }
+.cell.sel-bad{ background-color: #F4D3CC !important; }
+.cell.clue span{ pointer-events:none; }
+
+@keyframes shk-shake{
+  0%,100%{ transform: translateX(0); }
+  20%{ transform: translateX(-3px); }
+  40%{ transform: translateX(3px); }
+  60%{ transform: translateX(-2px); }
+  80%{ transform: translateX(2px); }
+}
+.board.shake{ animation: shk-shake .3s ease; }
+
+.day-info{text-align:center;margin-top:16px;font-size:10.5px;color:var(--text-faint);font-family:var(--mono)}
+
+@media(max-width:960px){
+  .title-logo{max-width:139px}
+  .toolbar{margin:12px 0 14px}
+  .icon-btn{width:29px;height:29px;font-size:13px}
+  .day-info{margin-top:12px;font-size:9px}
+}
+
+/* ---- Help popup examples ---- */
+.example-board{display:inline-grid;grid-template-columns:repeat(4,26px);grid-template-rows:repeat(3,26px);border:1px solid var(--shk-line);margin:10px 0;border-radius:4px;overflow:hidden}
+.example-board div{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:12px;border:.5px solid var(--shk-line)}
+
+/* ---- End popup ---- */
+.end-popup h2{text-align:center;font-size:24px}
+.end-popup .end-sub{font-size:13px;text-align:center;color:var(--text-dim);margin-top:2px}
+.end-popup .end-stats{display:flex;justify-content:center;gap:22px;margin:16px 0}
+.end-popup .end-stat{text-align:center}
+.end-popup .end-stat b{display:block;font-family:var(--display);font-size:22px;color:var(--shk-accent)}
+.end-popup .end-stat span{font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.04em}
+.share-btn{display:block;width:100%;margin:6px auto 0;background:var(--shk-accent);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:var(--body);font-weight:700;font-size:14px;cursor:pointer}
+.share-btn:hover{opacity:.9}
+.replay-btn{display:block;width:100%;margin:8px auto 0;background:transparent;color:var(--shk-accent);border:2px solid var(--shk-accent);border-radius:8px;padding:8px 22px;font-family:var(--body);font-weight:700;font-size:14px;cursor:pointer}
+.replay-btn:hover{background:var(--shk-accent-soft)}
+.countdown{text-align:center;font-size:12px;color:var(--text-dim);margin-top:14px}
+.countdown-val{font-weight:800;font-size:16px;color:var(--text);display:block;margin-top:2px;font-family:var(--mono)}
+
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/">
+      <img src="/logo.png" alt="dailygametree logo" class="logo-mark" />
+      <span class="logo-text">dailygametree</span>
+    </a>
+  </header>
+
+  <div class="layout">
+    <aside class="ad-rail left">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+
+    <div class="main-content">
+      <div class="main-inner">
+        <main>
+          <a class="back-link" href="/">&larr; All games</a>
+
+          <div class="game-wrap">
+            <div class="page">
+              <div class="game-col">
+
+                <div class="title-block">
+                  <h1 class="title">Shikaku<span class="dle">-dle</span></h1>
+                  <p class="subtitle">Every number is the size of the rectangle it belongs to. Draw the rectangles until the whole grid is covered.</p>
+                </div>
+
+                <div class="toolbar">
+                  <div class="toolbar-left">
+                    <span class="puzzle-num" id="puzzleNum">Shikaku #—</span>
+                  </div>
+                  <div class="toolbar-right">
+                    <span class="timer" id="timerDisplay">00:00</span>
+                    <button class="icon-btn" id="clearBtn" title="Start over">&#8635;</button>
+                    <button class="icon-btn" id="helpBtn" title="How to play">?</button>
+                  </div>
+                </div>
+
+                <div class="board-frame">
+                  <div class="board" id="board"><!-- cells injected by JS --></div>
+                </div>
+
+                <p class="day-info" id="dayInfo">Generating today&rsquo;s puzzle&hellip;</p>
+
+              </div>
+            </div>
+
+            <!-- Help popup -->
+            <div class="overlay" id="helpOverlay">
+              <div class="popup">
+                <button class="popup-close" id="helpClose">✕</button>
+                <h2>How to Play</h2>
+                <p>Every clue number is the <strong>area</strong> (in cells) of the rectangle it sits inside. Click or tap a cell and drag to draw a rectangle.</p>
+                <p>A rectangle is valid when it contains <strong>exactly one</strong> clue, and its width &times; height equals that clue's number. Rectangles can't overlap.</p>
+                <div style="text-align:center">
+                  <div class="example-board">
+                    <div>6</div><div></div><div></div><div>2</div>
+                    <div></div><div></div><div></div><div></div>
+                    <div>4</div><div></div><div></div><div></div>
+                  </div>
+                </div>
+                <p>Above: a 4&times;3 grid split into a 3&times;2 rectangle (6), a 1&times;2 rectangle (2), and a 4&times;1 rectangle (4) &mdash; every cell covered exactly once.</p>
+                <p>Tap any placed rectangle to remove it and try again. When every cell is covered, you've solved it.</p>
+                <p style="margin-top:10px;font-size:12px;color:var(--text-faint)">A new Shikaku unlocks every day at midnight UTC. Grid size varies day to day.</p>
+              </div>
+            </div>
+
+            <!-- End of game popup -->
+            <div class="overlay" id="endOverlay">
+              <div class="popup end-popup">
+                <button class="popup-close" id="endClose">✕</button>
+                <h2>🧩 Solved!</h2>
+                <p class="end-sub" id="endSub"></p>
+                <div class="end-stats">
+                  <div class="end-stat"><b id="endTime">00:00</b><span>Time</span></div>
+                  <div class="end-stat"><b id="endPieces">0</b><span>Rectangles</span></div>
+                </div>
+                <button class="share-btn" id="shareBtn">Share Result</button>
+                <button class="replay-btn" id="playAgainBtn">Play Again</button>
+                <div class="countdown">
+                  Next Shikaku in
+                  <span class="countdown-val" id="countdownVal">--:--:--</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </main>
+      </div>
+    </div>
+
+    <aside class="ad-rail right">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+  </div>
+
+  <footer>
+    <nav class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms and Conditions</a>
+      <a href="/about.html">About Us</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+    <p>&copy; <span id="year"></span> dailygametree.com</p>
+  </footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ═══════════════════════════════════════════════
+//  SEEDED RANDOM (same generator used across the site)
+// ═══════════════════════════════════════════════
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// ═══════════════════════════════════════════════
+//  DAILY INDEX
+// ═══════════════════════════════════════════════
+function getDayIndex(){
+  const epoch = Date.UTC(2025, 0, 1);
+  const now = new Date();
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.max(0, Math.floor((today - epoch) / 86400000));
+}
+
+// ═══════════════════════════════════════════════
+//  PUZZLE GENERATION
+//  Recursively splits the grid into rectangles (a valid partition by
+//  construction), assigns one clue cell per rectangle labelled with its
+//  area, then runs a small backtracking solver to confirm the puzzle has
+//  a single solution before accepting it. If a given attempt turns out
+//  ambiguous, or produces too many long thin "sliver" pieces, it just
+//  re-rolls with a different sub-seed — this is cheap (tens of ms) so it
+//  can safely retry a bunch of times and keep the best-looking result.
+// ═══════════════════════════════════════════════
+
+// Central-biased cut position: averaging two uniform draws gives a
+// triangular distribution peaked at the midpoint, so splits trend toward
+// roughly-even halves instead of frequently slicing off a 1-wide sliver.
+function biasedCut(rand, span){
+  const r = (rand() + rand()) / 2;
+  let cut = Math.round(r * span);
+  return Math.max(1, Math.min(span - 1, cut));
+}
+
+function generatePartition(rand, rows, cols, targetPieces){
+  let rects = [{ x:0, y:0, w:cols, h:rows }];
+  let guard = 0;
+  while (rects.length < targetPieces && guard++ < 5000){
+    const splittable = rects.filter(r => r.w > 1 || r.h > 1);
+    if (splittable.length === 0) break;
+    const totalArea = splittable.reduce((s, r) => s + r.w * r.h, 0);
+    let pick = rand() * totalArea;
+    let chosen = splittable[splittable.length - 1];
+    for (const r of splittable){
+      pick -= r.w * r.h;
+      if (pick <= 0){ chosen = r; break; }
+    }
+    const idx = rects.indexOf(chosen);
+    const r = chosen;
+
+    // Bias toward cutting whichever dimension is currently longer, so
+    // pieces trend toward square rather than piling up into long strips.
+    let orientation;
+    if (r.w <= 1) orientation = 'h';
+    else if (r.h <= 1) orientation = 'v';
+    else orientation = rand() < r.w / (r.w + r.h) ? 'v' : 'h';
+
+    let a, b;
+    if (orientation === 'v'){
+      const cut = biasedCut(rand, r.w);
+      a = { x:r.x, y:r.y, w:cut, h:r.h };
+      b = { x:r.x + cut, y:r.y, w:r.w - cut, h:r.h };
+    } else {
+      const cut = biasedCut(rand, r.h);
+      a = { x:r.x, y:r.y, w:r.w, h:cut };
+      b = { x:r.x, y:r.y + cut, w:r.w, h:r.h - cut };
+    }
+    rects.splice(idx, 1, a, b);
+  }
+  return rects;
+}
+
+// Flags pieces that read as long thin "slivers" (an extreme width:height
+// ratio, e.g. a 1×7 column) so generateDailyPuzzle can steer away from
+// puzzles that end up mostly straight columns/rows.
+function sliverCount(rects){
+  let n = 0;
+  for (const r of rects){
+    if (Math.max(r.w, r.h) / Math.min(r.w, r.h) >= 4) n++;
+  }
+  return n;
+}
+
+function assignClues(rand, rects){
+  return rects.map((r, id) => {
+    const cx = r.x + Math.floor(rand() * r.w);
+    const cy = r.y + Math.floor(rand() * r.h);
+    return { id, x:r.x, y:r.y, w:r.w, h:r.h, area:r.w * r.h, cx, cy };
+  });
+}
+
+function divisorPairs(area, maxW, maxH){
+  const pairs = [];
+  for (let w = 1; w <= area && w <= maxW; w++){
+    if (area % w !== 0) continue;
+    const h = area / w;
+    if (h <= maxH) pairs.push([w, h]);
+  }
+  return pairs;
+}
+
+function buildCandidates(clue, rows, cols){
+  const cands = [];
+  for (const [w, h] of divisorPairs(clue.area, cols, rows)){
+    const xMin = Math.max(0, clue.cx - w + 1);
+    const xMax = Math.min(clue.cx, cols - w);
+    const yMin = Math.max(0, clue.cy - h + 1);
+    const yMax = Math.min(clue.cy, rows - h);
+    for (let x = xMin; x <= xMax; x++)
+      for (let y = yMin; y <= yMax; y++)
+        cands.push({ x, y, w, h });
+  }
+  return cands;
+}
+
+function countSolutions(clues, rows, cols, nodeBudget){
+  const withCands = clues.map(c => ({ c, cands: buildCandidates(c, rows, cols) }));
+  if (withCands.some(e => e.cands.length === 0)) return { count:0 };
+  withCands.sort((a, b) => a.cands.length - b.cands.length);
+
+  const occ = new Int32Array(rows * cols).fill(-1);
+  let solutions = 0, nodes = 0, exhausted = false;
+
+  function place(rect, id){
+    for (let yy = rect.y; yy < rect.y + rect.h; yy++)
+      for (let xx = rect.x; xx < rect.x + rect.w; xx++)
+        occ[yy * cols + xx] = id;
+  }
+  function unplace(rect){
+    for (let yy = rect.y; yy < rect.y + rect.h; yy++)
+      for (let xx = rect.x; xx < rect.x + rect.w; xx++)
+        occ[yy * cols + xx] = -1;
+  }
+  function fits(rect){
+    for (let yy = rect.y; yy < rect.y + rect.h; yy++)
+      for (let xx = rect.x; xx < rect.x + rect.w; xx++)
+        if (occ[yy * cols + xx] !== -1) return false;
+    return true;
+  }
+  function backtrack(i){
+    if (solutions >= 2 || exhausted) return;
+    if (nodes++ > nodeBudget){ exhausted = true; return; }
+    if (i >= withCands.length){ solutions++; return; }
+    const { c, cands } = withCands[i];
+    for (const cand of cands){
+      if (!fits(cand)) continue;
+      place(cand, c.id);
+      backtrack(i + 1);
+      unplace(cand);
+      if (solutions >= 2 || exhausted) return;
+    }
+  }
+  backtrack(0);
+  return { count: solutions };
+}
+
+// Every piece gets its own hue, spaced by the golden angle (~137.5°) so
+// consecutive ids land far apart around the wheel — the standard trick
+// for generating N well-separated colours with no repeats, however many
+// pieces a puzzle ends up with.
+function colourForIndex(i){
+  const hue = (i * 137.50776) % 360;
+  return {
+    fill: `hsl(${hue.toFixed(1)}, 42%, 88%)`,
+    line: `hsl(${hue.toFixed(1)}, 38%, 52%)`
+  };
+}
+
+function generateDailyPuzzle(dayIndex){
+  const minDim = 6, maxDim = 10, avgArea = 6, nodeBudget = 80000, maxAttempts = 20;
+  const sizeRand = mulberry32(dayIndex * 2 + 1);
+  const rows = minDim + Math.floor(sizeRand() * (maxDim - minDim + 1));
+  const cols = minDim + Math.floor(sizeRand() * (maxDim - minDim + 1));
+  const targetPieces = Math.max(5, Math.round((rows * cols) / avgArea));
+
+  // Try a handful of independent layouts and keep the best-scoring one:
+  // must have a single solution (hard requirement), and among those,
+  // fewer long thin sliver pieces reads as a much more varied puzzle.
+  let best = null, bestScore = Infinity;
+  for (let attempt = 0; attempt < maxAttempts; attempt++){
+    const rand = mulberry32(dayIndex * 7919 + attempt * 104729 + 17);
+    const rects = generatePartition(rand, rows, cols, targetPieces);
+    const clues = assignClues(rand, rects);
+    const { count } = countSolutions(clues, rows, cols, nodeBudget);
+    const slivers = sliverCount(rects);
+    const score = (count === 1 ? 0 : 1000) + slivers * 10;
+    if (score < bestScore){
+      bestScore = score;
+      best = { rows, cols, clues };
+    }
+    if (count === 1 && slivers <= 1) break;
+  }
+  best.clues.forEach((c, i) => { c.colour = colourForIndex(i); });
+  best.dayIndex = dayIndex;
+  best.puzzleNum = dayIndex + 1;
+  return best;
+}
+
+// ═══════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════
+const dayIndex = getDayIndex();
+const puzzle = generateDailyPuzzle(dayIndex);
+const rows = puzzle.rows, cols = puzzle.cols;
+const STATE_KEY = 'shikaku_state_v1';
+
+// clueGrid[y*cols+x] -> clue object or null
+const clueGrid = new Array(rows * cols).fill(null);
+puzzle.clues.forEach(c => { clueGrid[c.cy * cols + c.cx] = c; });
+
+let ownerGrid = new Array(rows * cols).fill(-1); // -1 = empty, else clue.id
+let placedRects = [];   // [{x,y,w,h,id}]
+let secondsElapsed = 0;
+let timerInterval = null;
+let status = 'playing';
+let countdownInterval = null;
+
+// ═══════════════════════════════════════════════
+//  BOARD RENDER
+// ═══════════════════════════════════════════════
+const boardEl = document.getElementById('board');
+boardEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+boardEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+boardEl.style.aspectRatio = `${cols} / ${rows}`;
+
+const cellEls = [];
+for (let y = 0; y < rows; y++){
+  for (let x = 0; x < cols; x++){
+    const d = document.createElement('div');
+    d.className = 'cell';
+    const clue = clueGrid[y * cols + x];
+    if (clue){
+      d.classList.add('clue');
+      const span = document.createElement('span');
+      span.textContent = clue.area;
+      d.appendChild(span);
+    }
+    boardEl.appendChild(d);
+    cellEls.push(d);
+  }
+}
+
+function paintCells(){
+  for (let y = 0; y < rows; y++){
+    for (let x = 0; x < cols; x++){
+      const idx = y * cols + x;
+      const el = cellEls[idx];
+      const owner = ownerGrid[idx];
+      if (owner === -1){
+        el.style.background = '';
+        el.style.borderTop = el.style.borderRight = el.style.borderBottom = el.style.borderLeft = '';
+        continue;
+      }
+      const clue = puzzle.clues[owner];
+      el.style.background = clue.colour.fill;
+      const sameOwner = (nx, ny) => {
+        if (nx < 0 || nx >= cols || ny < 0 || ny >= rows) return false;
+        return ownerGrid[ny * cols + nx] === owner;
+      };
+      const edge = `2px solid ${clue.colour.line}`;
+      el.style.borderTop = sameOwner(x, y - 1) ? 'none' : edge;
+      el.style.borderBottom = sameOwner(x, y + 1) ? 'none' : edge;
+      el.style.borderLeft = sameOwner(x - 1, y) ? 'none' : edge;
+      el.style.borderRight = sameOwner(x + 1, y) ? 'none' : edge;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  PLACEMENT LOGIC
+// ═══════════════════════════════════════════════
+function rectCells(x0, y0, x1, y1){
+  const minX = Math.min(x0, x1), maxX = Math.max(x0, x1);
+  const minY = Math.min(y0, y1), maxY = Math.max(y0, y1);
+  return { x:minX, y:minY, w:maxX - minX + 1, h:maxY - minY + 1 };
+}
+
+function tryPlace(rect){
+  // must not overlap an existing rectangle
+  for (let yy = rect.y; yy < rect.y + rect.h; yy++)
+    for (let xx = rect.x; xx < rect.x + rect.w; xx++)
+      if (ownerGrid[yy * cols + xx] !== -1) return false;
+
+  // must contain exactly one clue, whose area matches this rectangle
+  let found = null;
+  for (let yy = rect.y; yy < rect.y + rect.h; yy++){
+    for (let xx = rect.x; xx < rect.x + rect.w; xx++){
+      const clue = clueGrid[yy * cols + xx];
+      if (clue){
+        if (found) return false; // more than one clue
+        found = clue;
+      }
+    }
+  }
+  if (!found || found.area !== rect.w * rect.h) return false;
+
+  for (let yy = rect.y; yy < rect.y + rect.h; yy++)
+    for (let xx = rect.x; xx < rect.x + rect.w; xx++)
+      ownerGrid[yy * cols + xx] = found.id;
+  placedRects.push({ x:rect.x, y:rect.y, w:rect.w, h:rect.h, id:found.id });
+  return true;
+}
+
+function removeRectAt(x, y){
+  const idx = y * cols + x;
+  const owner = ownerGrid[idx];
+  if (owner === -1) return false;
+  const pi = placedRects.findIndex(r => r.id === owner);
+  if (pi === -1) return false;
+  const r = placedRects[pi];
+  for (let yy = r.y; yy < r.y + r.h; yy++)
+    for (let xx = r.x; xx < r.x + r.w; xx++)
+      ownerGrid[yy * cols + xx] = -1;
+  placedRects.splice(pi, 1);
+  return true;
+}
+
+function isSolved(){
+  return ownerGrid.every(v => v !== -1);
+}
+
+// ═══════════════════════════════════════════════
+//  POINTER / DRAG INTERACTION
+// ═══════════════════════════════════════════════
+let dragging = false;
+let startCell = null;
+let selCells = [];
+
+function cellFromPoint(clientX, clientY){
+  const r = boardEl.getBoundingClientRect();
+  let cx = Math.floor((clientX - r.left) / r.width * cols);
+  let cy = Math.floor((clientY - r.top) / r.height * rows);
+  cx = Math.max(0, Math.min(cols - 1, cx));
+  cy = Math.max(0, Math.min(rows - 1, cy));
+  return { cx, cy };
+}
+
+function clearSelPreview(){
+  selCells.forEach(idx => cellEls[idx].classList.remove('sel', 'sel-bad'));
+  selCells = [];
+}
+
+function setSelPreview(rect, bad){
+  clearSelPreview();
+  for (let yy = rect.y; yy < rect.y + rect.h; yy++){
+    for (let xx = rect.x; xx < rect.x + rect.w; xx++){
+      const idx = yy * cols + xx;
+      cellEls[idx].classList.add(bad ? 'sel-bad' : 'sel');
+      selCells.push(idx);
+    }
+  }
+}
+
+function onPointerDown(evt){
+  if (status !== 'playing') return;
+  evt.preventDefault();
+  const { cx, cy } = cellFromPoint(evt.clientX, evt.clientY);
+  if (ownerGrid[cy * cols + cx] !== -1){
+    removeRectAt(cx, cy);
+    paintCells();
+    saveState();
+    return;
+  }
+  dragging = true;
+  startCell = { cx, cy };
+  boardEl.setPointerCapture(evt.pointerId);
+  setSelPreview({ x:cx, y:cy, w:1, h:1 }, false);
+}
+
+function onPointerMove(evt){
+  if (!dragging) return;
+  evt.preventDefault();
+  const { cx, cy } = cellFromPoint(evt.clientX, evt.clientY);
+  const rect = rectCells(startCell.cx, startCell.cy, cx, cy);
+  setSelPreview(rect, false);
+}
+
+function onPointerUp(evt){
+  if (!dragging) return;
+  dragging = false;
+  const { cx, cy } = cellFromPoint(evt.clientX, evt.clientY);
+  const rect = rectCells(startCell.cx, startCell.cy, cx, cy);
+  const ok = tryPlace(rect);
+  if (ok){
+    clearSelPreview();
+    paintCells();
+    if (secondsElapsed === 0 && !timerInterval) startTimer();
+    saveState();
+    if (isSolved()) finishGame();
+  } else {
+    setSelPreview(rect, true);
+    boardEl.classList.add('shake');
+    setTimeout(() => {
+      clearSelPreview();
+      boardEl.classList.remove('shake');
+    }, 320);
+  }
+}
+
+boardEl.addEventListener('pointerdown', onPointerDown);
+boardEl.addEventListener('pointermove', onPointerMove);
+window.addEventListener('pointerup', onPointerUp);
+window.addEventListener('pointercancel', onPointerUp);
+
+// ═══════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════
+function fmt(s){
+  const m = Math.floor(s / 60), sec = s % 60;
+  return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+}
+function startTimer(){
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    document.getElementById('timerDisplay').textContent = fmt(secondsElapsed);
+  }, 1000);
+}
+function stopTimer(){
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+// ═══════════════════════════════════════════════
+//  WIN / SHARE / COUNTDOWN
+// ═══════════════════════════════════════════════
+function finishGame(){
+  status = 'won';
+  stopTimer();
+  document.getElementById('timerDisplay').classList.add('won');
+  saveState();
+  setTimeout(showEndPopup, 300);
+}
+
+function showEndPopup(){
+  document.getElementById('endSub').textContent = `${cols}×${rows} grid`;
+  document.getElementById('endTime').textContent = fmt(secondsElapsed);
+  document.getElementById('endPieces').textContent = placedRects.length;
+  document.getElementById('endOverlay').classList.add('on');
+  startCountdown();
+}
+
+function startCountdown(){
+  const el = document.getElementById('countdownVal');
+  function tick(){
+    const now = new Date();
+    const nextMidnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+    const diff = Math.max(0, nextMidnight - now.getTime());
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
+  }
+  tick();
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(tick, 1000);
+}
+
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const text = `Shikaku #${puzzle.puzzleNum} — ${cols}×${rows} grid\nSolved in ${fmt(secondsElapsed)} with ${placedRects.length} rectangles 🧩`;
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('shareBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    }).catch(() => {});
+  }
+});
+
+function resetBoard(){
+  // Works even after a solve — this is the only way to play the same
+  // puzzle again, since the board otherwise restores whatever state was
+  // last saved for today's date.
+  document.getElementById('endOverlay').classList.remove('on');
+  clearInterval(countdownInterval);
+  stopTimer();
+  ownerGrid = new Array(rows * cols).fill(-1);
+  placedRects = [];
+  secondsElapsed = 0;
+  status = 'playing';
+  document.getElementById('timerDisplay').textContent = fmt(0);
+  document.getElementById('timerDisplay').classList.remove('won');
+  paintCells();
+  saveState();
+}
+document.getElementById('clearBtn').addEventListener('click', resetBoard);
+document.getElementById('playAgainBtn').addEventListener('click', resetBoard);
+
+// ═══════════════════════════════════════════════
+//  POPUP WIRING
+// ═══════════════════════════════════════════════
+function setupPopup(btnId, overlayId, closeId){
+  document.getElementById(btnId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.add('on'));
+  document.getElementById(closeId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.remove('on'));
+  document.getElementById(overlayId)?.addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('on');
+  });
+}
+setupPopup('helpBtn', 'helpOverlay', 'helpClose');
+setupPopup(null, 'endOverlay', 'endClose');
+
+// ═══════════════════════════════════════════════
+//  STATE PERSISTENCE
+// ═══════════════════════════════════════════════
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed.dayIndex !== dayIndex) return null;
+    return parsed;
+  }catch(e){ return null; }
+}
+function saveState(){
+  try{
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+      dayIndex, placedRects, secondsElapsed, status
+    }));
+  }catch(e){}
+}
+
+function replaySavedState(saved){
+  (saved.placedRects || []).forEach(r => {
+    for (let yy = r.y; yy < r.y + r.h; yy++)
+      for (let xx = r.x; xx < r.x + r.w; xx++)
+        ownerGrid[yy * cols + xx] = r.id;
+  });
+  placedRects = saved.placedRects || [];
+  secondsElapsed = saved.secondsElapsed || 0;
+  status = saved.status || 'playing';
+  document.getElementById('timerDisplay').textContent = fmt(secondsElapsed);
+  paintCells();
+  if (status === 'won'){
+    document.getElementById('timerDisplay').classList.add('won');
+    setTimeout(showEndPopup, 300);
+  } else if (placedRects.length > 0){
+    startTimer();
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+function init(){
+  document.getElementById('puzzleNum').textContent = 'Shikaku #' + puzzle.puzzleNum;
+  document.getElementById('dayInfo').textContent =
+    'Shikaku #' + puzzle.puzzleNum + ' · ' + cols + '×' + rows + ' grid · new puzzle daily at midnight UTC';
+
+  const saved = loadState();
+  if (saved) replaySavedState(saved);
+}
+init();
+</script>
+</body>
+</html>
