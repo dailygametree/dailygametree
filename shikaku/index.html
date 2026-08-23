@@ -795,6 +795,10 @@ function onPointerDown(evt){
   startCell = { cx, cy };
   boardEl.setPointerCapture(evt.pointerId);
   setSelPreview({ x:cx, y:cy, w:1, h:1 }, false);
+  // Start the clock on the first attempt, not the first *correct* one —
+  // otherwise it sits at 00:00 through however long it takes to land a
+  // valid rectangle, which reads as broken.
+  startTimer();
 }
 
 function onPointerMove(evt){
@@ -814,7 +818,6 @@ function onPointerUp(evt){
   if (ok){
     clearSelPreview();
     paintCells();
-    if (secondsElapsed === 0 && !timerInterval) startTimer();
     saveState();
     if (isSolved()) finishGame();
   } else {
