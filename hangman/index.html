@@ -438,15 +438,42 @@ footer {
 .day-info{font-size:11px;color:#aaa;text-align:center;margin-top:22px;font-family:var(--mono)}
 
 @media(max-width:960px){
-  .title{font-size:clamp(19px,5.8vw,26px)}
-  .chalkboard-frame{padding:10px}
-  .chalkboard{padding:14px 10px 16px}
-  .gallows-wrap{width:110px;height:130px}
-  .word-row{gap:7px;min-height:40px;margin:10px 0 4px}
-  .letter-slot{font-size:clamp(18px,6.5vw,26px)}
-  #drawCanvas{max-width:230px}
-  .action-btn{padding:8px 16px;font-size:12px}
-  .day-info{margin-top:12px}
+  /* Compact everything so the whole chalkboard fits one mobile screen
+     with no scrolling needed — sizes below are tuned to fit within
+     ~600px of usable height (a small phone viewport). */
+  .ad-rail{margin:3px 10px}
+  .ad-rail .ad-slot{height:16px;font-size:6.5px}
+  .back-link{margin:5px 4px 0;padding:3px 9px;font-size:11px}
+  .game-wrap{margin-top:4px}
+  .game-col{padding:4px 8px 4px}
+  .title-block{gap:6px}
+  .title{font-size:clamp(16px,5.2vw,24px)}
+  .divider{margin:4px 0 6px}
+  .toolbar{margin-bottom:4px}
+  .icon-btn{width:24px;height:24px;font-size:12px}
+  .chalkboard-frame{padding:5px}
+  .chalkboard{padding:8px 6px 8px}
+  .board-inner{gap:2px}
+  .gallows-wrap{width:clamp(50px,14vh,90px);height:clamp(60px,16.5vh,106px)}
+  .lives-note{margin-top:0;font-size:10px}
+  .word-row{gap:5px;min-height:26px;margin:4px 0 1px}
+  .letter-slot{font-size:clamp(14px,5.6vw,22px)}
+  .tried-row{gap:4px;min-height:14px;margin:2px 0 1px}
+  .tried-chip{width:16px;height:16px;font-size:10px}
+  .slate-label{margin-top:4px;font-size:9px}
+  .type-row{margin-top:3px;gap:6px}
+  .type-input{font-size:16px;width:1.4em;padding:1px 0 2px}
+  .type-confirm-btn{width:20px;height:20px;font-size:12px}
+  .slate{margin-top:4px;padding:4px}
+  #drawCanvas{max-width:clamp(100px,22vh,160px)}
+  .recognized-row{margin-top:4px;min-height:20px;gap:8px}
+  .recognized-label{font-size:9.5px}
+  .recognized-letter{font-size:18px}
+  .candidate-btn{width:22px;height:22px;font-size:11px}
+  .action-row{margin-top:4px;gap:8px}
+  .action-btn{padding:5px 11px;font-size:10.5px}
+  .hint-msg{min-height:13px;margin-top:3px;font-size:10.5px}
+  .day-info{margin-top:4px;font-size:9.5px}
 }
 
 /* ── Popups ── */
@@ -997,6 +1024,18 @@ let mlLoadFailed = false;
 const mlLoadPromise = (async () => {
   try {
     mlModel = await tf.loadLayersModel('model/model.json');
+    // Warm up the backend (WebGL shader compilation on the very first
+    // predict() call can take 500-800ms) with a throwaway prediction, so
+    // the model is already "hot" by the time the user draws their first
+    // real letter — otherwise a fast guess right after page load can
+    // finish drawing and tap Confirm before the first real prediction
+    // (and the resulting candidates) is ready, and the tap does nothing
+    // because the confirm button is still disabled at that instant.
+    const warm = tf.zeros([1, 28, 28, 1]);
+    const warmPred = mlModel.predict(warm);
+    await warmPred.data();
+    warm.dispose();
+    warmPred.dispose();
   } catch (e) {
     mlLoadFailed = true;
     console.warn('Handwriting model failed to load; using built-in shape matcher instead.', e);
@@ -1093,6 +1132,34 @@ async function recognizeStrokesML(strokes){
   return out;
 }
 
+// Merge the CNN's candidates with the built-in shape-matcher's candidates.
+// The two are independent recognizers with different failure modes — the
+// CNN is strong overall but (like most EMNIST-style models) is prone to
+// mixing up thin single-stroke letters such as I / l / i, since those are
+// genuinely near-identical as raster shapes. The shape-matcher's templates
+// for those same letters retain small distinguishing details (e.g. the
+// little hook at the base of a lowercase "l"), so when the two disagree we
+// let agreement act as a tie-break: a letter both recognizers rank highly
+// gets boosted above one only the CNN likes.
+function mergeCandidates(mlCands, geoCands){
+  const entries = new Map();
+  const add = (list, weight) => {
+    list.forEach((c, idx) => {
+      const key = c.letter.toUpperCase();
+      const score = (list.length - idx) * weight;
+      const prev = entries.get(key);
+      if (prev){
+        prev.score += score;
+      } else {
+        entries.set(key, { letter: c.letter, score });
+      }
+    });
+  };
+  add(mlCands, 2);   // CNN candidates weighted higher — it's the stronger general recognizer
+  add(geoCands, 1);  // shape-matcher candidates act as a tie-break / second opinion
+  return [...entries.values()].sort((a, b) => b.score - a.score).slice(0, 4);
+}
+
 // ═══════════════════════════════════════════════
 //  RECOGNITION UI
 // ═══════════════════════════════════════════════
@@ -1104,31 +1171,42 @@ const hintMsgEl = document.getElementById('hintMsg');
 
 async function runRecognition(){
   const strokesSnapshot = strokes;
-  let result = [];
-  if (!mlLoadFailed){
-    await mlLoadPromise;
-  }
-  if (mlModel){
-    try {
-      result = await recognizeStrokesML(strokesSnapshot);
-    } catch (e){
-      console.warn('ML recognition failed, falling back to shape matcher.', e);
-      result = recognizeStrokes(strokesSnapshot);
-    }
+
+  // The shape-matcher is synchronous and fast, so show its guess right
+  // away and make Confirm Guess usable immediately — don't leave the
+  // button sitting disabled while the (usually better, but async) ML
+  // model is still working. Without this, a quick letter drawn right
+  // after page load could be confirmed before the model's first
+  // prediction (which briefly needs to warm up its GPU pipeline) has
+  // even resolved, and the tap would silently do nothing.
+  const geoResult = recognizeStrokes(strokesSnapshot);
+  candidates = geoResult;
+  if (candidates.length){
+    selectedLetter = candidates[0].letter;
+    renderRecognition();
   } else {
-    result = recognizeStrokes(strokesSnapshot);
-  }
-  // if the slate was cleared (or redrawn) while we were awaiting the
-  // model, don't clobber the newer state with a stale result
-  if (strokesSnapshot !== strokes) return;
-  candidates = result;
-  if (candidates.length === 0){
     selectedLetter = null;
     recognizedLetterEl.textContent = '—';
     candidatesRowEl.innerHTML = '';
     confirmBtn.disabled = true;
+  }
+
+  if (!mlLoadFailed) await mlLoadPromise;
+  if (!mlModel) return;
+  let mlResult;
+  try {
+    mlResult = await recognizeStrokesML(strokesSnapshot);
+  } catch (e){
+    console.warn('ML recognition failed, keeping shape-matcher guess.', e);
     return;
   }
+  // if the slate was cleared/redrawn, or the guess was already confirmed
+  // (which also clears the slate), while we were awaiting the model,
+  // don't clobber newer state with this now-stale result
+  if (strokesSnapshot !== strokes) return;
+  const merged = mlResult.length ? mergeCandidates(mlResult, geoResult) : geoResult;
+  if (merged.length === 0) return;
+  candidates = merged;
   selectedLetter = candidates[0].letter;
   renderRecognition();
 }
