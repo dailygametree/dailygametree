@@ -214,6 +214,11 @@ footer {
   .game-wrap{height:100%;display:flex;flex-direction:column;min-height:0}
 }
 
+/* header-row is a layout-only wrapper: on desktop it's invisible to layout
+   (display:contents) so title/divider/toolbar stack exactly as before;
+   on mobile it becomes a real flex row so the title and toolbar sit
+   side by side instead of each taking their own stacked row. */
+.header-row{display:contents}
 .title-block{display:flex;align-items:center;gap:10px}
 .title{font-family:var(--font-chalk);font-weight:700;font-size:clamp(24px,4.4vw,38px);letter-spacing:.3px;color:var(--text)}
 .title .hang{color:var(--amber)}
@@ -259,6 +264,13 @@ footer {
 
 .board-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px}
 
+/* board-top/board-info: same display:contents trick — invisible wrappers
+   on desktop (gallows sits above the word/lives/tried info, unchanged),
+   real flex rows on mobile (gallows sits beside that info instead of
+   above it, so the two don't each need their own full-width row). */
+.board-top{display:contents}
+.board-info{display:contents}
+
 .gallows-wrap{width:150px;height:177px;flex-shrink:0}
 .gallows-wrap svg{width:100%;height:100%;display:block}
 .gallows-wrap path{fill:none;stroke-linecap:round;stroke-linejoin:round}
@@ -273,21 +285,23 @@ footer {
 
 .word-row{
   display:flex;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   justify-content:center;
-  gap:10px;
+  gap:var(--letter-gap, 10px);
   margin:14px 0 6px;
   min-height:52px;
   align-items:flex-end;
+  width:100%;
 }
 .letter-slot{
   font-family:var(--font-chalk);
   font-weight:700;
-  font-size:clamp(22px,5.4vw,34px);
+  font-size:var(--letter-fs, clamp(22px,5.4vw,34px));
   color:var(--chalk);
   min-width:0.7em;
   text-align:center;
   line-height:1;
+  flex-shrink:0;
 }
 .letter-slot.space{min-width:14px}
 
@@ -438,42 +452,70 @@ footer {
 .day-info{font-size:11px;color:#aaa;text-align:center;margin-top:22px;font-family:var(--mono)}
 
 @media(max-width:960px){
-  /* Compact everything so the whole chalkboard fits one mobile screen
-     with no scrolling needed — sizes below are tuned to fit within
-     ~600px of usable height (a small phone viewport). */
+  /* Reorganized (not just shrunk) mobile layout: the gallows sits beside
+     the word/lives/tried info instead of above it, and the title sits
+     beside the toolbar instead of above it — each pairing shares one row
+     instead of stacking two, which frees up enough height to keep the
+     canvas, buttons and text at comfortable, tappable/readable sizes. */
   .ad-rail{margin:3px 10px}
-  .ad-rail .ad-slot{height:16px;font-size:6.5px}
-  .back-link{margin:5px 4px 0;padding:3px 9px;font-size:11px}
+  .ad-rail .ad-slot{height:18px;font-size:7px}
+  .back-link{margin:6px 4px 0;padding:4px 10px;font-size:11.5px}
   .game-wrap{margin-top:4px}
   .game-col{padding:4px 8px 4px}
+
+  .header-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:6px;
+  }
   .title-block{gap:6px}
-  .title{font-size:clamp(16px,5.2vw,24px)}
-  .divider{margin:4px 0 6px}
-  .toolbar{margin-bottom:4px}
-  .icon-btn{width:24px;height:24px;font-size:12px}
-  .chalkboard-frame{padding:5px}
-  .chalkboard{padding:8px 6px 8px}
-  .board-inner{gap:2px}
-  .gallows-wrap{width:clamp(50px,14vh,90px);height:clamp(60px,16.5vh,106px)}
-  .lives-note{margin-top:0;font-size:10px}
-  .word-row{gap:5px;min-height:26px;margin:4px 0 1px}
-  .letter-slot{font-size:clamp(14px,5.6vw,22px)}
-  .tried-row{gap:4px;min-height:14px;margin:2px 0 1px}
-  .tried-chip{width:16px;height:16px;font-size:10px}
-  .slate-label{margin-top:4px;font-size:9px}
-  .type-row{margin-top:3px;gap:6px}
-  .type-input{font-size:16px;width:1.4em;padding:1px 0 2px}
-  .type-confirm-btn{width:20px;height:20px;font-size:12px}
-  .slate{margin-top:4px;padding:4px}
-  #drawCanvas{max-width:clamp(100px,22vh,160px)}
-  .recognized-row{margin-top:4px;min-height:20px;gap:8px}
-  .recognized-label{font-size:9.5px}
-  .recognized-letter{font-size:18px}
-  .candidate-btn{width:22px;height:22px;font-size:11px}
-  .action-row{margin-top:4px;gap:8px}
-  .action-btn{padding:5px 11px;font-size:10.5px}
-  .hint-msg{min-height:13px;margin-top:3px;font-size:10.5px}
-  .day-info{margin-top:4px;font-size:9.5px}
+  .title{font-size:clamp(17px,5.2vw,22px)}
+  .divider{display:none}
+  .toolbar{margin-bottom:0;flex-shrink:0}
+  .toolbar-left{font-size:11px}
+  .icon-btn{width:28px;height:28px;font-size:13px}
+
+  .chalkboard-frame{padding:8px}
+  .chalkboard{padding:12px 10px 12px}
+  .board-inner{gap:8px}
+
+  .board-top{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    width:100%;
+  }
+  .board-info{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    flex:1;
+    min-width:0;
+  }
+  .gallows-wrap{width:clamp(76px,20vh,105px);height:clamp(90px,24vh,124px);flex-shrink:0}
+  .lives-note{margin-top:0;font-size:11.5px}
+  .word-row{gap:var(--letter-gap, 6px);min-height:0;margin:2px 0;justify-content:flex-start}
+  .letter-slot{font-size:var(--letter-fs, clamp(16px,6vw,24px))}
+  .tried-row{gap:5px;min-height:0;margin:0;justify-content:flex-start}
+  .tried-chip{width:19px;height:19px;font-size:11px}
+
+  .slate-label{margin-top:8px;font-size:10.5px}
+  .type-row{margin-top:5px;gap:8px}
+  .type-input{font-size:19px;width:1.4em;padding:2px 0}
+  .type-confirm-btn{width:28px;height:28px;font-size:15px}
+  .slate{margin-top:6px;padding:6px}
+  #drawCanvas{max-width:clamp(150px,42vw,210px)}
+
+  .recognized-row{margin-top:8px;min-height:0;gap:10px}
+  .recognized-label{font-size:10.5px}
+  .recognized-letter{font-size:22px}
+  .candidate-btn{width:28px;height:28px;font-size:13px}
+  .action-row{margin-top:8px;gap:10px}
+  .action-btn{padding:8px 16px;font-size:12px}
+  .hint-msg{min-height:14px;margin-top:5px;font-size:11.5px}
+  .day-info{margin-top:6px;font-size:10.5px}
 }
 
 /* ── Popups ── */
@@ -521,15 +563,17 @@ footer {
           <div class="game-wrap">
             <div class="page">
               <div class="game-col">
-                <div class="title-block">
-                  <h1 class="title">Daily <span class="hang">Hangman</span></h1>
-                </div>
-                <hr class="divider">
+                <div class="header-row">
+                  <div class="title-block">
+                    <h1 class="title">Daily <span class="hang">Hangman</span></h1>
+                  </div>
+                  <hr class="divider">
 
-                <div class="toolbar">
-                  <div class="toolbar-left" id="dayLabel">Hangman #1</div>
-                  <div class="toolbar-right">
-                    <button class="icon-btn" id="helpBtn" title="How to play">?</button>
+                  <div class="toolbar">
+                    <div class="toolbar-left" id="dayLabel">Hangman #1</div>
+                    <div class="toolbar-right">
+                      <button class="icon-btn" id="helpBtn" title="How to play">?</button>
+                    </div>
                   </div>
                 </div>
 
@@ -537,6 +581,7 @@ footer {
                   <div class="chalkboard">
                     <div class="board-inner">
 
+                      <div class="board-top">
                       <div class="gallows-wrap">
                         <svg viewBox="0 0 220 260" aria-hidden="true">
                           <g class="structure">
@@ -557,10 +602,12 @@ footer {
                           </g>
                         </svg>
                       </div>
-                      <div class="lives-note" id="livesNote"><b>6</b> wrong guesses left</div>
-
-                      <div class="word-row" id="wordRow"></div>
-                      <div class="tried-row" id="triedRow"></div>
+                      <div class="board-info">
+                        <div class="lives-note" id="livesNote"><b>6</b> wrong guesses left</div>
+                        <div class="word-row" id="wordRow"></div>
+                        <div class="tried-row" id="triedRow"></div>
+                      </div>
+                      </div>
 
                       <div class="slate-label">Draw a letter on the slate</div>
                       <div class="type-row">
@@ -886,7 +933,48 @@ function renderWord(){
     if (gameOver && status === 'lost' && !revealed.has(ch)) slot.style.opacity = '0.55';
     wordRowEl.appendChild(slot);
   }
+  fitWordRow();
 }
+
+// The word row must never wrap to a second line — long words (some in
+// the list run 10-11 letters) combined with the narrower mobile column
+// could otherwise overflow. Shrink the letter font just enough to keep
+// everything on one line, rather than let it wrap.
+function fitWordRow(){
+  wordRowEl.style.removeProperty('--letter-fs');
+  wordRowEl.style.removeProperty('--letter-gap');
+  const available = wordRowEl.clientWidth;
+  if (available <= 0) return;
+  if (wordRowEl.scrollWidth <= available) return;
+
+  // first, tighten the gap between letters — cheaper than shrinking the
+  // font and barely affects legibility, so it's the first thing to give
+  let gap = parseFloat(getComputedStyle(wordRowEl).columnGap) || 10;
+  let gapGuard = 0;
+  while (wordRowEl.scrollWidth > available && gap > 2 && gapGuard < 20){
+    gap = Math.max(2, gap - 1);
+    wordRowEl.style.setProperty('--letter-gap', gap + 'px');
+    gapGuard++;
+  }
+  if (wordRowEl.scrollWidth <= available) return;
+
+  // still doesn't fit on one line — shrink the font too, down to a
+  // minimum floor that guarantees it never wraps to a second line
+  const firstSlot = wordRowEl.querySelector('.letter-slot');
+  let size = firstSlot ? parseFloat(getComputedStyle(firstSlot).fontSize) : 22;
+  if (!size || Number.isNaN(size)) size = 22;
+  size = Math.max(9, Math.floor(size * (available / wordRowEl.scrollWidth) * 0.95));
+  wordRowEl.style.setProperty('--letter-fs', size + 'px');
+
+  let guard = 0;
+  while (wordRowEl.scrollWidth > available && size > 9 && guard < 40){
+    size -= 1;
+    wordRowEl.style.setProperty('--letter-fs', size + 'px');
+    guard++;
+  }
+}
+
+window.addEventListener('resize', fitWordRow);
 
 function renderTried(){
   triedRowEl.innerHTML = '';
