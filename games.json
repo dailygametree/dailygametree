@@ -37,5 +37,18 @@
   "dateAdded": "2026-08-22",
   "tags": ["puzzle", "word", "daily"],
   "hiddenTags": ["hangman", "hang man", "hangdle", "word game", "letter game", "guess the word", "chalkboard", "chalk", "draw", "handwriting", "wordle"]
+  },
+  {
+  "id": "shikaku",
+  "folder": "shikaku",
+  "title": "Shikaku",
+  "tagline": "Every number is a rectangle's area",
+  "description": "A daily rectangle-division logic puzzle — draw rectangles so each one contains exactly one number, matching its area, until the whole grid is covered.",
+  "banner": "shikaku/banner.png",
+  "favicon": "shikaku/favicon.png",
+  "accent": "#3E6E92",
+  "dateAdded": "2026-08-23",
+  "tags": ["puzzle", "logic", "daily"],
+  "hiddenTags": ["shikaku", "rectangle puzzle", "area puzzle", "block puzzle", "logic puzzle", "grid puzzle", "divide by box", "math puzzle", "japanese puzzle", "tatami", "wordle", "square puzzle", "sudoku", "shikakudle", "shikaku-dle"]
   }
 ]
