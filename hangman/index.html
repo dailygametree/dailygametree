@@ -1,0 +1,1341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Daily Hangman — dailygametree</title>
+<meta name="description" content="Draw your guess in chalk. A new hangman word every day.">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="canonical" href="https://dailygametree.com/hangman/" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ---------- Site-wide palette (drives header / ad rails / footer) ---------- */
+:root{
+  --bg: #F6F5EF;
+  --bg-elevated: #EFEDE3;
+  --bg-card: #FFFFFF;
+  --text: #20261C;
+  --text-dim: #5B6255;
+  --text-faint: #9AA091;
+  --accent: #6E9C1E;
+  --accent-dim: #557A16;
+  --accent-soft: #E7F1D4;
+  --amber: #C97A1B;
+  --line: #E1DDCF;
+  --radius: 8px;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: 'Fraunces', serif;
+  --body: 'Public Sans', ui-sans-serif, sans-serif;
+}
+
+html,body{
+  min-height:100%;
+  background:var(--bg);
+  font-family:var(--body);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+a{ color:inherit; }
+
+/* ---------- Header (identical to homepage) ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: rgba(246, 245, 239, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.logo-mark { width: 55px; height: auto; display: block; }
+
+/* ---------- Ad rails (identical to homepage) ---------- */
+
+.layout {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.ad-rail {
+  flex: 0 0 160px;
+  margin: 0 10px;
+  position: sticky;
+  top: 78px;
+  align-self: stretch;
+  display: flex;
+}
+
+.ad-slot {
+  border: 1px dashed #CBC6B4;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  color: var(--text-faint);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.6;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.main-inner {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+
+@media (max-width: 900px) {
+  html, body { height: 100dvh; overflow: hidden; }
+  body { display: flex; flex-direction: column; }
+  .site-header { display: none; }
+  .layout { flex: 1 1 auto; min-height: 0; flex-direction: column; align-items: stretch; overflow: hidden; }
+  .ad-rail { position: static; flex: 0 0 auto; width: calc(100% - 20px); margin: 6px 10px; align-self: auto; }
+  .ad-rail.left { order: -1; }
+  .main-content { order: 0; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  .ad-rail.right { order: 1; }
+  .ad-rail .ad-slot { height: 32px; width: auto; font-size: 8px; letter-spacing: .04em; }
+  .main-inner { padding: 0 12px; height: 100%; }
+
+  .back-link { align-self: flex-start; }
+  footer { display: none; }
+}
+
+@media (max-width: 480px) {
+  .logo-text { display: none; }
+  .logo { gap: 0; }
+}
+
+.back-link{
+  display:inline-block;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  margin:24px 4px 0;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--body);
+  transition:border-color .15s,color .15s;
+}
+.back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
+
+/* ---------- Footer (identical to homepage) ---------- */
+
+footer {
+  text-align: center;
+  padding: 28px 24px 40px;
+  color: var(--text-faint);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+.footer-links a:hover { color: var(--accent-dim); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =====================================================================
+   GAME CONTENT
+   ===================================================================== */
+
+.game-wrap{
+  --board: #142520;
+  --board-edge: #0d1912;
+  --wood: #3b2a1b;
+  --wood-light: #573f29;
+  --chalk: #f2f2ea;
+  --chalk-dim: #c9cfc4;
+  --chalk-amber: #e8c57a;
+  --chalk-red: #e3897d;
+  --chalk-green: #a7d38c;
+  --font-chalk: 'Kalam', cursive;
+  font-family: var(--body);
+  color: var(--text);
+  margin-top: 14px;
+}
+
+.page{display:flex;justify-content:center;padding:0 24px}
+.game-col{flex:0 0 620px;max-width:620px;padding:32px 24px 60px}
+
+@media(max-width:960px){
+  .page{padding:0 6px;height:100%}
+  .game-col{flex:0 0 auto;max-width:100%;width:100%;height:100%;padding:10px 10px 10px;display:flex;flex-direction:column;overflow-y:auto}
+  .main-inner{height:100%}
+  .main-inner > main{height:100%;display:flex;flex-direction:column;min-height:0}
+  .game-wrap{height:100%;display:flex;flex-direction:column;min-height:0}
+}
+
+.title-block{display:flex;align-items:center;gap:10px}
+.title{font-family:var(--font-chalk);font-weight:700;font-size:clamp(24px,4.4vw,38px);letter-spacing:.3px;color:var(--text)}
+.title .hang{color:var(--amber)}
+.divider{border:none;height:2px;background:linear-gradient(to right,var(--amber),#e8c07a,var(--amber));margin:10px 0 18px;border-radius:2px;opacity:.7}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.toolbar-left{font-family:var(--mono);font-size:12px;color:var(--text-faint)}
+.toolbar-right{display:flex;align-items:center;gap:8px}
+.icon-btn{width:32px;height:32px;border-radius:50%;border:2px solid var(--text);background:transparent;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;flex-shrink:0;padding:0;line-height:1;color:var(--text)}
+.icon-btn:hover{background:var(--text);color:var(--bg)}
+
+/* ---------- Chalkboard ---------- */
+
+.chalkboard-frame{
+  background:var(--wood);
+  border-radius:14px;
+  padding:14px;
+  box-shadow:0 12px 30px rgba(20,30,20,.22), inset 0 0 0 1px rgba(0,0,0,.25);
+}
+
+.chalkboard{
+  position:relative;
+  background:
+    radial-gradient(ellipse 500px 260px at 20% 0%, rgba(255,255,255,.05), transparent),
+    radial-gradient(ellipse 420px 300px at 85% 100%, rgba(255,255,255,.045), transparent),
+    var(--board);
+  border-radius:6px;
+  padding:20px 18px 22px;
+  overflow:hidden;
+}
+
+.chalkboard::before{
+  content:"";
+  position:absolute; inset:0;
+  background-image:
+    radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    radial-gradient(rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size: 37px 41px, 23px 29px;
+  background-position: 0 0, 11px 17px;
+  opacity:.5;
+  pointer-events:none;
+}
+
+.board-inner{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px}
+
+.gallows-wrap{width:150px;height:177px;flex-shrink:0}
+.gallows-wrap svg{width:100%;height:100%;display:block}
+.gallows-wrap path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.gallows-wrap .structure path{stroke:var(--chalk-amber);stroke-width:3.4;opacity:.92}
+.gallows-wrap .figure path{stroke:var(--chalk);stroke-width:3.2;opacity:.95}
+.gallows-wrap .figure.dead path{stroke:var(--chalk-red)}
+.gallows-wrap .part{display:none}
+.gallows-wrap .part.show{display:block}
+
+.lives-note{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--chalk-dim);margin-top:2px}
+.lives-note b{color:var(--chalk-amber)}
+
+.word-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  margin:14px 0 6px;
+  min-height:52px;
+  align-items:flex-end;
+}
+.letter-slot{
+  font-family:var(--font-chalk);
+  font-weight:700;
+  font-size:clamp(22px,5.4vw,34px);
+  color:var(--chalk);
+  min-width:0.7em;
+  text-align:center;
+  line-height:1;
+}
+.letter-slot.space{min-width:14px}
+
+.tried-row{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:6px;
+  margin:6px 0 4px;
+  min-height:20px;
+}
+.tried-chip{
+  font-family:var(--font-chalk);
+  font-size:14px;
+  width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;
+  border:1.5px solid currentColor;
+}
+.tried-chip.good{color:var(--chalk-green)}
+.tried-chip.bad{color:var(--chalk-red);opacity:.85}
+
+.slate-label{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--chalk-dim);
+  margin-top:14px;
+}
+
+.type-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin-top:8px;
+}
+.type-row-label{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--chalk-dim);
+}
+.type-input{
+  font-family:var(--font-chalk);
+  font-weight:700;
+  font-size:22px;
+  width:1.6em;
+  padding:2px 0 3px;
+  text-align:center;
+  text-transform:uppercase;
+  color:var(--chalk);
+  background:rgba(255,255,255,.035);
+  border:none;
+  border-bottom:2px dashed rgba(242,242,234,.45);
+  border-radius:0;
+  outline:none;
+  caret-color:var(--chalk-amber);
+}
+.type-input:focus{border-bottom-color:var(--chalk-amber)}
+.type-confirm-btn{
+  width:26px;height:26px;
+  display:flex;align-items:center;justify-content:center;
+  border:1.5px solid rgba(242,242,234,.45);
+  border-radius:5px;
+  background:transparent;
+  color:var(--chalk-green);
+  font-family:var(--font-chalk);
+  font-weight:700;
+  font-size:15px;
+  line-height:1;
+  cursor:pointer;
+  transition:border-color .12s,background .12s,opacity .12s;
+}
+.type-confirm-btn:hover:not(:disabled){border-color:var(--chalk-green);background:rgba(167,211,140,.12)}
+.type-confirm-btn:disabled{opacity:.35;cursor:default}
+
+.slate{
+  margin-top:8px;
+  background:rgba(255,255,255,.035);
+  border:1.5px dashed rgba(242,242,234,.3);
+  border-radius:10px;
+  padding:8px;
+  touch-action:none;
+}
+
+#drawCanvas{
+  display:block;
+  width:100%;
+  max-width:280px;
+  aspect-ratio:1.15/1;
+  margin:0 auto;
+  cursor:crosshair;
+  border-radius:6px;
+}
+
+.recognized-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  margin-top:14px;
+  min-height:40px;
+}
+.recognized-label{font-family:var(--mono);font-size:11px;color:var(--text-faint)}
+.recognized-letter{
+  font-family:var(--font-chalk);
+  font-weight:700;
+  font-size:30px;
+  color:var(--text);
+  min-width:1.1em;
+  text-align:center;
+}
+.candidates{display:flex;gap:6px}
+.candidate-btn{
+  font-family:var(--font-chalk);
+  font-size:15px;
+  width:30px;height:30px;
+  border-radius:8px;
+  border:1.5px solid var(--line);
+  background:var(--bg-card);
+  cursor:pointer;
+  transition:border-color .12s,background .12s;
+}
+.candidate-btn.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dim)}
+.candidate-btn:hover{border-color:var(--accent)}
+
+.action-row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.action-btn{font-family:var(--mono);font-size:13px;padding:9px 20px;background:var(--bg-card);border:1.5px solid #bbb;border-radius:8px;cursor:pointer;transition:background .12s}
+.action-btn:hover{background:var(--bg-elevated)}
+.action-btn.primary{background:var(--accent);border-color:var(--accent-dim);color:#fff;font-weight:700}
+.action-btn.primary:hover{background:var(--accent-dim)}
+.action-btn.primary:disabled{background:#ccc;border-color:#bbb;color:#888;cursor:default}
+.action-btn:disabled{opacity:.5;cursor:default}
+
+.hint-msg{
+  text-align:center;
+  font-family:var(--mono);
+  font-size:12.5px;
+  color:var(--text-faint);
+  min-height:18px;
+  margin-top:8px;
+}
+.hint-msg.warn{color:var(--amber)}
+
+.day-info{font-size:11px;color:#aaa;text-align:center;margin-top:22px;font-family:var(--mono)}
+
+@media(max-width:960px){
+  .title{font-size:clamp(19px,5.8vw,26px)}
+  .chalkboard-frame{padding:10px}
+  .chalkboard{padding:14px 10px 16px}
+  .gallows-wrap{width:110px;height:130px}
+  .word-row{gap:7px;min-height:40px;margin:10px 0 4px}
+  .letter-slot{font-size:clamp(18px,6.5vw,26px)}
+  #drawCanvas{max-width:230px}
+  .action-btn{padding:8px 16px;font-size:12px}
+  .day-info{margin-top:12px}
+}
+
+/* ── Popups ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:200;align-items:center;justify-content:center;padding:16px}
+.overlay.on{display:flex}
+.popup{background:var(--bg);border-radius:14px;padding:26px 26px 22px;max-width:420px;width:100%;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.28);font-family:var(--body)}
+.popup h2{font-family:var(--display);font-size:20px;margin-bottom:12px}
+.popup p,.popup li{font-size:13.5px;line-height:1.7;color:var(--text-dim)}
+.popup ul{padding-left:16px;margin-top:6px}
+.popup ul li{margin-bottom:4px}
+.popup-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--text);line-height:1;padding:2px 4px}
+.popup-close:hover{opacity:.55}
+.popup code{background:#e4dfd4;border-radius:3px;padding:1px 4px;font-family:var(--mono);font-size:12px}
+
+.end-title{font-size:24px;text-align:center;font-family:var(--display)}
+.end-word{font-family:var(--font-chalk);font-weight:700;font-size:26px;text-align:center;margin-top:8px;color:var(--text)}
+.end-event{font-size:13px;text-align:center;margin-top:4px;color:var(--text-dim)}
+.end-grid{display:flex;flex-direction:column;align-items:center;gap:4px;margin:16px 0}
+.end-grid-row{display:flex;gap:4px}
+.end-grid-row span{width:16px;height:16px;border-radius:3px;display:inline-block}
+.end-actions{display:flex;gap:10px;justify-content:center;margin-top:6px}
+.countdown-box{text-align:center;margin-top:14px;font-size:12px;color:var(--text-faint)}
+.countdown-val{font-family:var(--mono);font-size:15px;color:var(--text);display:block;margin-top:2px}
+
+</style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/">
+      <img src="/logo.png" alt="dailygametree logo" class="logo-mark" />
+      <span class="logo-text">dailygametree</span>
+    </a>
+  </header>
+
+  <div class="layout">
+    <aside class="ad-rail left">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+
+    <div class="main-content">
+      <div class="main-inner">
+        <main>
+          <a class="back-link" href="/">&larr; All games</a>
+
+          <div class="game-wrap">
+            <div class="page">
+              <div class="game-col">
+                <div class="title-block">
+                  <h1 class="title">Daily <span class="hang">Hangman</span></h1>
+                </div>
+                <hr class="divider">
+
+                <div class="toolbar">
+                  <div class="toolbar-left" id="dayLabel">Hangman #1</div>
+                  <div class="toolbar-right">
+                    <button class="icon-btn" id="helpBtn" title="How to play">?</button>
+                  </div>
+                </div>
+
+                <div class="chalkboard-frame">
+                  <div class="chalkboard">
+                    <div class="board-inner">
+
+                      <div class="gallows-wrap">
+                        <svg viewBox="0 0 220 260" aria-hidden="true">
+                          <g class="structure">
+                            <path class="part show" d="M18.0 240.0 L31.6 240.5 L45.1 240.7 L58.7 239.1 L72.2 240.0 L85.8 239.8 L99.3 240.6 L112.9 240.8 L126.4 239.4 L140.0 240.0"/>
+                            <path class="part show" d="M55.0 240.0 L55.7 214.8 L53.7 189.6 L53.4 164.3 L56.5 139.1 L56.0 113.9 L55.6 88.7 L54.5 63.4 L55.2 38.2 L55.0 13.0"/>
+                            <path class="part show" d="M53.0 15.0 L64.0 15.1 L75.0 14.6 L86.0 15.4 L97.0 15.5 L108.0 13.1 L119.0 13.1 L130.0 16.0 L141.0 14.6 L152.0 15.0"/>
+                            <path class="part show" d="M55.0 43.0 L59.2 39.4 L63.9 36.5 L67.9 32.6 L72.2 29.0 L77.5 27.1 L83.2 25.6 L87.4 21.9 L91.7 18.4 L96.0 15.0"/>
+                            <path class="part show" d="M150.0 15.0 L149.6 17.7 L149.2 20.3 L148.3 23.0 L149.0 25.7 L148.2 28.3 L151.8 31.0 L150.1 33.7 L149.3 36.3 L150.0 39.0"/>
+                          </g>
+                          <g class="figure" id="figureGroup">
+                            <path class="part" data-n="1" d="M168.8 57.0 L168.4 61.2 L166.2 64.8 L163.6 67.8 L160.4 70.0 L158.0 73.6 L154.0 74.5 L150.0 75.7 L146.1 74.2 L141.9 73.9 L139.2 70.6 L135.3 68.7 L133.2 65.1 L132.7 61.0 L131.9 57.0 L132.0 52.9 L134.6 49.6 L135.8 45.7 L138.2 42.3 L142.5 41.4 L145.8 38.6 L150.0 38.5 L154.2 38.5 L157.6 41.2 L160.5 43.8 L164.7 45.3 L167.0 48.8 L167.4 53.0 L166.9 57.0"/>
+                            <path class="part" data-n="2" d="M150.0 75.0 L150.5 82.3 L149.6 89.7 L151.6 97.0 L149.8 104.3 L150.6 111.7 L151.7 119.0 L150.0 126.3 L150.7 133.7 L150.0 141.0"/>
+                            <path class="part" data-n="3" d="M150.0 91.0 L146.2 93.8 L144.1 98.4 L139.4 100.4 L137.9 105.6 L134.1 108.4 L128.7 109.7 L127.2 114.9 L123.2 117.5 L120.0 121.0"/>
+                            <path class="part" data-n="4" d="M150.0 91.0 L153.5 94.2 L157.4 96.9 L159.0 102.0 L164.8 102.8 L166.7 107.7 L168.9 112.1 L174.2 113.5 L176.6 117.7 L180.0 121.0"/>
+                            <path class="part" data-n="5" d="M150.0 141.0 L147.4 145.7 L144.5 150.2 L143.0 155.6 L138.2 159.0 L135.4 163.6 L133.5 168.7 L132.2 174.1 L128.6 178.3 L126.0 183.0"/>
+                            <path class="part" data-n="6" d="M150.0 141.0 L152.6 145.7 L154.3 150.9 L158.1 154.9 L160.6 159.7 L163.0 164.5 L167.0 168.4 L168.6 173.7 L171.2 178.4 L174.0 183.0"/>
+                            <path class="part" data-n="dead" d="M143.0 51.0 L144.1 54.2 L145.3 57.3 L148.5 59.5 L149.0 63.0 M149.0 51.0 L147.0 53.7 L145.3 56.6 L143.5 59.5 L143.0 63.0 M151.0 51.0 L151.9 54.3 L153.4 57.3 L154.3 60.6 L157.0 63.0 M157.0 51.0 L156.9 54.7 L153.1 56.5 L153.5 60.5 L151.0 63.0"/>
+                          </g>
+                        </svg>
+                      </div>
+                      <div class="lives-note" id="livesNote"><b>6</b> wrong guesses left</div>
+
+                      <div class="word-row" id="wordRow"></div>
+                      <div class="tried-row" id="triedRow"></div>
+
+                      <div class="slate-label">Draw a letter on the slate</div>
+                      <div class="type-row">
+                        <span class="type-row-label">Or type:</span>
+                        <input type="text" id="typeInput" class="type-input" maxlength="1" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Type a letter to guess">
+                        <button type="button" id="typeConfirmBtn" class="type-confirm-btn" aria-label="Confirm typed letter" disabled>&#10003;</button>
+                      </div>
+                      <div class="slate">
+                        <canvas id="drawCanvas"></canvas>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+                <div class="recognized-row">
+                  <span class="recognized-label">We think you drew:</span>
+                  <span class="recognized-letter" id="recognizedLetter">&mdash;</span>
+                  <div class="candidates" id="candidatesRow"></div>
+                </div>
+
+                <div class="action-row">
+                  <button class="action-btn" id="clearBtn">✕ Clear slate</button>
+                  <button class="action-btn primary" id="confirmBtn" disabled>Confirm Guess</button>
+                </div>
+                <div class="hint-msg" id="hintMsg"></div>
+
+                <div class="day-info" id="dayInfo"></div>
+              </div>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+
+    <aside class="ad-rail right">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+  </div>
+
+  <footer>
+    <nav class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms and Conditions</a>
+      <a href="/about.html">About Us</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+    <p>&copy; <span id="year"></span> dailygametree.com</p>
+  </footer>
+
+<!-- Help popup -->
+<div class="overlay" id="helpOverlay">
+  <div class="popup">
+    <button class="popup-close" id="helpClose">✕</button>
+    <h2>How to Play</h2>
+    <p>A new word is picked every day. Guess its letters before the hangman is complete.</p>
+    <ul>
+      <li>Draw a single letter on the chalk slate with your mouse or finger — upper or lowercase, whatever feels natural.</li>
+      <li>The board shows its best guess at what you drew. Not quite right? Tap one of the alternates, or clear the slate and try again.</li>
+      <li>Tap <strong>Confirm Guess</strong> to submit that letter.</li>
+      <li>Guess right and every matching letter is revealed. Guess wrong and the hangman gains a part — you get 6 wrong guesses.</li>
+      <li>Prefer typing? Use the "Or type:" box just below the slate label, then tap the ✓ next to it to guess that letter directly, no drawing required.</li>
+    </ul>
+    <p style="margin-top:10px;font-size:12px;color:#888">A new word every day at midnight UTC.</p>
+  </div>
+</div>
+
+<!-- End popup -->
+<div class="overlay" id="endOverlay">
+  <div class="popup">
+    <button class="popup-close" id="endClose">✕</button>
+    <h2 class="end-title" id="endTitle">🎉 You got it!</h2>
+    <p class="end-word" id="endWord"></p>
+    <div class="end-grid" id="endGrid"></div>
+    <div class="end-actions">
+      <button class="action-btn" id="shareBtn">📋 Copy result</button>
+    </div>
+    <div class="countdown-box">
+      Next word in
+      <span class="countdown-val" id="countdownVal">--:--:--</span>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+<script>
+const WORDS=["ACCORDION", "ACORN", "ADVENTURE", "AIRPLANE", "ALBATROSS", "ALGEBRA", "ALLIGATOR", "ALMOND", "ALPHABET", "ANCHOR", "ANCHOVY", "ANKLE", "ANTEATER", "ANTHEM", "ANXIOUS", "ARCHERY", "ARCHITECT", "ARMADILLO", "ARROGANT", "ARTICHOKE", "ASPARAGUS", "ASTEROID", "ASTRONAUT", "AVALANCHE", "AVOCADO", "BACKBONE", "BACKPACK", "BACON", "BADGER", "BADMINTON", "BAKER", "BALCONY", "BALLAD", "BAMBOO", "BASEBALL", "BASKETBALL", "BATTERY", "BEANIE", "BEAVER", "BEETLE", "BICYCLE", "BINOCULARS", "BIOLOGY", "BIRCH", "BISCUIT", "BLANKET", "BLAZER", "BLENDER", "BLINK", "BLIZZARD", "BLOSSOM", "BOULDER", "BOUNCE", "BOWTIE", "BRACELET", "BRANCH", "BREEZE", "BROCCOLI", "BROOM", "BROWNIE", "BUCKET", "BUFFALO", "BURRITO", "BUTCHER", "BUTTER", "BUTTERFLY", "CABBAGE", "CABINET", "CACTUS", "CALCULATOR", "CALENDAR", "CANDLE", "CANOE", "CANOPY", "CANYON", "CAPTURE", "CARAMEL", "CARAVAN", "CARDIGAN", "CARPENTER", "CARPET", "CARRIAGE", "CARROT", "CARVE", "CASHEW", "CASSEROLE", "CASTLE", "CATERPILLAR", "CAULDRON", "CAULIFLOWER", "CAUTIOUS", "CEDAR", "CELLO", "CENTIPEDE", "CHALKBOARD", "CHAMELEON", "CHARGER", "CHEDDAR", "CHEEKBONE", "CHEERFUL", "CHEETAH", "CHEF", "CHEMISTRY", "CHICKEN", "CHIMNEY", "CHIPMUNK", "CHOCOLATE", "CHORUS", "CHUCKLE", "CINNAMON", "CLARINET", "CLASSROOM", "CLIPBOARD", "CLOCK", "COASTLINE", "COBRA", "COCKROACH", "COCONUT", "COLLARBONE", "COMET", "COMPASS", "COMPOSER", "CONFIDENT", "CORAL", "COTTAGE", "COURTYARD", "CRAB", "CRANE", "CRAWL", "CRAYON", "CREAM", "CRICKET", "CROCODILE", "CROISSANT", "CUCUMBER", "CUFFLINK", "CUPCAKE", "CURIOUS", "CURRENT", "CURTAIN", "CUSHION", "DAYLIGHT", "DENTIST", "DESERT", "DETECTIVE", "DICTIONARY", "DISCOVER", "DISCUS", "DISHWASHER", "DOLPHIN", "DOODLE", "DOORBELL", "DOORMAT", "DOUGHNUT", "DRAGONFLY", "DRAWBRIDGE", "DRAWER", "DRIFTWOOD", "DRIZZLE", "DUGOUT", "DUMPLING", "DUNGEON", "EAGLE", "EARDRUM", "EARRING", "EARTHQUAKE", "EARTHWORM", "ECLIPSE", "EGGPLANT", "ELBOW", "ELECTRICIAN", "ELEPHANT", "ELEVATOR", "ENGINEER", "ENVELOPE", "ESCALATOR", "ESCAPE", "ESPRESSO", "EXPLORE", "EXTENSION", "EYEBROW", "EYELASH", "FABLE", "FALAFEL", "FALCON", "FARMER", "FENCING", "FERRET", "FERRY", "FINGERTIP", "FIREFIGHTER", "FLAMINGO", "FLASHLIGHT", "FOLDER", "FOOTBALL", "FOREARM", "FOREHEAD", "FOREST", "FORTUNE", "FOUNTAIN", "FROST", "FUNGUS", "FURIOUS", "GALAXY", "GENEROUS", "GEOGRAPHY", "GEOMETRY", "GIGGLE", "GIRAFFE", "GLACIER", "GLOOMY", "GONDOLA", "GORILLA", "GRAMMAR", "GRASSHOPPER", "GRATEFUL", "GUACAMOLE", "GYMNASTICS", "HAILSTORM", "HAMMER", "HAMMOCK", "HANDBAG", "HARBOR", "HARMONICA", "HARMONY", "HAWK", "HEARTBEAT", "HEDGEHOG", "HELICOPTER", "HERON", "HERRING", "HISTORY", "HOCKEY", "HONEY", "HOPEFUL", "HORIZON", "HOURGLASS", "HUMBLE", "HUMIDITY", "HUMMUS", "HURDLES", "HURRICANE", "HYENA", "IGUANA", "IMAGINE", "INVENT", "ISLAND", "JACKAL", "JACKET", "JAVELIN", "JAWLINE", "JEALOUS", "JELLYFISH", "JOURNALIST", "JOURNEY", "JUGGLE", "JUMPSUIT", "JUNGLE", "KANGAROO", "KAYAK", "KAYAKING", "KETTLE", "KEYBOARD", "KEYRING", "KINGDOM", "KNEECAP", "KNIT", "KOALA", "LACROSSE", "LADDER", "LADYBUG", "LAGOON", "LANTERN", "LASAGNA", "LEGEND", "LEGGING", "LEMONADE", "LEMUR", "LEOPARD", "LETTUCE", "LIBRARIAN", "LICHEN", "LIGHTHOUSE", "LIGHTNING", "LIZARD", "LOBSTER", "LONELY", "LYRICS", "MACKEREL", "MAGNET", "MANGO", "MAPLE", "MARATHON", "MATTRESS", "MEADOW", "MEADOWLARK", "MECHANIC", "MEERKAT", "MELODY", "METEOR", "MICROWAVE", "MIDNIGHT", "MIRROR", "MISCHIEVOUS", "MITTEN", "MONGOOSE", "MONITOR", "MONORAIL", "MONSOON", "MOONLIGHT", "MOSQUITO", "MOSS", "MOTORCYCLE", "MOUNTAIN", "MUFFIN", "MUMBLE", "MUSHROOM", "MUSICIAN", "MUSTARD", "MYSTERY", "NEBULA", "NECKLACE", "NERVOUS", "NIGHTGOWN", "NOODLE", "NOSTRIL", "NOTEBOOK", "NOVELIST", "OATMEAL", "OCTOPUS", "OMELETTE", "ORBIT", "ORCHARD", "ORCHESTRA", "OSTRICH", "OTTER", "OVERALLS", "OVERCAST", "PADLOCK", "PAINTER", "PAJAMA", "PANCAKE", "PANTHER", "PAPAYA", "PARAGRAPH", "PARAMEDIC", "PARCHMENT", "PASTRY", "PEACEFUL", "PEACOCK", "PEANUT", "PEBBLE", "PELICAN", "PENCIL", "PENGUIN", "PENINSULA", "PEPPER", "PETAL", "PHARMACIST", "PILLOW", "PILOT", "PINEAPPLE", "PINECONE", "PLANET", "PLATEAU", "PLATYPUS", "PLAYFUL", "PLUMBER", "POLISH", "PONCHO", "PONDER", "POPCORN", "POTATO", "PRAIRIE", "PRETZEL", "PUFFIN", "PUMPKIN", "PUZZLE", "PYTHON", "RACCOON", "RADISH", "RAINBOW", "RAINCOAT", "RAINFALL", "RATTLESNAKE", "RECLINER", "REEF", "REFEREE", "RELAY", "RESCUE", "RESTLESS", "RHYTHM", "RICKSHAW", "RIDDLE", "RISOTTO", "RIVER", "ROOFTOP", "ROWING", "RUGBY", "SAILBOAT", "SAILOR", "SALMON", "SANDALS", "SANDWICH", "SATELLITE", "SAUCEPAN", "SAUSAGE", "SAXOPHONE", "SCARF", "SCIENTIST", "SCISSORS", "SCOOTER", "SCOREBOARD", "SCORPION", "SCREWDRIVER", "SCRUB", "SCULPTOR", "SEAGULL", "SEAHORSE", "SEASHELL", "SECRET", "SENTENCE", "SERENADE", "SHELF", "SHEPHERD", "SHIVER", "SHOULDER", "SHOUT", "SHRIMP", "SHUDDER", "SKATEBOARD", "SKETCH", "SKILLET", "SLEET", "SLIPPERS", "SLOTH", "SLUG", "SMOOTHIE", "SNAIL", "SNEAKERS", "SNORE", "SNOWBOARD", "SNOWFALL", "SPAGHETTI", "SPARROW", "SPATULA", "SPEAKER", "SPIDER", "SPINACH", "SPONGE", "SPRINT", "SQUEEZE", "SQUIRREL", "STADIUM", "STAPLER", "STARFISH", "STARLIGHT", "STITCH", "STOMACH", "STORK", "STREAM", "STREETCAR", "STRETCH", "STUBBORN", "STUMBLE", "SUBMARINE", "SUITCASE", "SUNLIGHT", "SUNRISE", "SUNSET", "SUNSHINE", "SURFING", "SURGEON", "SWALLOW", "SWEATER", "SWEEP", "SWIMSUIT", "SYMPHONY", "TAMBOURINE", "TEACHER", "TELESCOPE", "TEMPERATURE", "TERMITE", "TEXTBOOK", "THERMOSTAT", "THUMBNAIL", "THUNDER", "TIDE", "TIGER", "TIPTOE", "TOASTER", "TONGUE", "TOOLBOX", "TORNADO", "TORTILLA", "TORTOISE", "TOURNAMENT", "TRAILER", "TREASURE", "TRIATHLON", "TRUMPET", "TSUNAMI", "TUMBLE", "TURNIP", "TUXEDO", "TWILIGHT", "UKULELE", "UMBRELLA", "UNDERBRUSH", "VALLEY", "VANILLA", "VANISH", "VILLAGE", "VINEGAR", "VIOLIN", "VIPER", "VOCABULARY", "VOLCANO", "VOLLEYBALL", "VULTURE", "WAFFLE", "WAGON", "WAISTCOAT", "WALLET", "WALNUT", "WALRUS", "WANDER", "WATERFALL", "WAVE", "WEASEL", "WEAVE", "WETSUIT", "WHIRLPOOL", "WHISK", "WHISPER", "WHISTLE", "WILDFLOWER", "WILLOW", "WINDMILL", "WOBBLE", "WOMBAT", "WOODPECKER", "WRENCH", "WRESTLING", "WRIST", "XYLOPHONE", "YAWN", "YOGURT", "ZUCCHINI"];
+</script>
+<script>
+const LETTER_TEMPLATES={"A":[[[6.0,100.0],[11.6,80.0],[17.2,60.0],[22.8,40.0],[28.4,20.0],[34.0,0.0]],[[34.0,0.0],[39.6,20.0],[45.2,40.0],[50.8,60.0],[56.4,80.0],[62.0,100.0]],[[15.0,65.0],[22.6,65.0],[30.2,65.0],[37.8,65.0],[45.4,65.0],[53.0,65.0]]],"B":[[[10.0,0.0],[10.0,20.0],[10.0,40.0],[10.0,60.0],[10.0,80.0],[10.0,100.0]],[[10.0,0.0],[15.6,0.0],[21.2,0.0],[26.8,0.0],[32.4,0.0],[38.0,0.0],[38.0,2.0],[43.5,3.1],[48.3,6.2],[51.9,11.0],[53.8,16.9],[53.8,23.1],[51.9,29.0],[48.3,33.8],[43.5,36.9],[38.0,38.0],[38.0,38.0],[32.4,38.0],[26.8,38.0],[21.2,38.0],[15.6,38.0],[10.0,38.0]],[[10.0,38.0],[16.4,38.0],[22.8,38.0],[29.2,38.0],[35.6,38.0],[42.0,38.0],[42.0,38.0],[48.2,39.8],[53.6,45.0],[57.6,53.0],[59.7,62.8],[59.7,73.2],[57.6,83.0],[53.6,91.0],[48.2,96.2],[42.0,98.0],[42.0,98.0],[35.6,98.0],[29.2,98.0],[22.8,98.0],[16.4,98.0],[10.0,98.0]]],"C":[[[54.9,78.9],[48.5,88.4],[40.7,93.9],[32.3,94.8],[24.1,90.9],[17.2,82.7],[12.0,71.1],[9.3,57.3],[9.3,42.7],[12.0,28.9],[17.2,17.3],[24.1,9.1],[32.3,5.2],[40.7,6.1],[48.5,11.6],[54.9,21.1]]],"D":[[[10.0,0.0],[10.0,20.0],[10.0,40.0],[10.0,60.0],[10.0,80.0],[10.0,100.0]],[[10.0,0.0],[13.6,0.0],[17.2,0.0],[20.8,0.0],[24.4,0.0],[28.0,0.0],[28.0,0.0],[33.3,1.5],[38.2,5.7],[42.6,12.6],[46.1,21.6],[48.6,32.3],[49.8,44.0],[49.8,56.0],[48.6,67.7],[46.1,78.4],[42.6,87.4],[38.2,94.3],[33.3,98.5],[28.0,100.0],[28.0,100.0],[24.4,100.0],[20.8,100.0],[17.2,100.0],[13.6,100.0],[10.0,100.0]]],"E":[[[12.0,0.0],[12.0,20.0],[12.0,40.0],[12.0,60.0],[12.0,80.0],[12.0,100.0]],[[12.0,0.0],[20.0,0.0],[28.0,0.0],[36.0,0.0],[44.0,0.0],[52.0,0.0]],[[12.0,50.0],[18.0,50.0],[24.0,50.0],[30.0,50.0],[36.0,50.0],[42.0,50.0]],[[12.0,100.0],[20.0,100.0],[28.0,100.0],[36.0,100.0],[44.0,100.0],[52.0,100.0]]],"F":[[[12.0,0.0],[12.0,20.0],[12.0,40.0],[12.0,60.0],[12.0,80.0],[12.0,100.0]],[[12.0,0.0],[20.0,0.0],[28.0,0.0],[36.0,0.0],[44.0,0.0],[52.0,0.0]],[[12.0,50.0],[18.0,50.0],[24.0,50.0],[30.0,50.0],[36.0,50.0],[42.0,50.0]]],"G":[[[54.9,78.9],[48.5,88.4],[40.7,93.9],[32.3,94.8],[24.1,90.9],[17.2,82.7],[12.0,71.1],[9.3,57.3],[9.3,42.7],[12.0,28.9],[17.2,17.3],[24.1,9.1],[32.3,5.2],[40.7,6.1],[48.5,11.6],[54.9,21.1]],[[61.0,50.0],[56.8,50.0],[52.6,50.0],[48.4,50.0],[44.2,50.0],[40.0,50.0]],[[40.0,50.0],[40.0,54.8],[40.0,59.6],[40.0,64.4],[40.0,69.2],[40.0,74.0]]],"H":[[[10.0,0.0],[10.0,20.0],[10.0,40.0],[10.0,60.0],[10.0,80.0],[10.0,100.0]],[[58.0,0.0],[58.0,20.0],[58.0,40.0],[58.0,60.0],[58.0,80.0],[58.0,100.0]],[[10.0,50.0],[19.6,50.0],[29.2,50.0],[38.8,50.0],[48.4,50.0],[58.0,50.0]]],"I":[[[30.0,0.0],[30.0,20.0],[30.0,40.0],[30.0,60.0],[30.0,80.0],[30.0,100.0]]],"J":[[[50.0,0.0],[50.0,16.0],[50.0,32.0],[50.0,48.0],[50.0,64.0],[50.0,80.0],[50.0,80.0],[49.7,83.5],[48.9,86.8],[47.5,89.9],[45.7,92.6],[43.5,94.8],[40.9,96.5],[38.2,97.6],[35.3,98.0],[32.4,97.7]]],"K":[[[10.0,0.0],[10.0,20.0],[10.0,40.0],[10.0,60.0],[10.0,80.0],[10.0,100.0]],[[54.0,0.0],[45.6,10.4],[37.2,20.8],[28.8,31.2],[20.4,41.6],[12.0,52.0]],[[18.0,46.0],[25.6,56.8],[33.2,67.6],[40.8,78.4],[48.4,89.2],[56.0,100.0]]],"L":[[[14.0,0.0],[14.0,20.0],[14.0,40.0],[14.0,60.0],[14.0,80.0],[14.0,100.0]],[[14.0,100.0],[21.2,100.0],[28.4,100.0],[35.6,100.0],[42.8,100.0],[50.0,100.0]]],"M":[[[8.0,100.0],[8.0,80.0],[8.0,60.0],[8.0,40.0],[8.0,20.0],[8.0,0.0]],[[8.0,0.0],[13.2,11.0],[18.4,22.0],[23.6,33.0],[28.8,44.0],[34.0,55.0]],[[34.0,55.0],[39.2,44.0],[44.4,33.0],[49.6,22.0],[54.8,11.0],[60.0,0.0]],[[60.0,0.0],[60.0,20.0],[60.0,40.0],[60.0,60.0],[60.0,80.0],[60.0,100.0]]],"N":[[[10.0,100.0],[10.0,80.0],[10.0,60.0],[10.0,40.0],[10.0,20.0],[10.0,0.0]],[[10.0,0.0],[18.8,20.0],[27.6,40.0],[36.4,60.0],[45.2,80.0],[54.0,100.0]],[[54.0,100.0],[54.0,80.0],[54.0,60.0],[54.0,40.0],[54.0,20.0],[54.0,0.0]]],"O":[[[61.0,50.0],[59.6,65.6],[55.5,79.5],[49.2,90.2],[41.4,96.5],[32.9,97.8],[24.6,94.0],[17.4,85.3],[12.1,72.8],[9.4,57.9],[9.4,42.1],[12.1,27.2],[17.4,14.7],[24.6,6.0],[32.9,2.2],[41.4,3.5],[49.2,9.8],[55.5,20.5],[59.6,34.4],[61.0,50.0]]],"P":[[[10.0,0.0],[10.0,20.0],[10.0,40.0],[10.0,60.0],[10.0,80.0],[10.0,100.0]],[[10.0,0.0],[15.2,0.0],[20.4,0.0],[25.6,0.0],[30.8,0.0],[36.0,0.0],[36.0,4.0],[41.5,5.1],[46.3,8.2],[49.9,13.0],[51.8,18.9],[51.8,25.1],[49.9,31.0],[46.3,35.8],[41.5,38.9],[36.0,40.0],[36.0,40.0],[30.8,40.0],[25.6,40.0],[20.4,40.0],[15.2,40.0],[10.0,40.0]]],"Q":[[[61.0,48.0],[59.6,62.9],[55.5,76.3],[49.2,86.5],[41.4,92.6],[32.9,93.8],[24.6,90.1],[17.4,81.8],[12.1,69.9],[9.4,55.6],[9.4,40.4],[12.1,26.1],[17.4,14.2],[24.6,5.9],[32.9,2.2],[41.4,3.4],[49.2,9.5],[55.5,19.7],[59.6,33.1],[61.0,48.0]],[[30.0,68.0],[35.0,73.6],[40.0,79.2],[45.0,84.8],[50.0,90.4],[55.0,96.0]]],"R":[[[10.0,0.0],[10.0,20.0],[10.0,40.0],[10.0,60.0],[10.0,80.0],[10.0,100.0]],[[10.0,0.0],[15.2,0.0],[20.4,0.0],[25.6,0.0],[30.8,0.0],[36.0,0.0],[36.0,4.0],[41.5,5.1],[46.3,8.2],[49.9,13.0],[51.8,18.9],[51.8,25.1],[49.9,31.0],[46.3,35.8],[41.5,38.9],[36.0,40.0],[36.0,40.0],[30.8,40.0],[25.6,40.0],[20.4,40.0],[15.2,40.0],[10.0,40.0]],[[24.0,40.0],[30.0,52.0],[36.0,64.0],[42.0,76.0],[48.0,88.0],[54.0,100.0]]],"S":[[[32.0,0.0],[26.5,1.5],[21.7,5.8],[18.1,12.5],[16.2,20.7],[16.2,29.3],[18.1,37.5],[21.7,44.2],[26.5,48.5],[32.0,50.0],[32.0,50.0],[26.5,51.5],[21.7,55.8],[18.1,62.5],[16.2,70.7],[16.2,79.3],[18.1,87.5],[21.7,94.2],[26.5,98.5],[32.0,100.0]]],"T":[[[8.0,0.0],[17.6,0.0],[27.2,0.0],[36.8,0.0],[46.4,0.0],[56.0,0.0]],[[32.0,0.0],[32.0,20.0],[32.0,40.0],[32.0,60.0],[32.0,80.0],[32.0,100.0]]],"U":[[[10.0,0.0],[10.0,14.4],[10.0,28.8],[10.0,43.2],[10.0,57.6],[10.0,72.0],[10.0,72.0],[10.8,79.3],[13.2,86.1],[16.9,91.6],[21.7,95.7],[27.2,97.7],[32.8,97.7],[38.3,95.7],[43.1,91.6],[46.8,86.1],[49.2,79.3],[50.0,72.0],[50.0,72.0],[50.0,57.6],[50.0,43.2],[50.0,28.8],[50.0,14.4],[50.0,0.0]]],"V":[[[6.0,0.0],[11.2,20.0],[16.4,40.0],[21.6,60.0],[26.8,80.0],[32.0,100.0]],[[32.0,100.0],[37.2,80.0],[42.4,60.0],[47.6,40.0],[52.8,20.0],[58.0,0.0]]],"W":[[[4.0,0.0],[6.8,20.0],[9.6,40.0],[12.4,60.0],[15.2,80.0],[18.0,100.0]],[[18.0,100.0],[20.8,88.0],[23.6,76.0],[26.4,64.0],[29.2,52.0],[32.0,40.0]],[[32.0,40.0],[34.8,52.0],[37.6,64.0],[40.4,76.0],[43.2,88.0],[46.0,100.0]],[[46.0,100.0],[48.8,80.0],[51.6,60.0],[54.4,40.0],[57.2,20.0],[60.0,0.0]]],"X":[[[8.0,0.0],[17.6,20.0],[27.2,40.0],[36.8,60.0],[46.4,80.0],[56.0,100.0]],[[56.0,0.0],[46.4,20.0],[36.8,40.0],[27.2,60.0],[17.6,80.0],[8.0,100.0]]],"Y":[[[6.0,0.0],[11.2,10.0],[16.4,20.0],[21.6,30.0],[26.8,40.0],[32.0,50.0]],[[58.0,0.0],[52.8,10.0],[47.6,20.0],[42.4,30.0],[37.2,40.0],[32.0,50.0]],[[32.0,50.0],[32.0,60.0],[32.0,70.0],[32.0,80.0],[32.0,90.0],[32.0,100.0]]],"Z":[[[8.0,0.0],[17.2,0.0],[26.4,0.0],[35.6,0.0],[44.8,0.0],[54.0,0.0]],[[54.0,0.0],[44.8,20.0],[35.6,40.0],[26.4,60.0],[17.2,80.0],[8.0,100.0]],[[8.0,100.0],[17.2,100.0],[26.4,100.0],[35.6,100.0],[44.8,100.0],[54.0,100.0]]],"a":[[[47.7,64.2],[47.4,73.8],[43.6,82.4],[37.3,88.1],[29.5,90.0],[21.8,87.6],[15.8,81.5],[12.4,72.7],[12.5,63.0],[15.9,54.3],[22.1,48.3],[29.8,46.0],[37.5,48.0],[43.8,53.9]],[[48.0,55.0],[48.0,63.6],[48.0,72.2],[48.0,80.8],[48.0,89.4],[48.0,98.0]]],"b":[[[10.0,2.0],[10.0,21.6],[10.0,41.2],[10.0,60.8],[10.0,80.4],[10.0,100.0]],[[13.1,60.5],[17.4,52.3],[24.1,47.2],[31.9,46.1],[39.4,49.2],[45.1,56.0],[47.8,65.1],[47.1,74.7],[43.1,83.0],[36.6,88.5],[28.8,90.0],[21.2,87.2],[15.3,80.7],[12.3,71.8]]],"c":[[[47.3,82.1],[41.5,87.3],[34.4,89.8],[27.0,89.3],[20.2,85.8],[15.1,79.8],[12.4,72.1],[12.4,63.9],[15.1,56.2],[20.2,50.2],[27.0,46.7],[34.4,46.2],[41.5,48.7],[47.3,53.9]]],"d":[[[50.0,2.0],[50.0,21.6],[50.0,41.2],[50.0,60.8],[50.0,80.4],[50.0,100.0]],[[46.9,75.5],[42.8,83.5],[36.4,88.6],[28.8,90.0],[21.4,87.3],[15.6,81.2],[12.4,72.7],[12.4,63.3],[15.6,54.8],[21.4,48.7],[28.8,46.0],[36.4,47.4],[42.8,52.5],[46.9,60.5]]],"e":[[[12.0,68.0],[19.2,68.0],[26.4,68.0],[33.6,68.0],[40.8,68.0],[48.0,68.0]],[[48.0,68.0],[46.6,75.7],[42.7,82.2],[36.7,86.5],[29.8,88.0],[22.9,86.4],[17.1,81.9],[13.2,75.3],[12.0,67.5],[13.6,59.9],[17.6,53.5],[23.6,49.3],[30.6,48.0],[37.5,49.8],[43.2,54.4],[46.9,61.2]]],"f":[[[52.0,20.0],[51.4,24.5],[49.6,28.5],[46.8,31.6],[43.3,33.5],[39.4,34.0],[35.6,33.0],[32.3,30.7],[28.0,26.0],[28.0,40.8],[28.0,55.6],[28.0,70.4],[28.0,85.2],[28.0,100.0]],[[14.0,48.0],[19.6,48.0],[25.2,48.0],[30.8,48.0],[36.4,48.0],[42.0,48.0]]],"g":[[[48.0,68.0],[46.4,76.1],[42.0,82.9],[35.6,87.0],[28.1,87.9],[21.0,85.3],[15.4,79.8],[12.4,72.2],[12.4,63.8],[15.4,56.2],[21.0,50.7],[28.1,48.1],[35.6,49.0],[42.0,53.1],[46.4,59.9],[48.0,68.0]],[[48.0,50.0],[48.0,63.2],[48.0,76.4],[48.0,89.6],[48.0,102.8],[48.0,116.0],[48.0,116.0],[47.3,119.8],[45.4,123.3],[42.2,126.3],[38.2,128.5],[33.6,129.7],[28.7,130.0],[23.8,129.2]]],"h":[[[10.0,2.0],[10.0,21.6],[10.0,41.2],[10.0,60.8],[10.0,80.4],[10.0,100.0]],[[10.0,56.0],[11.0,50.5],[13.7,45.7],[18.0,42.1],[23.2,40.2],[28.8,40.2],[34.0,42.1],[38.3,45.7],[41.0,50.5],[42.0,56.0],[42.0,56.0],[42.0,64.8],[42.0,73.6],[42.0,82.4],[42.0,91.2],[42.0,100.0]]],"i":[[[28.0,46.0],[28.0,56.8],[28.0,67.6],[28.0,78.4],[28.0,89.2],[28.0,100.0]],[[28,30]]],"j":[[[34.0,46.0],[34.0,60.0],[34.0,74.0],[34.0,88.0],[34.0,102.0],[34.0,116.0],[34.0,116.0],[33.6,119.5],[32.3,122.7],[30.3,125.5],[27.6,127.8],[24.5,129.3],[21.0,130.0],[17.6,129.8]],[[34,30]]],"k":[[[10.0,2.0],[10.0,21.6],[10.0,41.2],[10.0,60.8],[10.0,80.4],[10.0,100.0]],[[40.0,46.0],[34.0,50.4],[28.0,54.8],[22.0,59.2],[16.0,63.6],[10.0,68.0]],[[16.0,62.0],[21.6,69.6],[27.2,77.2],[32.8,84.8],[38.4,92.4],[44.0,100.0]]],"l":[[[24.0,2.0],[24.0,20.0],[24.0,38.0],[24.0,56.0],[24.0,74.0],[24.0,92.0],[24.0,92.0],[24.4,89.5],[25.5,87.3],[27.3,85.5],[29.5,84.4],[32.0,84.0]]],"m":[[[8.0,100.0],[8.0,89.2],[8.0,78.4],[8.0,67.6],[8.0,56.8],[8.0,46.0]],[[8.0,56.0],[8.0,54.8],[8.0,53.6],[8.0,52.4],[8.0,51.2],[8.0,50.0],[8.0,56.0],[9.2,50.8],[12.5,46.6],[17.3,44.3],[22.7,44.3],[27.5,46.6],[30.8,50.8],[32.0,56.0],[32.0,56.0],[32.0,64.8],[32.0,73.6],[32.0,82.4],[32.0,91.2],[32.0,100.0]],[[32.0,56.0],[32.0,54.8],[32.0,53.6],[32.0,52.4],[32.0,51.2],[32.0,50.0],[32.0,56.0],[33.2,50.8],[36.5,46.6],[41.3,44.3],[46.7,44.3],[51.5,46.6],[54.8,50.8],[56.0,56.0],[56.0,56.0],[56.0,64.8],[56.0,73.6],[56.0,82.4],[56.0,91.2],[56.0,100.0]]],"n":[[[10.0,46.0],[10.0,56.8],[10.0,67.6],[10.0,78.4],[10.0,89.2],[10.0,100.0]],[[10.0,56.0],[10.0,54.8],[10.0,53.6],[10.0,52.4],[10.0,51.2],[10.0,50.0],[10.0,56.0],[11.0,50.5],[13.7,45.7],[18.0,42.1],[23.2,40.2],[28.8,40.2],[34.0,42.1],[38.3,45.7],[41.0,50.5],[42.0,56.0],[42.0,56.0],[42.0,64.8],[42.0,73.6],[42.0,82.4],[42.0,91.2],[42.0,100.0]]],"o":[[[48.0,68.0],[46.8,75.2],[43.3,81.5],[38.0,85.9],[31.7,87.9],[25.1,87.2],[19.2,84.0],[14.7,78.5],[12.3,71.7],[12.3,64.3],[14.7,57.5],[19.2,52.0],[25.1,48.8],[31.7,48.1],[38.0,50.1],[43.3,54.5],[46.8,60.8],[48.0,68.0]]],"p":[[[10.0,46.0],[10.0,62.8],[10.0,79.6],[10.0,96.4],[10.0,113.2],[10.0,130.0]],[[11.1,60.5],[15.4,52.3],[22.1,47.2],[29.9,46.1],[37.4,49.2],[43.1,56.0],[45.8,65.1],[45.1,74.7],[41.1,83.0],[34.6,88.5],[26.8,90.0],[19.2,87.2],[13.3,80.7],[10.3,71.8]]],"q":[[[46.9,75.5],[42.8,83.5],[36.4,88.6],[28.8,90.0],[21.4,87.3],[15.6,81.2],[12.4,72.7],[12.4,63.3],[15.6,54.8],[21.4,48.7],[28.8,46.0],[36.4,47.4],[42.8,52.5],[46.9,60.5]],[[48.0,55.0],[48.0,70.0],[48.0,85.0],[48.0,100.0],[48.0,115.0],[48.0,130.0]]],"r":[[[10.0,46.0],[10.0,56.8],[10.0,67.6],[10.0,78.4],[10.0,89.2],[10.0,100.0]],[[25.2,49.9],[26.0,54.3],[24.9,58.7],[22.0,62.4],[17.8,64.9],[12.7,66.0],[7.5,65.4],[3.0,63.2]]],"s":[[[30.0,40.0],[25.7,41.5],[22.2,45.6],[20.3,51.7],[20.3,58.3],[22.2,64.4],[25.7,68.5],[30.0,70.0],[30.0,70.0],[25.7,71.5],[22.2,75.6],[20.3,81.7],[20.3,88.3],[22.2,94.4],[25.7,98.5],[30.0,100.0]]],"t":[[[24.0,12.0],[24.0,27.6],[24.0,43.2],[24.0,58.8],[24.0,74.4],[24.0,90.0],[24.0,90.0],[24.5,86.9],[25.9,84.1],[28.1,81.9],[30.9,80.5],[34.0,80.0]],[[12.0,48.0],[16.8,48.0],[21.6,48.0],[26.4,48.0],[31.2,48.0],[36.0,48.0]]],"u":[[[10.0,46.0],[10.0,52.4],[10.0,58.8],[10.0,65.2],[10.0,71.6],[10.0,78.0],[10.0,78.0],[11.0,84.8],[13.7,90.9],[18.0,95.3],[23.2,97.7],[28.8,97.7],[34.0,95.3],[38.3,90.9],[41.0,84.8],[42.0,78.0]],[[42.0,46.0],[42.0,56.8],[42.0,67.6],[42.0,78.4],[42.0,89.2],[42.0,100.0]]],"v":[[[8.0,46.0],[11.6,56.8],[15.2,67.6],[18.8,78.4],[22.4,89.2],[26.0,100.0]],[[26.0,100.0],[29.6,89.2],[33.2,78.4],[36.8,67.6],[40.4,56.8],[44.0,46.0]]],"w":[[[6.0,46.0],[8.0,56.8],[10.0,67.6],[12.0,78.4],[14.0,89.2],[16.0,100.0]],[[16.0,100.0],[18.4,91.2],[20.8,82.4],[23.2,73.6],[25.6,64.8],[28.0,56.0]],[[28.0,56.0],[30.4,64.8],[32.8,73.6],[35.2,82.4],[37.6,91.2],[40.0,100.0]],[[40.0,100.0],[42.0,89.2],[44.0,78.4],[46.0,67.6],[48.0,56.8],[50.0,46.0]]],"x":[[[8.0,46.0],[14.8,56.8],[21.6,67.6],[28.4,78.4],[35.2,89.2],[42.0,100.0]],[[42.0,46.0],[35.2,56.8],[28.4,67.6],[21.6,78.4],[14.8,89.2],[8.0,100.0]]],"y":[[[8.0,46.0],[11.6,53.2],[15.2,60.4],[18.8,67.6],[22.4,74.8],[26.0,82.0]],[[44.0,46.0],[39.2,62.8],[34.4,79.6],[29.6,96.4],[24.8,113.2],[20.0,130.0],[22.0,120.0],[21.6,117.2],[20.5,114.7],[18.7,112.6],[16.4,111.0],[13.7,110.2]]],"z":[[[8.0,48.0],[14.4,48.0],[20.8,48.0],[27.2,48.0],[33.6,48.0],[40.0,48.0]],[[40.0,48.0],[33.6,58.4],[27.2,68.8],[20.8,79.2],[14.4,89.6],[8.0,100.0]],[[8.0,100.0],[14.4,100.0],[20.8,100.0],[27.2,100.0],[33.6,100.0],[40.0,100.0]]]};
+</script>
+<script src="tfjs.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+//  DAILY WORD SELECTION (same seeded-shuffle pattern as Yeardle: cycle
+//  through the whole word list once, in a fixed shuffled order, before
+//  repeating, so everyone sees the same word on the same day)
+// ═══════════════════════════════════════════════
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, seed){
+  const rand = mulberry32(seed);
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+const SHUFFLE_SEED = 20260822;
+const SHUFFLED_ORDER = seededShuffle([...Array(WORDS.length).keys()], SHUFFLE_SEED);
+
+function getTodaysPuzzle(){
+  const epoch = Date.UTC(2025, 0, 1);
+  const now = new Date();
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const dayIndex = Math.max(0, Math.floor((today - epoch) / 86400000));
+  const puzzleIndex = dayIndex % WORDS.length;
+  const wordIndex = SHUFFLED_ORDER[puzzleIndex];
+  return {
+    dayIndex,
+    puzzleNum: puzzleIndex + 1,
+    total: WORDS.length,
+    word: WORDS[wordIndex]
+  };
+}
+
+// ═══════════════════════════════════════════════
+//  HANDWRITING RECOGNITION — a from-scratch shape matcher.
+//  No ML, no external model. The key idea: judge the *drawn shape*, not
+//  the pen's journey through it. A naive approach resamples points along
+//  the recorded path in drawing order — but real handwriting retraces
+//  lines (reinforcing a stem, correcting a corner) without lifting the
+//  pen, and that back-and-forth motion would otherwise get read as extra
+//  geometry, badly distorting the comparison even though it looks like
+//  one clean line to a person.
+//
+//  So instead: normalise the strokes (translate to centroid, scale
+//  uniformly to preserve aspect ratio), then rasterise them onto a small
+//  fixed grid and keep only the *set of cells touched* — a coverage map,
+//  not a timeline. Tracing over the same stroke five times marks the same
+//  cells it already marked; the result is identical to tracing it once.
+//  Two coverage maps are then compared by nearest-cell distance in both
+//  directions (a symmetric Chamfer distance) — this also naturally copes
+//  with the two maps having different numbers of points, no padding needed.
+// ═══════════════════════════════════════════════
+const GRID_N = 20;              // cells across the shape's longer axis
+const CELL = 100 / GRID_N;      // normalised shapes span roughly -50..50
+
+function normalizeStrokes(strokes){
+  const nonEmpty = strokes.filter(s => s.length > 0);
+  if (nonEmpty.length === 0) return null;
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  nonEmpty.forEach(s => s.forEach(p => {
+    minX=Math.min(minX,p.x); minY=Math.min(minY,p.y);
+    maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y);
+  }));
+  const w = Math.max(maxX-minX, 1e-6), h = Math.max(maxY-minY, 1e-6);
+  const scale = 100 / Math.max(w, h);
+  const cx = (minX+maxX)/2, cy = (minY+maxY)/2;
+  return nonEmpty.map(s => s.map(p => ({x:(p.x-cx)*scale, y:(p.y-cy)*scale})));
+}
+
+// Walks each stroke and marks every grid cell the ink passes through,
+// deduplicated — so however many times a line gets retraced, each cell
+// it covers counts once. Returns the set of touched cell-centres.
+function rasterizeStrokes(normStrokes){
+  const seen = new Set();
+  const points = [];
+  function markCell(x, y){
+    const gx = Math.round(x / CELL), gy = Math.round(y / CELL);
+    const key = gx + ',' + gy;
+    if (!seen.has(key)){
+      seen.add(key);
+      points.push({x: gx * CELL, y: gy * CELL});
+    }
+  }
+  normStrokes.forEach(stroke => {
+    if (stroke.length === 0) return;
+    if (stroke.length === 1){ markCell(stroke[0].x, stroke[0].y); return; }
+    for (let i = 1; i < stroke.length; i++){
+      const p0 = stroke[i-1], p1 = stroke[i];
+      const dist = Math.hypot(p1.x-p0.x, p1.y-p0.y);
+      const steps = Math.max(1, Math.ceil(dist / (CELL * 0.5)));
+      for (let s = 0; s <= steps; s++){
+        const t = s / steps;
+        markCell(p0.x + (p1.x-p0.x)*t, p0.y + (p1.y-p0.y)*t);
+      }
+    }
+  });
+  return points;
+}
+
+function buildPointCloud(strokes){
+  const norm = normalizeStrokes(strokes);
+  if (!norm) return null;
+  const pts = rasterizeStrokes(norm);
+  return pts.length ? pts : null;
+}
+
+// Symmetric nearest-cell (Chamfer-style) distance between two coverage
+// maps. Works fine even when the two clouds have different point counts,
+// which a coverage map naturally produces (a simple letter like "l"
+// touches fewer cells than a busy one like "m").
+function nearestSum(X, Y){
+  let total = 0;
+  for (const p of X){
+    let best = Infinity;
+    for (const q of Y){
+      const dx = p.x-q.x, dy = p.y-q.y;
+      const d = dx*dx + dy*dy;
+      if (d < best) best = d;
+    }
+    total += Math.sqrt(best);
+  }
+  return total;
+}
+function cloudDistance(A, B){
+  if (A.length === 0 || B.length === 0) return Infinity;
+  return (nearestSum(A, B)/A.length + nearestSum(B, A)/B.length) / 2;
+}
+
+// Precompute + cache every template's coverage map once.
+const TEMPLATE_CLOUDS = (() => {
+  const out = [];
+  for (const letter in LETTER_TEMPLATES){
+    // Templates are authored as [x,y] pairs; live strokes are captured as
+    // {x,y} objects. Convert once here so both sides of every comparison
+    // are the same shape.
+    const strokes = LETTER_TEMPLATES[letter].map(stroke => stroke.map(([x,y]) => ({x, y})));
+    const cloud = buildPointCloud(strokes);
+    if (cloud) out.push({ letter, cloud });
+  }
+  return out;
+})();
+
+// Returns candidates ranked best-first: [{letter, dist}, ...] deduped by
+// letter identity (upper/lowercase of round letters like c/C or o/O are
+// near-identical shapes once normalised — that's fine, hangman guesses
+// are case-insensitive anyway, so we just keep whichever case scored best).
+function recognizeStrokes(strokes){
+  const cloud = buildPointCloud(strokes);
+  if (!cloud) return [];
+  const scored = TEMPLATE_CLOUDS.map(t => ({
+    letter: t.letter.toUpperCase(),
+    dist: cloudDistance(cloud, t.cloud)
+  }));
+  scored.sort((a,b) => a.dist - b.dist);
+  const seen = new Set();
+  const out = [];
+  for (const s of scored){
+    if (seen.has(s.letter)) continue;
+    seen.add(s.letter);
+    out.push(s);
+    if (out.length >= 4) break;
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════
+const puzzle = getTodaysPuzzle();
+const MAX_WRONG = 6;
+const STATE_KEY = 'hangman_state_v1';
+
+let revealed = new Set();     // correctly-guessed letters (uppercase)
+let wrongGuesses = [];        // wrong letters, in order guessed (uppercase)
+let wrongCount = 0;
+let gameOver = false;
+let status = 'playing';       // 'playing' | 'won' | 'lost'
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed.dayIndex !== puzzle.dayIndex) return null;
+    return parsed;
+  }catch(e){ return null; }
+}
+function saveState(){
+  try{
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+      dayIndex: puzzle.dayIndex,
+      revealed: [...revealed],
+      wrongGuesses,
+      status
+    }));
+  }catch(e){}
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER: BOARD
+// ═══════════════════════════════════════════════
+const wordRowEl = document.getElementById('wordRow');
+const triedRowEl = document.getElementById('triedRow');
+const livesNoteEl = document.getElementById('livesNote');
+const figureGroup = document.getElementById('figureGroup');
+
+function renderWord(){
+  wordRowEl.innerHTML = '';
+  for (const ch of puzzle.word){
+    if (ch === ' '){
+      const sp = document.createElement('span');
+      sp.className = 'letter-slot space';
+      wordRowEl.appendChild(sp);
+      continue;
+    }
+    const slot = document.createElement('span');
+    slot.className = 'letter-slot';
+    slot.textContent = revealed.has(ch) ? ch : (gameOver && status === 'lost' ? ch : '_');
+    if (gameOver && status === 'lost' && !revealed.has(ch)) slot.style.opacity = '0.55';
+    wordRowEl.appendChild(slot);
+  }
+}
+
+function renderTried(){
+  triedRowEl.innerHTML = '';
+  const all = [];
+  revealed.forEach(l => all.push({l, good:true}));
+  wrongGuesses.forEach(l => all.push({l, good:false}));
+  all.sort((a,b) => a.l.localeCompare(b.l));
+  all.forEach(({l, good}) => {
+    const chip = document.createElement('span');
+    chip.className = 'tried-chip ' + (good ? 'good' : 'bad');
+    chip.textContent = l;
+    triedRowEl.appendChild(chip);
+  });
+}
+
+function renderFigure(){
+  const parts = figureGroup.querySelectorAll('.part');
+  parts.forEach(p => {
+    const n = p.getAttribute('data-n');
+    if (n === 'dead'){
+      p.classList.toggle('show', status === 'lost');
+    } else {
+      p.classList.toggle('show', Number(n) <= wrongCount);
+    }
+  });
+  figureGroup.classList.toggle('dead', status === 'lost');
+  const remaining = Math.max(0, MAX_WRONG - wrongCount);
+  livesNoteEl.innerHTML = gameOver
+    ? (status === 'won' ? 'Solved with <b>' + remaining + '</b> to spare' : '<b>Out of guesses</b>')
+    : '<b>' + remaining + '</b> wrong guess' + (remaining === 1 ? '' : 'es') + ' left';
+}
+
+function renderBoard(){
+  renderWord();
+  renderTried();
+  renderFigure();
+}
+
+// ═══════════════════════════════════════════════
+//  DRAWING CANVAS
+// ═══════════════════════════════════════════════
+const canvas = document.getElementById('drawCanvas');
+const ctx = canvas.getContext('2d');
+let strokes = [];        // array of stroke arrays, each an array of {x,y} in canvas-local px
+let currentStroke = null;
+let candidates = [];
+let selectedLetter = null;
+
+function sizeCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  redrawCanvas();
+}
+
+function redrawCanvas(){
+  const rect = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, rect.width, rect.height);
+  ctx.strokeStyle = '#f2f2ea';
+  ctx.lineWidth = 6;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.shadowColor = 'rgba(242,242,234,0.5)';
+  ctx.shadowBlur = 3;
+  strokes.forEach(stroke => drawStroke(stroke));
+  if (currentStroke) drawStroke(currentStroke);
+}
+
+function drawStroke(pts){
+  if (pts.length < 2){
+    if (pts.length === 1){
+      ctx.beginPath();
+      ctx.arc(pts[0].x, pts[0].y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = '#f2f2ea';
+      ctx.fill();
+    }
+    return;
+  }
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.stroke();
+}
+
+function localPoint(evt){
+  const rect = canvas.getBoundingClientRect();
+  return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+}
+
+function onPointerDown(evt){
+  if (gameOver) return;
+  evt.preventDefault();
+  canvas.setPointerCapture(evt.pointerId);
+  currentStroke = [localPoint(evt)];
+  redrawCanvas();
+}
+function onPointerMove(evt){
+  if (!currentStroke) return;
+  evt.preventDefault();
+  currentStroke.push(localPoint(evt));
+  redrawCanvas();
+}
+function onPointerUp(evt){
+  if (!currentStroke) return;
+  if (currentStroke.length >= 1) strokes.push(currentStroke);
+  currentStroke = null;
+  redrawCanvas();
+  runRecognition();
+}
+
+canvas.addEventListener('pointerdown', onPointerDown);
+canvas.addEventListener('pointermove', onPointerMove);
+window.addEventListener('pointerup', onPointerUp);
+window.addEventListener('pointercancel', onPointerUp);
+
+window.addEventListener('resize', sizeCanvas);
+
+// ═══════════════════════════════════════════════
+//  ML LETTER RECOGNIZER
+//  Uses a pretrained CNN (trained on the full EMNIST byclass dataset —
+//  digits + uppercase + lowercase, real handwriting from thousands of
+//  writers) to classify the drawn strokes, so recognition generalizes to
+//  real handwriting styles rather than only the hand-authored shapes in
+//  LETTER_TEMPLATES above. Model weights/architecture credit: emnist-web-app
+//  by 4ltrem (MIT license, see model/LICENSE-emnist-model.txt), converted
+//  to TensorFlow.js format; loaded and run entirely client-side/offline —
+//  no data ever leaves the browser. If the model fails to load or predict
+//  for any reason (slow connection, unsupported browser, etc.) we fall
+//  back to the built-in shape-matcher above so drawing still works.
+// ═══════════════════════════════════════════════
+let mlModel = null;
+let mlLoadFailed = false;
+const mlLoadPromise = (async () => {
+  try {
+    mlModel = await tf.loadLayersModel('model/model.json');
+  } catch (e) {
+    mlLoadFailed = true;
+    console.warn('Handwriting model failed to load; using built-in shape matcher instead.', e);
+  }
+})();
+
+const ML_CLASS_LABELS = (() => {
+  const out = [];
+  for (let i = 0; i < 10; i++) out.push(String.fromCharCode(48 + i)); // 0-9
+  for (let i = 0; i < 26; i++) out.push(String.fromCharCode(65 + i)); // A-Z
+  for (let i = 0; i < 26; i++) out.push(String.fromCharCode(97 + i)); // a-z
+  return out;
+})();
+
+// offscreen canvases used to rasterize the drawn strokes down to the
+// 28x28 grayscale format the model expects (same convention as MNIST/EMNIST)
+const mlBigCanvas = document.createElement('canvas');
+mlBigCanvas.width = 200; mlBigCanvas.height = 200;
+const mlBigCtx = mlBigCanvas.getContext('2d');
+const mlSmallCanvas = document.createElement('canvas');
+mlSmallCanvas.width = 28; mlSmallCanvas.height = 28;
+const mlSmallCtx = mlSmallCanvas.getContext('2d');
+
+function strokesToModelInput(nonEmptyStrokes){
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  nonEmptyStrokes.forEach(s => s.forEach(p => {
+    minX = Math.min(minX, p.x); minY = Math.min(minY, p.y);
+    maxX = Math.max(maxX, p.x); maxY = Math.max(maxY, p.y);
+  }));
+  const w = Math.max(maxX - minX, 1e-6), h = Math.max(maxY - minY, 1e-6);
+  const margin = 26;
+  const avail = mlBigCanvas.width - margin * 2;
+  const scale = Math.min(avail / w, avail / h);
+  const offX = margin + (avail - w * scale) / 2 - minX * scale;
+  const offY = margin + (avail - h * scale) / 2 - minY * scale;
+
+  mlBigCtx.fillStyle = '#000';
+  mlBigCtx.fillRect(0, 0, mlBigCanvas.width, mlBigCanvas.height);
+  mlBigCtx.strokeStyle = '#fff';
+  mlBigCtx.fillStyle = '#fff';
+  mlBigCtx.lineWidth = 14;
+  mlBigCtx.lineCap = 'round';
+  mlBigCtx.lineJoin = 'round';
+  nonEmptyStrokes.forEach(stroke => {
+    if (stroke.length === 1){
+      const p = stroke[0];
+      mlBigCtx.beginPath();
+      mlBigCtx.arc(p.x * scale + offX, p.y * scale + offY, 7, 0, Math.PI * 2);
+      mlBigCtx.fill();
+      return;
+    }
+    mlBigCtx.beginPath();
+    stroke.forEach((p, i) => {
+      const x = p.x * scale + offX, y = p.y * scale + offY;
+      if (i === 0) mlBigCtx.moveTo(x, y); else mlBigCtx.lineTo(x, y);
+    });
+    mlBigCtx.stroke();
+  });
+
+  mlSmallCtx.clearRect(0, 0, 28, 28);
+  mlSmallCtx.drawImage(mlBigCanvas, 0, 0, 28, 28);
+  const imgData = mlSmallCtx.getImageData(0, 0, 28, 28);
+  const data = new Float32Array(28 * 28);
+  for (let i = 0; i < data.length; i++) data[i] = imgData.data[i * 4] / 255; // red channel, 0..1
+  return data;
+}
+
+async function recognizeStrokesML(strokes){
+  const nonEmpty = strokes.filter(s => s.length > 0);
+  if (nonEmpty.length === 0) return [];
+  const data = strokesToModelInput(nonEmpty);
+  const input = tf.tensor(data, [1, 28, 28, 1]);
+  let probs;
+  try {
+    const predT = mlModel.predict(input);
+    probs = await predT.data();
+    predT.dispose();
+  } finally {
+    input.dispose();
+  }
+  const scored = Array.from(probs).map((p, i) => ({
+    letter: ML_CLASS_LABELS[i], p, key: ML_CLASS_LABELS[i].toUpperCase()
+  }));
+  for (let i = 0; i < 10; i++) scored[i].p = -1; // mask digit classes — the game never expects one
+  scored.sort((a, b) => b.p - a.p);
+  const seen = new Set();
+  const out = [];
+  for (const s of scored){
+    if (seen.has(s.key)) continue;
+    seen.add(s.key);
+    out.push({ letter: s.letter, dist: 1 - s.p });
+    if (out.length >= 4) break;
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════
+//  RECOGNITION UI
+// ═══════════════════════════════════════════════
+const recognizedLetterEl = document.getElementById('recognizedLetter');
+const candidatesRowEl = document.getElementById('candidatesRow');
+const confirmBtn = document.getElementById('confirmBtn');
+const clearBtn = document.getElementById('clearBtn');
+const hintMsgEl = document.getElementById('hintMsg');
+
+async function runRecognition(){
+  const strokesSnapshot = strokes;
+  let result = [];
+  if (!mlLoadFailed){
+    await mlLoadPromise;
+  }
+  if (mlModel){
+    try {
+      result = await recognizeStrokesML(strokesSnapshot);
+    } catch (e){
+      console.warn('ML recognition failed, falling back to shape matcher.', e);
+      result = recognizeStrokes(strokesSnapshot);
+    }
+  } else {
+    result = recognizeStrokes(strokesSnapshot);
+  }
+  // if the slate was cleared (or redrawn) while we were awaiting the
+  // model, don't clobber the newer state with a stale result
+  if (strokesSnapshot !== strokes) return;
+  candidates = result;
+  if (candidates.length === 0){
+    selectedLetter = null;
+    recognizedLetterEl.textContent = '—';
+    candidatesRowEl.innerHTML = '';
+    confirmBtn.disabled = true;
+    return;
+  }
+  selectedLetter = candidates[0].letter;
+  renderRecognition();
+}
+
+function renderRecognition(){
+  recognizedLetterEl.textContent = selectedLetter || '—';
+  candidatesRowEl.innerHTML = '';
+  candidates.slice(1).forEach(c => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'candidate-btn';
+    btn.textContent = c.letter;
+    btn.title = 'Use ' + c.letter + ' instead';
+    btn.addEventListener('click', () => {
+      selectedLetter = c.letter;
+      renderRecognition();
+    });
+    candidatesRowEl.appendChild(btn);
+  });
+  confirmBtn.disabled = gameOver || !selectedLetter;
+}
+
+function clearSlate(){
+  strokes = [];
+  currentStroke = null;
+  candidates = [];
+  selectedLetter = null;
+  redrawCanvas();
+  recognizedLetterEl.textContent = '—';
+  candidatesRowEl.innerHTML = '';
+  confirmBtn.disabled = true;
+  hintMsgEl.textContent = '';
+  hintMsgEl.classList.remove('warn');
+}
+
+clearBtn.addEventListener('click', clearSlate);
+confirmBtn.addEventListener('click', () => {
+  if (selectedLetter) submitGuess(selectedLetter);
+});
+
+// ═══════════════════════════════════════════════
+//  GUESS SUBMISSION
+// ═══════════════════════════════════════════════
+function submitGuess(letter){
+  if (gameOver) return;
+  letter = letter.toUpperCase();
+  if (revealed.has(letter) || wrongGuesses.includes(letter)){
+    hintMsgEl.textContent = 'You already tried "' + letter + '".';
+    hintMsgEl.classList.add('warn');
+    clearSlate();
+    return;
+  }
+
+  if (puzzle.word.includes(letter)){
+    revealed.add(letter);
+    hintMsgEl.textContent = '';
+    hintMsgEl.classList.remove('warn');
+  } else {
+    wrongGuesses.push(letter);
+    wrongCount++;
+    hintMsgEl.textContent = '';
+    hintMsgEl.classList.remove('warn');
+  }
+
+  const solved = [...puzzle.word].every(ch => ch === ' ' || revealed.has(ch));
+  if (solved){
+    status = 'won';
+    gameOver = true;
+  } else if (wrongCount >= MAX_WRONG){
+    status = 'lost';
+    gameOver = true;
+  }
+
+  saveState();
+  clearSlate();
+  renderBoard();
+
+  if (gameOver) setTimeout(showEndPopup, 500);
+}
+
+// "Or type:" fallback — type a letter, then tap the tick box to guess it, no drawing required
+const typeInputEl = document.getElementById('typeInput');
+const typeConfirmBtn = document.getElementById('typeConfirmBtn');
+
+function updateTypeConfirmState(){
+  typeConfirmBtn.disabled = gameOver || !/^[A-Za-z]$/.test(typeInputEl.value);
+}
+
+function confirmTypedGuess(){
+  const val = typeInputEl.value;
+  if (gameOver || !/^[A-Za-z]$/.test(val)) return;
+  typeInputEl.value = '';
+  updateTypeConfirmState();
+  submitGuess(val);
+}
+
+typeInputEl.addEventListener('input', () => {
+  typeInputEl.value = typeInputEl.value.replace(/[^A-Za-z]/g, '').slice(-1);
+  updateTypeConfirmState();
+});
+typeInputEl.addEventListener('keydown', e => {
+  if (e.key === 'Enter'){
+    e.preventDefault();
+    confirmTypedGuess();
+  }
+});
+typeConfirmBtn.addEventListener('click', confirmTypedGuess);
+
+// ═══════════════════════════════════════════════
+//  END POPUP
+// ═══════════════════════════════════════════════
+let countdownInterval = null;
+
+function showEndPopup(){
+  const title = document.getElementById('endTitle');
+  const wordEl = document.getElementById('endWord');
+  const gridEl = document.getElementById('endGrid');
+
+  title.textContent = status === 'won' ? '🎉 You got it!' : '💀 So close!';
+  wordEl.textContent = puzzle.word;
+
+  gridEl.innerHTML = '';
+  const row = document.createElement('div');
+  row.className = 'end-grid-row';
+  const finalRow = wrongGuesses.map(() => 'bad').concat([...revealed].map(() => 'good'));
+  finalRow.forEach(kind => {
+    const sq = document.createElement('span');
+    sq.style.background = kind === 'good' ? 'var(--chalk-green, #a7d38c)' : 'var(--chalk-red, #e3897d)';
+    row.appendChild(sq);
+  });
+  gridEl.appendChild(row);
+
+  document.getElementById('endOverlay').classList.add('on');
+  startCountdown();
+}
+
+function startCountdown(){
+  const el = document.getElementById('countdownVal');
+  function tick(){
+    const now = new Date();
+    const nextMidnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+    let diff = Math.max(0, nextMidnight - now.getTime());
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = [h, m, s].map(x => String(x).padStart(2, '0')).join(':');
+  }
+  tick();
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(tick, 1000);
+}
+
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const scoreLabel = status === 'won' ? wrongCount + '/' + MAX_WRONG + ' wrong' : 'X/' + MAX_WRONG;
+  const squares = wrongGuesses.map(() => '🟥').concat([...revealed].map(() => '🟩')).join('');
+  const text = 'Daily Hangman #' + puzzle.puzzleNum + ' ' + scoreLabel + '\n' + squares;
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('shareBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    }).catch(() => {});
+  }
+});
+
+// ═══════════════════════════════════════════════
+//  POPUP WIRING
+// ═══════════════════════════════════════════════
+function setupPopup(btnId, overlayId, closeId){
+  document.getElementById(btnId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.add('on'));
+  document.getElementById(closeId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.remove('on'));
+  document.getElementById(overlayId)?.addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('on');
+  });
+}
+setupPopup('helpBtn', 'helpOverlay', 'helpClose');
+setupPopup(null, 'endOverlay', 'endClose');
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+function init(){
+  document.getElementById('dayLabel').textContent = 'Hangman #' + puzzle.puzzleNum;
+  document.getElementById('dayInfo').textContent =
+    'Daily Hangman #' + puzzle.puzzleNum + ' · New word daily at midnight UTC';
+
+  const saved = loadState();
+  if (saved){
+    revealed = new Set(saved.revealed || []);
+    wrongGuesses = saved.wrongGuesses || [];
+    wrongCount = wrongGuesses.length;
+    status = saved.status || 'playing';
+    gameOver = status !== 'playing';
+  }
+
+  sizeCanvas();
+  renderBoard();
+  confirmBtn.disabled = true;
+
+  if (gameOver) setTimeout(showEndPopup, 300);
+}
+
+init();
+
+</script>
+</body>
+</html>
