@@ -1,0 +1,2569 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Define-dle — dailygametree</title>
+<meta name="description" content="A daily word-guessing puzzle. Read the dictionary definition, then guess the word — unlimited guesses, letter-by-letter feedback like Wordle.">
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#F6F5EF" />
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="canonical" href="https://dailygametree.com/define-dle/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="DailyGameTree" />
+<meta property="og:title" content="Define-dle — dailygametree" />
+<meta property="og:description" content="A daily word-guessing puzzle. Read the dictionary definition, then guess the word — unlimited guesses, letter-by-letter feedback like Wordle." />
+<meta property="og:url" content="https://dailygametree.com/define-dle/" />
+<meta property="og:image" content="https://dailygametree.com/define-dle/banner.png" />
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ---------- Site-wide palette (drives header / ad rails / footer) ---------- */
+:root{
+  --bg: #F6F5EF;
+  --bg-elevated: #EFEDE3;
+  --bg-card: #FFFFFF;
+  --text: #20261C;
+  --text-dim: #5B6255;
+  --text-faint: #9AA091;
+  --accent: #6E9C1E;
+  --accent-dim: #557A16;
+  --accent-soft: #E7F1D4;
+  --amber: #C97A1B;
+  --line: #E1DDCF;
+  --radius: 8px;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: 'Fraunces', serif;
+  --body: 'Public Sans', ui-sans-serif, sans-serif;
+}
+
+html,body{
+  min-height:100%;
+  background:var(--bg);
+  font-family:var(--body);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+a{ color:inherit; }
+
+/* ---------- Header (identical to homepage) ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: rgba(246, 245, 239, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--display), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.logo-mark { width: 55px; height: auto; display: block; }
+
+/* ---------- Ad rails (identical to homepage) ---------- */
+
+.layout {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.ad-rail {
+  flex: 0 0 160px;
+  margin: 0 10px;
+  position: sticky;
+  top: 78px;
+  align-self: stretch;
+  display: flex;
+}
+
+.ad-slot {
+  border: 1px dashed #CBC6B4;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  color: var(--text-faint);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.6;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.main-inner {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+
+@media (max-width: 900px) {
+  .layout { flex-direction: column; align-items: stretch; }
+  .ad-rail { position: static; flex: 0 0 auto; width: 100%; margin: 10px 0; align-self: auto; display: block; }
+  .ad-rail.left { order: -1; }
+  .main-content { order: 0; }
+  .ad-rail.right { order: 1; }
+  .ad-rail .ad-slot { height: 50px; font-size: 9px; letter-spacing: .04em; }
+  .main-inner { padding: 0 14px; }
+}
+
+@media (max-width: 480px) {
+  .logo-text { display: none; }
+  .logo { gap: 0; }
+}
+
+.game-top-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  width:100%;
+  align-self:stretch;
+  margin:24px 4px 0;
+}
+.back-link{
+  display:inline-block;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  margin:0;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--body);
+  transition:border-color .15s,color .15s;
+}
+.back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
+.random-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  background:transparent;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--body);
+  cursor:pointer;
+  margin-left:auto;
+  transition:border-color .15s,color .15s;
+}
+.random-btn svg{ width:13px; height:13px; flex-shrink:0; transition:transform .4s ease; }
+.random-btn:hover{ border-color:var(--accent); color:var(--accent-dim); }
+.random-btn.is-loading svg{ animation:spin .6s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* ---------- Footer (identical to homepage) ---------- */
+
+footer {
+  text-align: center;
+  padding: 28px 24px 40px;
+  color: var(--text-faint);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+.footer-links a:hover { color: var(--accent-dim); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- Popups (shared pattern) ---- */
+.overlay{display:none;position:fixed;inset:0;background:rgba(32,38,28,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+.overlay.on{display:flex}
+.popup{background:var(--bg-card);border-radius:14px;padding:26px 26px 22px;max-width:400px;width:100%;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.28);color:var(--text)}
+.popup h2{font-family:var(--display);font-size:20px;margin-bottom:10px}
+.popup p{font-size:13.5px;line-height:1.6;color:var(--text-dim)}
+.popup p + p{margin-top:8px}
+.popup code{font-family:var(--mono);background:var(--bg-elevated);padding:1px 5px;border-radius:4px;font-size:12px}
+.popup-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:inherit;line-height:1;padding:2px 4px}
+.popup-close:hover{opacity:.55}
+
+/* =====================================================================
+   DEFINE-DLE GAME
+   ===================================================================== */
+
+.game-wrap{
+  --dfn-accent: #1F7A6C;
+  --dfn-accent-dim: #175C51;
+  --dfn-accent-soft: #DCEEEA;
+  --dfn-ink: #20261C;
+  --dfn-line: #DAD6C8;
+  --dfn-card-bg: #FFFEFA;
+  --dfn-correct: #6AAA64;
+  --dfn-present: #C9B458;
+  --dfn-absent: #9AA091;
+  --dfn-tile-bg: #FFFFFF;
+  --dfn-tile-line: #C7C2B2;
+  margin-top: 14px;
+}
+
+.page{display:flex;justify-content:center;padding:0 24px}
+.game-col{flex:0 0 480px;max-width:480px;padding:28px 24px 56px;width:100%}
+
+@media(max-width:640px){
+  .page{padding:0 6px}
+  .game-col{flex:0 0 auto;max-width:100%;width:100%;padding:14px 12px 32px}
+}
+
+/* ---- Title ---- */
+.title-block{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:14px}
+.title{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,40px);letter-spacing:-0.02em;color:var(--text)}
+.title .dle{color:var(--dfn-accent);font-style:italic}
+.subtitle{font-size:12.5px;color:var(--text-dim);margin-top:6px;max-width:380px}
+
+/* ---- Definition card ---- */
+.definition-card{
+  background: var(--dfn-card-bg);
+  border: 1px solid var(--dfn-line);
+  border-radius: 10px;
+  padding: 18px 20px;
+  box-shadow: 0 8px 22px rgba(32,38,28,.08);
+  text-align: center;
+  margin-bottom: 16px;
+}
+.definition-label{
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--dfn-accent-dim);
+  margin-bottom: 8px;
+}
+.definition-text{
+  font-family: var(--display);
+  font-style: italic;
+  font-size: clamp(15px, 3.6vw, 18px);
+  line-height: 1.5;
+  color: var(--dfn-ink);
+}
+.definition-meta{
+  margin-top: 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 16px;flex-wrap:wrap}
+.toolbar-left,.toolbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.puzzle-num{font-family:var(--mono);font-size:12px;color:var(--text-dim);font-weight:600;letter-spacing:.02em}
+.icon-btn{width:34px;height:34px;border-radius:50%;border:2px solid var(--text);background:transparent;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s,border-color .15s;flex-shrink:0;padding:0;line-height:1;color:var(--text)}
+.icon-btn:hover{background:var(--text);color:var(--bg)}
+
+.timer{font-family:var(--mono);font-size:13px;color:var(--text-dim);background:var(--bg-elevated);border-radius:999px;padding:6px 12px;letter-spacing:.02em;min-width:64px;text-align:center}
+.timer.won{color:#fff;background:var(--dfn-accent)}
+.guess-count{font-family:var(--mono);font-size:12px;color:var(--text-dim);background:var(--bg-elevated);border-radius:999px;padding:6px 12px;letter-spacing:.02em;white-space:nowrap}
+
+/* ---- Board ---- */
+.board-frame{
+  background: var(--dfn-card-bg);
+  border: 1px solid var(--dfn-line);
+  border-radius: 10px;
+  padding: 14px 10px;
+  box-shadow: 0 8px 22px rgba(32,38,28,.08);
+}
+
+.board{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 336px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding: 2px;
+}
+.board::-webkit-scrollbar{ width: 8px; }
+.board::-webkit-scrollbar-thumb{ background: var(--dfn-line); border-radius: 999px; }
+
+.guess-row{
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.tile{
+  width: var(--tile-size, 48px);
+  height: var(--tile-size, 48px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: calc(var(--tile-size, 48px) * 0.46);
+  color: var(--dfn-ink);
+  background: var(--dfn-tile-bg);
+  border: 2px solid var(--dfn-tile-line);
+  border-radius: 6px;
+  text-transform: uppercase;
+  transition: background-color .15s, border-color .15s, color .15s;
+}
+.tile.filled{ border-color: #A9A392; }
+.tile.correct{ background: var(--dfn-correct); border-color: var(--dfn-correct); color: #fff; }
+.tile.present{ background: var(--dfn-present); border-color: var(--dfn-present); color: #fff; }
+.tile.absent{ background: var(--dfn-absent); border-color: var(--dfn-absent); color: #fff; }
+
+.guess-row.pop .tile{ animation: dfn-pop .12s ease; }
+@keyframes dfn-pop{ 0%{ transform: scale(1); } 40%{ transform: scale(1.08); } 100%{ transform: scale(1); } }
+
+.guess-row.shake{ animation: dfn-shake .3s ease; }
+@keyframes dfn-shake{
+  0%,100%{ transform: translateX(0); }
+  20%{ transform: translateX(-5px); }
+  40%{ transform: translateX(5px); }
+  60%{ transform: translateX(-3px); }
+  80%{ transform: translateX(3px); }
+}
+
+.toast{
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--dfn-accent-dim);
+  min-height: 16px;
+  margin-top: 8px;
+}
+
+/* ---- Keyboard ---- */
+.keyboard{
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.kb-row{
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+.key{
+  flex: 1 1 0;
+  max-width: 38px;
+  height: 46px;
+  border: none;
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s;
+  text-transform: uppercase;
+}
+.key:hover{ background: #E2DFCF; }
+.key.wide{ max-width: 56px; font-size: 10.5px; }
+.key.correct{ background: var(--dfn-correct); color: #fff; }
+.key.present{ background: var(--dfn-present); color: #fff; }
+.key.absent{ background: var(--dfn-absent); color: #fff; }
+
+@media(max-width:420px){
+  .key{ height: 42px; font-size: 12px; }
+  .key.wide{ font-size: 9px; }
+}
+
+.day-info{text-align:center;margin-top:16px;font-size:10.5px;color:var(--text-faint);font-family:var(--mono)}
+
+@media(max-width:960px){
+  .icon-btn{width:29px;height:29px;font-size:13px}
+  .day-info{margin-top:12px;font-size:9px}
+}
+
+/* ---- End popup ---- */
+.end-popup h2{text-align:center;font-size:24px}
+.end-popup .end-sub{font-size:13px;text-align:center;color:var(--text-dim);margin-top:2px}
+.end-popup .end-stats{display:flex;justify-content:center;gap:22px;margin:16px 0}
+.end-popup .end-stat{text-align:center}
+.end-popup .end-stat b{display:block;font-family:var(--display);font-size:22px;color:var(--dfn-accent)}
+.end-popup .end-stat span{font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.04em}
+.share-btn{display:block;width:100%;margin:6px auto 0;background:var(--dfn-accent);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:var(--body);font-weight:700;font-size:14px;cursor:pointer}
+.share-btn:hover{opacity:.9}
+.replay-btn{display:block;width:100%;margin:8px auto 0;background:transparent;color:var(--dfn-accent);border:2px solid var(--dfn-accent);border-radius:8px;padding:8px 22px;font-family:var(--body);font-weight:700;font-size:14px;cursor:pointer}
+.replay-btn:hover{background:var(--dfn-accent-soft)}
+.countdown{text-align:center;font-size:12px;color:var(--text-dim);margin-top:14px}
+.countdown-val{font-weight:800;font-size:16px;color:var(--text);display:block;margin-top:2px;font-family:var(--mono)}
+
+/* ---- Help popup example ---- */
+.example-row{display:flex;justify-content:center;gap:6px;margin:10px 0}
+.example-row .tile{ width:36px; height:36px; font-size:16px; }
+
+</style>
+</head>
+<body data-game="define-dle">
+  <header class="site-header">
+    <a class="logo" href="/">
+      <img src="/logo.png" alt="dailygametree logo" class="logo-mark" />
+      <span class="logo-text">dailygametree</span>
+    </a>
+  </header>
+
+  <div class="layout">
+    <aside class="ad-rail left">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+
+    <div class="main-content">
+      <div class="main-inner">
+        <main>
+          <div class="game-top-row">
+            <a class="back-link" href="/">&larr; All games</a>
+            <button type="button" class="random-btn" data-random-game-btn aria-label="Play a random game">
+              <span>Random</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+                <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+                <line x1="4" y1="4" x2="9" y2="9"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="game-wrap">
+            <div class="page">
+              <div class="game-col">
+
+                <div class="title-block">
+                  <h1 class="title">Define<span class="dle">-dle</span></h1>
+                  <p class="subtitle">Read the definition, then guess the word. Unlimited guesses &mdash; it&rsquo;s all about how few you need and how fast you are.</p>
+                </div>
+
+                <div class="definition-card">
+                  <div class="definition-label">Today&rsquo;s definition</div>
+                  <div class="definition-text" id="definitionText">Loading&hellip;</div>
+                  <div class="definition-meta" id="definitionMeta"></div>
+                </div>
+
+                <div class="toolbar">
+                  <div class="toolbar-left">
+                    <span class="puzzle-num" id="puzzleNum">Define-dle #&mdash;</span>
+                  </div>
+                  <div class="toolbar-right">
+                    <span class="timer" id="timerDisplay">00:00</span>
+                    <span class="guess-count" id="guessCountDisplay">0 guesses</span>
+                    <button class="icon-btn" id="clearBtn" title="Start over">&#8635;</button>
+                    <button class="icon-btn" id="helpBtn" title="How to play">?</button>
+                  </div>
+                </div>
+
+                <div class="board-frame">
+                  <div class="board" id="board"><!-- guess rows injected by JS --></div>
+                  <div class="toast" id="toast"></div>
+                </div>
+
+                <div class="keyboard" id="keyboard"><!-- keys injected by JS --></div>
+
+                <p class="day-info" id="dayInfo">Generating today&rsquo;s puzzle&hellip;</p>
+
+              </div>
+            </div>
+
+            <!-- Help popup -->
+            <div class="overlay" id="helpOverlay">
+              <div class="popup">
+                <button class="popup-close" id="helpClose">✕</button>
+                <h2>How to Play</h2>
+                <p>Every day you get a real dictionary definition &mdash; your job is to guess the word it defines. Every word is at least 5 letters.</p>
+                <p>Type a guess the same length as the answer and press Enter. Each letter is colored to show how close you are:</p>
+                <div class="example-row">
+                  <div class="tile correct">W</div>
+                  <div class="tile present">O</div>
+                  <div class="tile absent">R</div>
+                  <div class="tile correct">D</div>
+                </div>
+                <p><strong>Green</strong> means that letter is correct and in the right spot. <strong>Yellow</strong> means it&rsquo;s in the word but in the wrong spot. <strong>Gray</strong> means it&rsquo;s not in the word at all.</p>
+                <p>There&rsquo;s no limit on guesses &mdash; keep going, each attempt just adds another row. The only things being timed are your guess count and how long you take.</p>
+                <p style="margin-top:10px;font-size:12px;color:var(--text-faint)">A new Define-dle unlocks every day at midnight UTC.</p>
+              </div>
+            </div>
+
+            <!-- End of game popup -->
+            <div class="overlay" id="endOverlay">
+              <div class="popup end-popup">
+                <button class="popup-close" id="endClose">✕</button>
+                <h2>📖 Solved!</h2>
+                <p class="end-sub" id="endSub"></p>
+                <div class="end-stats">
+                  <div class="end-stat"><b id="endTime">00:00</b><span>Time</span></div>
+                  <div class="end-stat"><b id="endGuesses">0</b><span>Guesses</span></div>
+                </div>
+                <button class="share-btn" id="shareBtn">Share Result</button>
+                <button class="replay-btn" id="playAgainBtn">Play Again</button>
+                <div class="countdown">
+                  Next Define-dle in
+                  <span class="countdown-val" id="countdownVal">--:--:--</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </main>
+      </div>
+    </div>
+
+    <aside class="ad-rail right">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+  </div>
+
+  <footer>
+    <nav class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms and Conditions</a>
+      <a href="/about.html">About Us</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+    <p>&copy; <span id="year"></span> dailygametree.com</p>
+  </footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ═══════════════════════════════════════════════
+//  SEEDED RANDOM (same generator used across the site)
+// ═══════════════════════════════════════════════
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, rand){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ═══════════════════════════════════════════════
+//  DAILY INDEX
+// ═══════════════════════════════════════════════
+function getDayIndex(){
+  const epoch = Date.UTC(2025, 0, 1);
+  const now = new Date();
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.max(0, Math.floor((today - epoch) / 86400000));
+}
+
+// ═══════════════════════════════════════════════
+//  WORD BANK — [WORD, "dictionary-style definition"]. Every word is at
+//  least 5 letters; definitions are written not to contain the word
+//  itself. A fixed shuffle order (seeded) is cycled through by day
+//  index, matching the pattern used by Yeardle and Shikaku, so the same
+//  day always resolves to the same word and the list only repeats once
+//  every full cycle.
+// ═══════════════════════════════════════════════
+const WORDS = [
+["ABACUS","A frame with sliding beads used for counting or doing arithmetic."],
+["ABDOMEN","The part of the body between the chest and the hips, containing the digestive organs."],
+["ABOLISH","To formally put an end to a law, system, or practice."],
+["ABRASIVE","Rough enough to rub away or scratch a surface."],
+["ABSTAIN","To choose not to do or vote for something."],
+["ACADEMY","A school or institution devoted to a particular field of study or training."],
+["ACCOMPANY","To go somewhere together with another person."],
+["ACCORDION","A portable musical instrument played by pressing keys while squeezing bellows."],
+["ACCUSE","To claim that someone has done something wrong."],
+["ACORN","The nut of an oak tree, held in a small cup-shaped base."],
+["ACROBAT","A performer skilled at gymnastic feats of balance and agility."],
+["ACTIVATE","To make something start working."],
+["ADAPTER","A device that allows equipment to be connected that would not otherwise be compatible."],
+["ADHESIVE","A substance used for sticking objects or materials together."],
+["ADMIRAL","A high-ranking officer in charge of a navy or fleet."],
+["ADOLESCENT","A young person in the process of developing from a child into an adult."],
+["ADORN","To decorate something to make it more attractive."],
+["ADRIFT","Floating without being steered or moored."],
+["ADVOCATE","A person who publicly supports a particular cause or policy."],
+["AERIAL","Existing or happening in the air."],
+["AFFLICT","To cause pain or suffering to someone."],
+["AGENDA","A list of items to be discussed at a meeting."],
+["AGILITY","The ability to move quickly and easily."],
+["AILMENT","A minor illness."],
+["AIRSHIP","A powered aircraft kept afloat by a gas lighter than air."],
+["ALCOVE","A small recessed section of a room, set back from the main space."],
+["ALIMONY","Money one spouse pays another for support after a divorce."],
+["ALKALI","A substance that neutralizes acids and turns litmus paper blue."],
+["ALLEGE","To claim something is true without offering proof."],
+["ALLERGY","A condition causing the body to react badly to a substance that is normally harmless."],
+["ALLIANCE","A union formed for mutual benefit between people, groups, or countries."],
+["ALMANAC","A yearly publication listing dates, events, and astronomical information."],
+["ALPHABET","The set of letters used to write a language, in a fixed order."],
+["ALTITUDE","The height of an object or point above sea level."],
+["ALUMNUS","A former student of a school, college, or university."],
+["AMATEUR","A person who engages in an activity for enjoyment rather than as a profession."],
+["AMBIENT","Relating to the immediate surroundings of something."],
+["AMBLE","To walk at a slow, relaxed pace."],
+["AMBUSH","A surprise attack launched from a hidden position."],
+["AMNESTY","An official pardon for people convicted of political offenses."],
+["AMPHIBIAN","A cold-blooded animal that lives both in water and on land."],
+["AMULET","A small object worn as protection against harm or evil."],
+["ANATOMY","The scientific study of the structure of bodies."],
+["ANCESTOR","A person from whom one is descended, typically more distant than a grandparent."],
+["ANCHOR","A heavy metal device lowered from a ship to keep it from drifting."],
+["ANCHOVY","A small, strong-flavored fish often used in sauces and toppings."],
+["ANECDOTE","A short, entertaining story about a real incident or person."],
+["ANGLER","A person who fishes with a rod and line."],
+["ANIMATE","To bring something to life or give it liveliness."],
+["ANNIVERSARY","The date on which an event took place in a previous year, marked each year."],
+["ANNOUNCE","To make something publicly or formally known."],
+["ANNUAL","Happening once every year."],
+["ANONYMOUS","Not identified by name; of unknown identity."],
+["ANTELOPE","A slender, fast-running horned animal found mainly in Africa."],
+["ANTIDOTE","A substance that counteracts the effects of a poison."],
+["ANTIQUE","An object valued for its age, craftsmanship, or rarity."],
+["ANTLER","A branching, bony growth on the head of a deer or similar animal."],
+["ANTONYM","A word opposite in meaning to another."],
+["ANVIL","A heavy iron block on which metal is hammered and shaped."],
+["APATHY","A lack of interest, enthusiasm, or concern."],
+["APOLOGY","A statement expressing regret for wrongdoing."],
+["APPAREL","Items worn to cover the body; garments collectively."],
+["APPEASE","To pacify or placate someone by giving in to their demands."],
+["APPENDIX","A supplementary section at the end of a book or document."],
+["APPRAISE","To assess the value or quality of something."],
+["APPRENTICE","A person learning a trade from a skilled employer."],
+["AQUARIUM","A tank or building where fish and other aquatic creatures are kept."],
+["AQUIFER","An underground layer of rock that holds and transmits groundwater."],
+["ARBITRARY","Based on random choice rather than any reason or system."],
+["ARCADE","A covered passageway, often lined with shops or games machines."],
+["ARCHER","A person who shoots with a bow and arrow."],
+["ARCHIVE","A collection of historical documents or records kept for reference."],
+["ARENA","A large enclosed area used for sports or entertainment events."],
+["ARGUMENT","An exchange of differing views, often in a heated manner."],
+["ARISTOCRAT","A member of the highest social class, often with inherited titles."],
+["ARMOR","Protective covering worn to shield the body from injury in combat."],
+["ARSENAL","A collection of weapons, or a place where they are stored."],
+["ARTERY","A tube that carries blood away from the heart to the rest of the body."],
+["ARTISAN","A worker skilled in a particular craft, made by hand."],
+["ASCEND","To move upward or climb."],
+["ASHTRAY","A small container for tobacco ash and cigarette ends."],
+["ASPHALT","A dark, sticky material used for surfacing roads."],
+["ASSASSIN","A person who kills a prominent figure for political or other motives."],
+["ASSEMBLY","A group of people gathered together for a common purpose."],
+["ASTEROID","A small rocky body orbiting the sun."],
+["ASTRAY","Away from the correct path or direction."],
+["ASYLUM","A place of refuge or safety, especially for those fleeing persecution."],
+["ATHLETE","A person trained to compete in sports or physical exercises."],
+["ATLAS","A book of maps."],
+["ATROCITY","An extremely cruel or brutal act."],
+["ATTIC","The space directly under the roof of a house, often used for storage."],
+["ATTIRE","Clothes, especially fine or formal ones."],
+["AUCTION","A public sale where goods are sold to the highest bidder."],
+["AUDIBLE","Loud enough to be heard."],
+["AUDITOR","A person who officially inspects financial accounts."],
+["AUTHENTIC","Genuine and of undisputed origin."],
+["AUTOMOBILE","A road vehicle powered by an engine, designed to carry passengers."],
+["AUTUMN","The season between summer and winter when leaves change color and fall."],
+["AVALANCHE","A large mass of snow, ice, and rock that falls rapidly down a mountainside."],
+["AVENUE","A broad street, often lined with trees."],
+["AVERAGE","A number expressing the central value in a set of data."],
+["AVIATOR","A person who flies an aircraft."],
+["AWNING","A sheet of material stretched over a frame to shelter a doorway or window."],
+["BACKPACK","A bag with straps, carried on the back."],
+["BADGER","A burrowing mammal with a black-and-white striped face."],
+["BAGGAGE","Luggage carried by a traveler."],
+["BAKERY","A place where bread and cakes are made or sold."],
+["BALANCE","A state in which weight is evenly distributed."],
+["BALCONY","A platform enclosed by a wall or railing, projecting from a building."],
+["BALLAST","Heavy material placed low in a vessel to improve stability."],
+["BALLOT","A paper or electronic form used to cast a vote in an election."],
+["BAMBOO","A tall, fast-growing tropical grass with hollow, woody stems."],
+["BANDAGE","A strip of material used to bind a wound or injury."],
+["BANDIT","An armed robber, especially one who attacks travelers."],
+["BANISH","To send someone away from a place as a punishment."],
+["BANJO","A stringed musical instrument with a long neck and a round body."],
+["BANQUET","A large, formal meal, typically held in celebration of a special occasion."],
+["BANTER","Playful, teasing conversation."],
+["BAPTISM","A religious ceremony marking admission to a Christian church."],
+["BARBER","A person whose job is to cut men's hair."],
+["BARGAIN","An agreement between two parties over the terms of a transaction."],
+["BARITONE","A male singing voice between tenor and bass."],
+["BARLEY","A cereal grain used for food and for making beer and whisky."],
+["BARNACLE","A small shelled creature that attaches itself to rocks and ship hulls."],
+["BARRACK","A building used to house soldiers."],
+["BARREL","A large cylindrical container with bulging sides, usually made of wood."],
+["BARRICADE","A barrier hastily set up to block a road or passage."],
+["BARTENDER","A person who serves drinks at a bar."],
+["BASEMENT","The floor of a building that is partly or entirely below ground level."],
+["BASIN","A wide, shallow bowl used for washing or holding liquid."],
+["BATTALION","A large body of troops, typically several hundred soldiers."],
+["BATTERY","A device that stores and supplies electrical energy."],
+["BAYONET","A blade attached to the muzzle of a rifle for close combat."],
+["BEACON","A light or signal used to guide travelers or warn of danger."],
+["BEETLE","An insect with hard, protective forewings covering its flying wings."],
+["BELFRY","A tower or room in which bells are housed."],
+["BELLOWS","A device used to blow air into a fire or musical instrument."],
+["BENEFIT","An advantage or profit gained from something."],
+["BEQUEST","Property or money left to someone in a will."],
+["BEVERAGE","A drink other than water."],
+["BEWILDER","To confuse someone completely."],
+["BICKER","To argue about petty or trivial matters."],
+["BICYCLE","A vehicle with two wheels, pedaled by the rider."],
+["BINOCULAR","An optical instrument with a lens for each eye, used for viewing distant objects."],
+["BIOLOGY","The scientific study of living organisms."],
+["BLACKSMITH","A person who makes and shapes iron by heating and hammering it."],
+["BLANKET","A large piece of woolen or similar fabric used as a covering for warmth."],
+["BLASPHEMY","Irreverent speech about sacred matters."],
+["BLEACH","A chemical used to whiten fabric or remove stains."],
+["BLISTER","A small bubble on the skin filled with fluid, caused by friction or burning."],
+["BLIZZARD","A severe snowstorm with high winds and very low visibility."],
+["BLOSSOM","A flower, especially on a fruit tree."],
+["BLUEPRINT","A detailed technical drawing or plan for a project."],
+["BLUNDER","A clumsy or stupid mistake."],
+["BOARDER","A person who lodges and takes meals at a school or another's home for payment."],
+["BOBBIN","A small spindle or cylinder on which thread is wound."],
+["BOLSTER","A long, narrow pillow, or something that supports or strengthens."],
+["BOMBARD","To attack a place continuously with weapons or missiles."],
+["BONFIRE","A large open-air fire, often used to celebrate something."],
+["BOOKLET","A small, thin book with a paper cover."],
+["BOTANIST","A scientist who studies plants."],
+["BOULDER","A large rock, typically one that has been worn smooth by erosion."],
+["BOULEVARD","A wide street in a city, often lined with trees."],
+["BOUNTY","A generous reward, often offered for capturing a person or animal."],
+["BOUQUET","A bunch of flowers arranged attractively."],
+["BOUTIQUE","A small shop selling fashionable clothes or accessories."],
+["BRACELET","An ornamental band worn around the wrist."],
+["BRAGGART","A person who boasts excessively about their achievements."],
+["BRANCH","A part of a tree that grows out from the trunk."],
+["BRASSIERE","An undergarment worn by women to support the breasts."],
+["BRAVADO","A bold, swaggering manner intended to impress or intimidate."],
+["BREEDER","A person who breeds animals or plants."],
+["BREEZE","A light, gentle current of air."],
+["BREWERY","A place where beer is made."],
+["BRIBERY","The act of offering money or favors to influence someone dishonestly."],
+["BRICKLAYER","A worker who builds walls with bricks."],
+["BRIDLE","A set of straps placed on a horse's head to control its movement."],
+["BRIGADE","A large group organized for a particular purpose, especially firefighting."],
+["BROCHURE","A small booklet or pamphlet containing information about a product or service."],
+["BRONZE","A metal alloy made mainly of copper and tin, often used for statues."],
+["BROTHEL","A house where people pay to have sex with prostitutes."],
+["BRUNETTE","A woman with dark brown hair."],
+["BUCCANEER","A pirate, especially one active in the Caribbean in the seventeenth century."],
+["BUCKET","A cylindrical open container used to carry liquids."],
+["BUCKLE","A fastener used to join two ends of a strap or belt."],
+["BUDGET","An estimate of income and expenditure for a set period."],
+["BUFFALO","A large wild ox with heavy curved horns."],
+["BUGGY","A light, horse-drawn carriage."],
+["BULLDOZER","A powerful tractor with a broad blade used for clearing ground."],
+["BULLETIN","A short official statement or summary of news."],
+["BUNGALOW","A single-story house."],
+["BUOYANT","Able to float or keep afloat."],
+["BURDEN","A heavy load, or a duty causing hardship or worry."],
+["BUREAUCRACY","A system of government marked by rigid procedures and many officials."],
+["BURROW","A hole or tunnel dug by a small animal as a dwelling."],
+["BUTCHER","A person whose trade is preparing and selling meat."],
+["BUTLER","The chief male servant of a household."],
+["CABBAGE","A leafy green or purple vegetable with a round, dense head."],
+["CACTUS","A spiny, thick-stemmed plant adapted to survive in dry desert climates."],
+["CADAVER","A dead body used for medical study."],
+["CADENCE","The rise and fall of the voice in speech, or the rhythm of a sequence of sounds."],
+["CAFFEINE","A stimulant found in coffee, tea, and some soft drinks."],
+["CAJOLE","To persuade someone gently or flatteringly to do something."],
+["CALAMITY","An event causing great and often sudden damage or distress."],
+["CALCIUM","A chemical element found in bones, teeth, and dairy products."],
+["CALDRON","A large metal pot used for cooking or boiling over an open fire."],
+["CALLOUS","Showing an insensitive disregard for others' feelings."],
+["CALORIE","A unit of energy content in food."],
+["CANAL","An artificial waterway used for transport or irrigation."],
+["CANDID","Truthful and straightforward, without holding anything back."],
+["CANDLESTICK","A holder for one or more candles."],
+["CANOPY","An ornamental cloth covering hung above a bed or throne, or a tree's upper layer."],
+["CANTEEN","A place in a workplace or school where meals are served."],
+["CANYON","A deep gorge, typically one carved by a river running through it."],
+["CAPRICE","A sudden and unaccountable change of mood or behavior."],
+["CAPSULE","A small container in which medicine is enclosed for swallowing."],
+["CAPTIVE","A person or animal that is held prisoner or confined."],
+["CARAVAN","A group of travelers journeying together, or a towed living vehicle."],
+["CARDBOARD","A stiff material made from layers of pulp, used for boxes."],
+["CARIBOU","A large species of deer found in Arctic and subarctic regions."],
+["CARNIVAL","A public festival involving processions, music, and dancing."],
+["CARNIVORE","An animal that eats mainly meat."],
+["CARPENTER","A person who makes and repairs wooden objects and structures."],
+["CARTOGRAPHER","A person who draws or produces maps."],
+["CASCADE","A small waterfall, especially one of several that fall in stages."],
+["CASHIER","A person who handles payments in a shop or bank."],
+["CASSEROLE","A dish of meat and vegetables cooked slowly in liquid in a covered pot."],
+["CASUALTY","A person killed or injured in an accident or war."],
+["CATALOG","A complete list of items, typically arranged systematically."],
+["CATAPULT","A device for launching an object with force, often using tension or elastic."],
+["CATEGORY","A class or division of things regarded as having particular shared characteristics."],
+["CATERPILLAR","The wormlike larva of a butterfly or moth."],
+["CATHEDRAL","A large and important church, typically the seat of a bishop."],
+["CAULDRON","A large pot used for boiling liquids over a fire."],
+["CAUTION","Care taken to avoid danger or mistakes."],
+["CAVALRY","Soldiers who fight on horseback or in armored vehicles."],
+["CAVERN","A large cave, or a chamber within an underground cave system."],
+["CAVITY","A hollow space within a solid object, or a hole in a tooth."],
+["CEASELESS","Not stopping; continuous."],
+["CELEBRITY","A famous person, especially in entertainment or sport."],
+["CELLAR","An underground room used for storage, often beneath a house."],
+["CENSUS","An official count of a population."],
+["CENTURY","A period of one hundred years."],
+["CEREMONY","A formal event held to mark a significant occasion."],
+["CERTIFY","To formally confirm that something is true or meets a standard."],
+["CHAMBER","An enclosed space or room, often used for a specific purpose."],
+["CHAMPAGNE","A sparkling white wine, traditionally associated with celebration."],
+["CHAPLAIN","A member of the clergy attached to a private institution or the military."],
+["CHARCOAL","A dark residue made by burning wood without much air, used as fuel."],
+["CHARIOT","A two-wheeled vehicle drawn by horses, used in ancient warfare and racing."],
+["CHARITY","The voluntary giving of help to those in need."],
+["CHASM","A deep, wide crack or opening in the ground."],
+["CHATTER","Rapid, informal talk about trivial matters."],
+["CHEETAH","A large, spotted cat known for its exceptional speed."],
+["CHEMIST","A scientist trained in the study of chemical substances."],
+["CHERISH","To protect and care for someone or something lovingly."],
+["CHESTNUT","A glossy brown edible nut, or the tree that produces it."],
+["CHIMNEY","A vertical pipe that carries smoke away from a fire or furnace."],
+["CHIPMUNK","A small striped rodent related to squirrels."],
+["CHIROPRACTOR","A practitioner who treats the spine and joints by manipulation."],
+["CHISEL","A metal tool with a sharpened edge, used to cut or shape wood or stone."],
+["CHLORINE","A greenish-yellow gas often used to disinfect water."],
+["CHOKER","A close-fitting necklace worn tightly around the neck."],
+["CHOLESTEROL","A fatty substance found in the blood and in animal tissue."],
+["CHOWDER","A thick soup typically made with seafood or corn."],
+["CHRONICLE","A written record of events in the order they occurred."],
+["CHUCKLE","A quiet or suppressed laugh."],
+["CIGARETTE","A thin roll of shredded tobacco wrapped in paper for smoking."],
+["CINEMA","A theater where films are shown."],
+["CINNAMON","A spice made from the dried inner bark of a tropical tree."],
+["CIPHER","A secret or disguised way of writing, or a code."],
+["CIRCA","Approximately, used before a date or number."],
+["CIRCUIT","A closed path through which an electric current can flow."],
+["CIRCUS","A traveling company that performs acrobatics, animal tricks, and clowning."],
+["CISTERN","A tank for storing water, especially rainwater."],
+["CITADEL","A fortress that protects or dominates a city."],
+["CIVILIAN","A person not serving in the armed forces or police."],
+["CLARINET","A woodwind instrument with a single reed and a cylindrical body."],
+["CLARITY","The quality of being clear and easy to understand."],
+["CLAVICLE","The collarbone."],
+["CLERGY","The body of people ordained for religious duties, especially in Christianity."],
+["CLERICAL","Relating to office work, or to the clergy."],
+["CLIENTELE","The customers of a shop or business, considered collectively."],
+["CLIMATE","The general weather conditions typical of a region over a long period."],
+["CLINIC","A place where outpatients receive medical treatment or advice."],
+["CLOISTER","A covered walk in a monastery or college, open on one side to a courtyard."],
+["CLOVER","A small plant with three-lobed leaves, often associated with luck."],
+["CLUTCH","To grasp something tightly; also, a group of eggs laid at one time."],
+["CLUTTER","An untidy collection of things lying about."],
+["COALITION","A temporary alliance between groups for combined action."],
+["COBBLER","A person who repairs shoes."],
+["COBWEB","A network of fine threads spun to catch prey."],
+["COCKPIT","The area in an aircraft or racing car occupied by the pilot or driver."],
+["COCONUT","The large brown seed of a tropical palm, with edible flesh and liquid."],
+["COINCIDE","To occur at the same time or place as something else."],
+["COLANDER","A bowl-shaped kitchen utensil with holes, used to drain food."],
+["COLLAPSE","To fall down or in suddenly, or fail abruptly."],
+["COLLEAGUE","A person one works with, especially in a profession."],
+["COLLIDE","To crash violently into something."],
+["COLONY","A country or area controlled politically by another country, or a group of similar organisms living together."],
+["COMBUSTION","The process of burning something."],
+["COMEDIAN","A person who entertains by making an audience laugh."],
+["COMMENCE","To start or begin a process or activity formally."],
+["COMMODITY","A raw material or primary agricultural product that can be bought and sold."],
+["COMMOTION","A state of confused and noisy disturbance."],
+["COMPANION","A person who spends a lot of time with, or travels with, another."],
+["COMPASS","An instrument for finding direction, with a needle that points north."],
+["COMPASSION","Sympathetic concern for the sufferings or misfortunes of others."],
+["COMPETENT","Having the necessary skill or knowledge to do something successfully."],
+["COMPLAINT","An expression of dissatisfaction about something unsatisfactory."],
+["COMPLIMENT","A polite expression of praise or admiration."],
+["COMPOSER","A person who writes music."],
+["COMPOUND","A thing made up of two or more separate elements combined together."],
+["CONCERTO","A musical composition for a solo instrument accompanied by an orchestra."],
+["CONCLUDE","To bring something to an end, or to decide something based on reasoning."],
+["CONDIMENT","A substance such as salt or ketchup used to flavor food."],
+["CONDOR","A very large bird of prey found in the mountains of the Americas."],
+["CONDUCTOR","A person who directs the performance of an orchestra."],
+["CONFETTI","Small pieces of colored paper thrown at celebrations."],
+["CONFIDANT","A person one trusts with private matters."],
+["CONGESTION","Overcrowding, especially of traffic."],
+["CONIFER","A tree that bears cones and evergreen needle-like leaves."],
+["CONSPIRE","To plan secretly with others to do something unlawful."],
+["CONSTABLE","A police officer of the lowest rank."],
+["CONSULATE","The premises occupied by a consul, an official representing a foreign country."],
+["CONTAGIOUS","Spread from one person to another by close contact."],
+["CONTINENT","One of the world's main large landmasses."],
+["CONTRABAND","Goods that have been imported or exported illegally."],
+["CONVERSE","To talk informally with another person."],
+["CONVICT","A person found guilty of a crime and serving a prison sentence."],
+["CONVOY","A group of vehicles or ships traveling together, often for protection."],
+["COPPER","A reddish-brown metal used for electrical wiring and coins."],
+["CORAL","A hard substance formed by tiny sea creatures, often forming reefs."],
+["CORNICE","An ornamental molding around the wall of a room just below the ceiling."],
+["CORONER","An official who investigates violent, sudden, or unexplained deaths."],
+["CORPORAL","A rank of noncommissioned officer in the army."],
+["CORRIDOR","A long passage in a building from which doors lead into rooms."],
+["CORROSION","The gradual destruction of a material caused by chemical reaction."],
+["COSTUME","A set of clothes worn to represent a particular period, place, or character."],
+["COTTAGE","A small, cozy house, typically found in a rural setting."],
+["COTTON","A soft fiber that grows around the seeds of a tropical plant."],
+["COUGAR","A large wild cat, also known as a puma or mountain lion."],
+["COUNCIL","A body of people formally constituted to give advice or manage affairs."],
+["COUNTERFEIT","Made in exact imitation of something valuable in order to deceive."],
+["COURIER","A person who carries messages or packages between places."],
+["COURTEOUS","Polite, respectful, and considerate in manner."],
+["COWARDICE","A lack of bravery when facing danger or difficulty."],
+["COYOTE","A wild dog native to North America, related to the wolf."],
+["CRADLE","A small bed for an infant, often designed to be rocked."],
+["CRANIUM","The skull of a vertebrate, especially the part enclosing the brain."],
+["CRATER","A large bowl-shaped hollow in the ground, often formed by an impact."],
+["CRAYFISH","A freshwater crustacean resembling a small lobster."],
+["CREDIBLE","Able to be believed; convincing."],
+["CREEK","A small stream or narrow inlet of water."],
+["CREVICE","A narrow crack or gap in a rock or wall."],
+["CRIMSON","A rich, deep shade of red."],
+["CRITIQUE","A detailed analysis and assessment of something."],
+["CROCHET","A craft in which yarn is worked into a fabric using a hooked needle."],
+["CROCODILE","A large predatory reptile with a long snout and armored skin."],
+["CRUCIAL","Extremely important or necessary."],
+["CRUMBLE","To break apart into small fragments, especially through age or pressure."],
+["CRUSADE","A vigorous campaign for a political, social, or religious cause."],
+["CRUTCH","A support used under the arm to help a person walk."],
+["CRYSTAL","A solid mineral with a symmetrical, repeating structure, often transparent."],
+["CUBICLE","A small partitioned-off area of a room."],
+["CUISINE","A style or method of cooking, especially associated with a particular region."],
+["CULPRIT","A person responsible for a crime or wrongdoing."],
+["CULTIVATE","To prepare and use land for growing crops or plants."],
+["CURATOR","A person in charge of a museum or other collection."],
+["CURFEW","A regulation requiring people to remain indoors during specified hours."],
+["CURRENCY","A system of money in general use in a particular country."],
+["CURRICULUM","The subjects comprising a course of study in a school or college."],
+["CUSHION","A soft bag filled with padding, used to sit or lean on for comfort."],
+["CUSTODY","The protective care or guardianship of someone or something."],
+["CUTLERY","Knives, forks, and spoons used for eating or serving food."],
+["CYLINDER","A solid or hollow object with straight parallel sides and a circular cross section."],
+["DAFFODIL","A yellow flower with a trumpet-shaped central part, blooming in spring."],
+["DAGGER","A short knife with a pointed blade, used as a weapon."],
+["DANDELION","A yellow-flowered wild plant with deeply toothed leaves."],
+["DAZZLE","To impress someone greatly, or to blind briefly with a bright light."],
+["DEBRIS","Scattered fragments left behind after something has been destroyed."],
+["DEBUT","A person's first public appearance or performance."],
+["DECADE","A period of ten years."],
+["DECEIVE","To make someone believe something that is not true."],
+["DECIBEL","A unit used to measure the loudness of sound."],
+["DECIPHER","To convert a coded or unclear message into ordinary language."],
+["DECOY","Something used to lure a person or animal into a trap."],
+["DEDICATE","To devote time or effort to a particular task or purpose."],
+["DEFECT","An imperfection or shortcoming in something."],
+["DEFIANT","Boldly resisting authority or an opposing force."],
+["DEFICIT","The amount by which something falls short, especially money."],
+["DEHYDRATE","To remove water from something, such as food or the body."],
+["DELEGATE","A person sent to represent others at a conference or meeting."],
+["DELIRIUM","An acutely disturbed state of mind with confused thoughts and speech."],
+["DELTA","A triangular area of land where a river splits into channels before the sea."],
+["DEMOLISH","To pull down or destroy a building completely."],
+["DENSITY","The degree of compactness of a substance, measured by mass per unit volume."],
+["DENTIST","A person qualified to treat diseases and conditions of the teeth."],
+["DEPOSIT","A sum of money placed or kept in a bank account, or a layer of matter that settles."],
+["DEPUTY","A person appointed to undertake the duties of a superior in their absence."],
+["DERAIL","To cause a train to leave the tracks."],
+["DESCEND","To move downward."],
+["DESERT","A large, extremely dry area of land with little vegetation."],
+["DESOLATE","Deserted and giving an impression of bleak emptiness."],
+["DESPAIR","The complete loss or absence of hope."],
+["DESPOT","A ruler with absolute power, especially one who exercises it cruelly."],
+["DESTINY","The events that will necessarily happen to a person in the future."],
+["DETECTIVE","A person whose job is to investigate crimes."],
+["DETERGENT","A cleaning agent that removes dirt from surfaces, often in liquid or powder form."],
+["DEVASTATE","To destroy or damage severely."],
+["DEVIATE","To depart from an established course or standard."],
+["DEVOTION","Great love or loyalty."],
+["DIABETES","A medical condition in which the body cannot properly regulate blood sugar."],
+["DIALECT","A particular form of a language specific to a region or social group."],
+["DIALOGUE","A conversation between two or more people."],
+["DIAMETER","A straight line passing through the center of a circle, connecting two points on its edge."],
+["DIAPER","An absorbent garment worn by babies who are not yet toilet trained."],
+["DIARY","A book in which someone records events or thoughts daily."],
+["DICTATE","To say or read something aloud for another person to write down."],
+["DIGNITY","The state of being worthy of honor or respect."],
+["DILUTE","To make a liquid weaker by adding water or another liquid."],
+["DIMENSION","A measurable extent of a particular kind, such as length or width."],
+["DINGHY","A small open boat, often used as a lifeboat or for sailing."],
+["DINOSAUR","An extinct reptile, some of enormous size, that lived millions of years ago."],
+["DIOCESE","A district under the pastoral care of a bishop."],
+["DIPLOMA","A certificate awarded by an institution for completing a course of study."],
+["DIPLOMAT","An official representing their country abroad."],
+["DIRECTOR","A person who supervises the making of a film or the running of an organization."],
+["DISABLE","To deprive someone of a physical or mental ability, or to make equipment nonfunctional."],
+["DISASTER","A sudden event causing great damage or suffering."],
+["DISCARD","To get rid of something no longer wanted or needed."],
+["DISCIPLE","A follower or student of a teacher, leader, or philosophy."],
+["DISCREET","Careful to avoid causing embarrassment or attracting attention."],
+["DISEASE","A disorder of structure or function affecting a living organism."],
+["DISGUISE","A costume or way of altering one's appearance to hide identity."],
+["DISPATCH","To send someone or something off to a destination."],
+["DISPERSE","To scatter or spread over a wide area."],
+["DISPUTE","A disagreement or argument between people."],
+["DISTILL","To purify a liquid by heating it and condensing the vapor."],
+["DISTRICT","An area of a country or city regarded as a unit for administrative purposes."],
+["DIVERGE","To separate and go in different directions."],
+["DIVIDEND","A sum of money paid regularly to shareholders from a company's profits."],
+["DOCTRINE","A belief or set of beliefs held and taught by a religion or organization."],
+["DOLPHIN","A highly intelligent marine mammal known for its curved snout and playful nature."],
+["DOMAIN","An area of territory owned or controlled, or a field of activity."],
+["DOMINO","A small rectangular tile marked with dots, used in a tile-based game."],
+["DONKEY","A domesticated animal related to the horse, with long ears."],
+["DOORWAY","An entrance to a room or building, fitted with a door."],
+["DOSAGE","The size and frequency of a dose of medicine to be taken."],
+["DOUGHNUT","A ring-shaped piece of sweet fried dough, often glazed or coated in sugar."],
+["DOWRY","Property or money brought by a bride to her husband at marriage."],
+["DRAGON","A mythical monster typically depicted as a large, fire-breathing, winged reptile."],
+["DRAWBRIDGE","A bridge that can be raised to prevent access or let vessels pass."],
+["DREADFUL","Very bad or unpleasant."],
+["DRIFT","To be carried slowly along by a current of air or water."],
+["DRIZZLE","Light rain falling in fine drops."],
+["DROUGHT","A prolonged period of abnormally low rainfall."],
+["DROWSY","Feeling sleepy and lacking energy."],
+["DUCHESS","The wife or widow of a duke, or a woman holding that rank in her own right."],
+["DUFFEL","A large cylindrical bag used for carrying belongings."],
+["DUGOUT","A shelter dug into the ground, or a covered structure beside a baseball field."],
+["DUMPLING","A small ball of dough, often cooked and served with stew or soup."],
+["DUNGEON","A strong underground prison cell, especially in a castle."],
+["DUPLICATE","An exact copy of something."],
+["DURABLE","Able to withstand wear and remain in good condition over time."],
+["DWELLING","A house or other place of residence."],
+["DYNAMITE","A high explosive made of nitroglycerin absorbed in a porous material."],
+["DYNASTY","A sequence of rulers from one family who hold power over generations."],
+["EAGERLY","In a manner that shows keen interest or desire."],
+["EARNEST","Resulting from or showing sincere and serious conviction."],
+["ECLIPSE","The blocking of light from one celestial body by another passing in front."],
+["ECOLOGY","The branch of biology dealing with organisms' relations to one another and their environment."],
+["EFFIGY","A sculpture or model of a person, often burned or hanged in protest."],
+["ELBOW","The joint between the forearm and the upper arm."],
+["ELDERLY","Old or aging."],
+["ELECTRIC","Powered by, or relating to, a flow of charged particles through a wire."],
+["ELEGANT","Graceful and stylish in appearance or manner."],
+["ELEPHANT","A very large mammal with a trunk, large ears, and ivory tusks."],
+["ELIGIBLE","Having the right to do or obtain something; satisfying the required conditions."],
+["ELIMINATE","To completely remove or get rid of something."],
+["ELOQUENT","Fluent and persuasive in speaking or writing."],
+["EMBASSY","The official residence or offices of an ambassador."],
+["EMBEZZLE","To steal money placed in one's trust or under one's control."],
+["EMBLEM","A symbol or design representing a particular quality or organization."],
+["EMBROIDER","To decorate fabric with needlework designs."],
+["EMERALD","A precious green gemstone, valued for its color and clarity."],
+["EMERGENCY","A serious, unexpected situation requiring immediate action."],
+["EMIGRATE","To leave one's own country to settle permanently in another."],
+["EMPEROR","The male ruler of an empire."],
+["EMPLOYEE","A person employed for wages or salary by another."],
+["EMULATE","To match or surpass someone by imitation."],
+["ENAMEL","A hard, glossy coating, or the hard outer layer covering a tooth."],
+["ENCLOSE","To surround something on all sides."],
+["ENCOUNTER","An unexpected or casual meeting with someone or something."],
+["ENDEAVOR","An attempt to achieve a goal."],
+["ENDORSE","To publicly declare one's approval or support of something."],
+["ENDURANCE","The ability to withstand hardship or exertion over a long period."],
+["ENGAGE","To occupy the attention or interest of someone, or to participate in an activity."],
+["ENGRAVE","To carve letters or a design into a hard surface."],
+["ENGULF","To sweep over something so as to surround or cover it completely."],
+["ENIGMA","A person or thing that is mysterious or difficult to understand."],
+["ENLIGHTEN","To give someone greater knowledge or understanding of a subject."],
+["ENORMOUS","Very large in size or extent."],
+["ENQUIRY","A request for information."],
+["ENSEMBLE","A group of musicians or performers who play or act together."],
+["ENTHRALL","To captivate or fascinate someone completely."],
+["ENTHUSE","To show great excitement or eagerness about something."],
+["ENTITLE","To give someone the right to have or do something."],
+["ENTOURAGE","A group of people who attend or surround an important person."],
+["ENVELOPE","A flat paper container used to enclose a letter or document."],
+["EPIDEMIC","A widespread occurrence of an infectious disease in a community."],
+["EPISODE","An event or a group of events forming a distinct part of a larger series."],
+["EPITAPH","An inscription on a tombstone in memory of the person buried there."],
+["EQUATOR","The imaginary line circling the Earth, equally distant from both poles."],
+["ERADICATE","To destroy or get rid of something completely."],
+["EROSION","The gradual wearing away of land or rock by wind, water, or ice."],
+["ERRAND","A short trip taken to carry out a specific task for someone else."],
+["ESCALATE","To increase rapidly in intensity or seriousness."],
+["ESCORT","A person or vehicle that accompanies another for protection or guidance."],
+["ESSENCE","The intrinsic nature or indispensable quality of something."],
+["ESTATE","A large area of land owned by a person or organization, often with a large house."],
+["ESTIMATE","An approximate calculation or judgment of the value or amount of something."],
+["ETIQUETTE","The customary code of polite behavior in society."],
+["EVACUATE","To remove people from a dangerous place to a place of safety."],
+["EVAPORATE","To turn from liquid into vapor."],
+["EVERGREEN","A plant that retains its leaves throughout the year."],
+["EVIDENT","Clear or obvious to see or understand."],
+["EXAGGERATE","To represent something as being larger or more extreme than it really is."],
+["EXCAVATE","To dig out and remove earth carefully to find buried remains or objects."],
+["EXCERPT","A short extract taken from a film, piece of music, or written text."],
+["EXECUTE","To carry out a plan or task, or to put someone to death as punishment."],
+["EXHALE","To breathe air out of the lungs."],
+["EXHAUST","The waste gases expelled by an engine, or to tire someone out completely."],
+["EXHIBIT","To publicly display something, especially a work of art."],
+["EXODUS","A mass departure of people, especially from a place."],
+["EXOTIC","Originating in or characteristic of a distant foreign country."],
+["EXPAND","To increase in size, number, or extent."],
+["EXPEDITE","To make a process happen more quickly."],
+["EXPEND","To spend or use up a resource."],
+["EXPERT","A person with a high level of knowledge or skill in a particular area."],
+["EXPIRE","To come to an end, or to breathe out."],
+["EXPLORE","To travel through an unfamiliar area to learn about it."],
+["EXPORT","To send goods or services to another country for sale."],
+["EXTEND","To make something longer or larger."],
+["EXTERIOR","The outer surface or structure of something."],
+["EXTINCT","No longer in existence, especially referring to a species."],
+["EXTRACT","To remove or take out something, often by force or effort."],
+["EXTREME","Reaching a high or the highest degree; not moderate."],
+["FABRIC","Cloth produced by weaving or knitting fibers together."],
+["FACADE","The front of a building, or a deceptive outward appearance."],
+["FACULTY","A natural ability or power of the mind or body, or a division of a university."],
+["FALCON","A fast-flying bird of prey with long pointed wings, often trained to hunt."],
+["FAMINE","An extreme and widespread scarcity of food."],
+["FAMISH","To suffer severely from hunger."],
+["FANATIC","A person filled with excessive and single-minded zeal for a cause."],
+["FARMHOUSE","The main dwelling on a farm."],
+["FASCINATE","To attract and hold the attention of someone."],
+["FATIGUE","Extreme tiredness resulting from mental or physical exertion."],
+["FAUCET","A device that controls the flow of liquid from a pipe."],
+["FEATHER","One of the light, flat growths forming the covering of a bird."],
+["FEDERAL","Relating to a system of government in which states unite under a central authority."],
+["FELINE","Relating to or resembling a cat or cats."],
+["FERMENT","To undergo a chemical change caused by microorganisms, producing alcohol or acid."],
+["FERTILE","Capable of producing abundant crops, vegetation, or offspring."],
+["FERTILIZER","A substance added to soil to increase its fertility."],
+["FESTIVAL","A day or period of celebration, typically for religious or cultural reasons."],
+["FICKLE","Likely to change one's mind or loyalty without warning."],
+["FICTION","Literature describing imaginary events and people."],
+["FIDDLE","A violin, especially when used to play folk music."],
+["FIDGET","To make small restless movements out of nervousness or impatience."],
+["FIGURINE","A small statuette, especially one representing a person."],
+["FILAMENT","A slender thread or wire, especially the wire inside a light bulb."],
+["FINALIST","A competitor who reaches the last stage of a contest."],
+["FIREFLY","A small nocturnal beetle that glows in the dark."],
+["FISCAL","Relating to government revenue, especially taxes."],
+["FLAGSTONE","A flat, hard slab of stone used for paving."],
+["FLAMINGO","A tall wading bird with pink feathers and a curved beak."],
+["FLANNEL","A soft woven fabric, typically made of cotton or wool."],
+["FLARE","A sudden burst of bright flame or light, often used as a signal."],
+["FLASHLIGHT","A portable, battery-powered light."],
+["FLASK","A small container, often flat, used for carrying liquids."],
+["FLATTERY","Excessive and insincere praise given to further one's own interests."],
+["FLAWLESS","Without any imperfections; perfect."],
+["FLEECE","The woolly coat of a sheep, or a soft fabric made to resemble it."],
+["FLEXIBLE","Capable of bending without breaking, or able to adapt to change."],
+["FLICKER","To shine or burn unsteadily, giving off a wavering light."],
+["FLIMSY","Light and insubstantial, easily damaged or broken."],
+["FLOTILLA","A small fleet of ships or boats."],
+["FLOUNDER","To struggle to move or think effectively, or a type of flatfish."],
+["FLUENT","Able to speak or write a language easily and accurately."],
+["FODDER","Food given to livestock, especially dried hay or straw."],
+["FOLIAGE","The leaves of a plant or plants collectively."],
+["FORAGE","To search widely for food or supplies."],
+["FORBID","To refuse to allow something."],
+["FOREARM","The part of the arm between the elbow and the wrist."],
+["FORECAST","A prediction of future events, especially the weather."],
+["FOREMAN","A worker who supervises other workers."],
+["FORESIGHT","The ability to predict what will happen and prepare for it."],
+["FORFEIT","To lose or be deprived of something as a penalty."],
+["FORGERY","The act of producing a fake document, signature, or work of art."],
+["FORMULA","A mathematical relationship expressed in symbols, or a fixed way of doing something."],
+["FORTIFY","To strengthen a place against attack, or to add nutrients to food."],
+["FORTRESS","A large, fortified building or complex built to withstand attack."],
+["FOSSIL","The remains of a prehistoric plant or animal preserved in rock."],
+["FOUNTAIN","A structure that shoots jets of water into the air for decoration."],
+["FOYER","An entrance hall in a theater, hotel, or apartment building."],
+["FRAGILE","Easily broken or damaged."],
+["FRAGMENT","A small part broken off or separated from something."],
+["FRANCHISE","An authorization granted to sell a company's goods, or the right to vote."],
+["FRANTIC","Wild or distraught with fear, anxiety, or other emotion."],
+["FRECKLE","A small patch of light brown pigment on the skin, often from sun exposure."],
+["FREIGHT","Goods transported in bulk by truck, train, ship, or aircraft."],
+["FRENZY","A state of wild excitement or uncontrolled behavior."],
+["FRESCO","A painting done on freshly laid plaster, especially on a wall or ceiling."],
+["FRIGATE","A fast, medium-sized warship."],
+["FRINGE","An ornamental border of hanging threads, or the outer or marginal part of something."],
+["FRONTIER","The outer edge of settled land, bordering an unexplored or wild region."],
+["FRUSTRATE","To prevent someone from accomplishing something, causing annoyance."],
+["FUGITIVE","A person who has escaped from captivity or is in hiding."],
+["FUMBLE","To handle something clumsily or with uncertainty."],
+["FUNERAL","A ceremony held to honor and bury or cremate a dead person."],
+["FUNGUS","A living organism, such as a mushroom or mold, that grows on decaying matter."],
+["FURNACE","An enclosed structure for burning fuel to generate heat."],
+["FURROW","A long, narrow trench made by a plow in the ground."],
+["GADGET","A small mechanical or electronic device with a practical use."],
+["GALAXY","A vast system of stars, gas, and dust held together by gravity."],
+["GALLERY","A room or building used to display works of art."],
+["GALLOP","The fastest pace of a horse, with all four feet off the ground at once."],
+["GANGSTER","A member of a group of violent criminals."],
+["GARLAND","A wreath of flowers or leaves worn or hung as a decoration."],
+["GARMENT","An item of clothing."],
+["GARRISON","A group of troops stationed in a fortress or town to defend it."],
+["GAUNTLET","A stout glove with a long, loose wrist, worn for protection."],
+["GAZELLE","A small, slender antelope known for its speed and grace."],
+["GAZETTE","An official journal listing government notices, or a newspaper."],
+["GENEROUS","Willing to give more of something, especially money, than is strictly necessary."],
+["GENUINE","Truly what it is claimed to be; authentic."],
+["GEOLOGY","The science that deals with the physical structure and history of the earth."],
+["GERANIUM","A garden plant with rounded leaves and pink, red, or white flowers."],
+["GESTURE","A movement of part of the body to express meaning."],
+["GEYSER","A hot spring that periodically shoots water and steam into the air."],
+["GHASTLY","Extremely unpleasant or frightening to look at."],
+["GIMMICK","A trick or device intended to attract attention."],
+["GIRAFFE","A tall African mammal with a very long neck and legs."],
+["GLACIER","A large, slow-moving mass of ice formed from accumulated snow."],
+["GLADIATOR","A man trained to fight in an arena for public entertainment in ancient Rome."],
+["GLIMMER","A faint, unsteady light."],
+["GLIMPSE","A brief or partial view of something."],
+["GLOSSARY","An alphabetical list of terms with their definitions."],
+["GOBLET","A drinking cup with a foot and stem, without handles."],
+["GONDOLA","A long, narrow boat used on the canals of Venice."],
+["GORILLA","A large ape with a stocky body, native to the forests of central Africa."],
+["GOSPEL","The teaching or good news of Christianity, or a genre of religious music."],
+["GOSSIP","Casual talk about other people, often unconfirmed."],
+["GRADUATE","A person who has successfully completed a course of study."],
+["GRANARY","A storehouse for threshed grain."],
+["GRANDEUR","Impressiveness in size, appearance, or manner."],
+["GRANITE","A hard, coarse-grained igneous rock, often used for building."],
+["GRATITUDE","The quality of being thankful."],
+["GRAVEL","Small, loose fragments of rock, often used to surface paths and driveways."],
+["GRAVITY","The force that attracts a body toward the center of the earth."],
+["GRENADE","A small bomb thrown by hand or launched mechanically."],
+["GRIEVANCE","A real or imagined cause for complaint."],
+["GRIMACE","A twisted facial expression showing pain or disgust."],
+["GRIMY","Covered with dirt."],
+["GRISTLE","Cartilage found in meat."],
+["GROCER","A person who sells food and household supplies."],
+["GROOM","A person employed to take care of horses, or a man about to be married."],
+["GROTTO","A small, picturesque cave, often located near water."],
+["GRUESOME","Causing repulsion or horror; grisly."],
+["GRUMBLE","To complain in a low, discontented tone."],
+["GUARDIAN","A person who protects or defends someone or something."],
+["GUERRILLA","A member of a small independent force fighting against regular troops."],
+["GUTTER","A shallow trough fixed beneath the edge of a roof to carry off rainwater."],
+["GYMNAST","A person trained in performing feats of physical agility and balance on equipment."],
+["HABITAT","The natural environment in which an organism lives."],
+["HACKSAW","A saw with a narrow blade set in a frame, used for cutting metal."],
+["HALIBUT","A large edible flatfish found in northern seas."],
+["HALLWAY","A corridor in a building."],
+["HAMMOCK","A hanging bed made of fabric or netting, suspended between two points."],
+["HAMPER","A large basket with a lid, or something that hinders progress."],
+["HANDICAP","A circumstance that makes progress or success more difficult."],
+["HANGAR","A large building where aircraft are kept."],
+["HARBOR","A sheltered area of water where ships can dock safely."],
+["HARDSHIP","Severe suffering or difficulty."],
+["HARMONY","The combination of simultaneously sounded musical notes to produce pleasing chords."],
+["HARNESS","A set of straps used to control an animal, or to control and use resources."],
+["HARPOON","A pole-mounted spear used to catch large fish or whales."],
+["HATCHERY","A place where eggs are hatched under artificial conditions."],
+["HATCHET","A small axe with a short handle, used with one hand."],
+["HAZARD","A source of danger or risk."],
+["HAZELNUT","The nut of the hazel tree."],
+["HEADLINE","A heading at the top of a newspaper article or page."],
+["HEARSAY","Information received from other people that cannot be substantiated."],
+["HEARTBEAT","One complete pulsation of the heart."],
+["HEDGEHOG","A small nocturnal mammal covered in spines."],
+["HEIRLOOM","A valuable object passed down through generations of a family."],
+["HELMET","A hard hat worn to protect the head."],
+["HEMISPHERE","Half of the earth, usually divided into northern and southern or eastern and western."],
+["HERBIVORE","An animal that feeds mainly on plants."],
+["HERITAGE","Property, traditions, or features inherited from the past."],
+["HERMIT","A person who lives alone, avoiding contact with others."],
+["HEROIC","Showing great bravery."],
+["HESITATE","To pause before saying or doing something, often through indecision."],
+["HIBERNATE","To spend the winter in a dormant state, as some animals do."],
+["HIJACK","To illegally seize control of an aircraft, ship, or vehicle in transit."],
+["HINDRANCE","A thing that impedes or delays someone or something."],
+["HOARDER","A person who accumulates and stores a large number of items."],
+["HOARSE","Having a rough, harsh-sounding voice, often due to illness."],
+["HOMICIDE","The killing of one person by another."],
+["HONEYCOMB","A structure of hexagonal wax cells made by bees to store honey."],
+["HORIZON","The line where the earth's surface appears to meet the sky."],
+["HORMONE","A regulatory substance produced in the body and transported by the bloodstream."],
+["HORNET","A large wasp with a powerful sting."],
+["HOSPICE","A home providing care for the sick or terminally ill."],
+["HOSTAGE","A person held captive as security for the fulfillment of a condition."],
+["HOSTILE","Unfriendly or antagonistic."],
+["HOWEVER","In spite of that; nevertheless."],
+["HUMBLE","Having a modest opinion of one's own importance."],
+["HUMIDITY","A measure of the amount of water vapor in the air."],
+["HURRICANE","A powerful, rotating storm that forms over warm ocean waters."],
+["HYDRANT","An upright pipe with a nozzle for drawing water from a main, especially for firefighting."],
+["HYGIENE","Conditions or practices conducive to maintaining health and cleanliness."],
+["HYPNOSIS","An artificially induced state of altered attention, often used therapeutically."],
+["ICEBERG","A large mass of ice floating in the sea, broken off from a glacier."],
+["ICICLE","A hanging spike of ice formed when dripping water freezes."],
+["IGLOO","A dome-shaped shelter built from blocks of packed snow."],
+["ILLUSION","A false impression or belief; something that appears different from reality."],
+["IMITATE","To copy the actions, appearance, or sound of someone or something."],
+["IMMENSE","Extremely large or great."],
+["IMMERSE","To dip or submerge something completely in a liquid."],
+["IMMUNITY","The ability of an organism to resist a particular infection or disease."],
+["IMPAIR","To weaken or damage something, especially a function or ability."],
+["IMPEACH","To formally charge a public official with misconduct."],
+["IMPETUS","The force or energy that causes something to happen or move forward."],
+["IMPORT","To bring goods or services into a country from abroad."],
+["IMPOSTOR","A person who pretends to be someone else in order to deceive."],
+["IMPROMPTU","Done without being planned or rehearsed."],
+["IMPULSE","A sudden strong urge to act without thinking it through."],
+["INCENSE","A substance burned for its sweet smell, especially in religious ceremonies."],
+["INCIDENT","An event or occurrence, especially one that is unusual or violent."],
+["INCLINE","A slope, or to lean or bend toward something."],
+["INCUBATE","To keep eggs warm until they hatch, or to develop something gradually."],
+["INDULGE","To allow oneself to enjoy the pleasure of something."],
+["INFANT","A very young child, typically one not yet able to walk or talk."],
+["INFANTRY","Foot soldiers collectively."],
+["INFECTION","The invasion and growth of harmful microorganisms in the body."],
+["INFERNO","A large fire that is dangerously out of control."],
+["INFLATE","To fill something with air or gas so that it expands."],
+["INFLUENZA","A highly contagious viral infection causing fever and respiratory symptoms."],
+["INGREDIENT","Any of the foods or substances combined to make a particular dish."],
+["INHABIT","To live in or occupy a place."],
+["INHALE","To breathe air into the lungs."],
+["INHERIT","To receive money, property, or a title from someone after their death."],
+["INITIAL","Existing or occurring at the beginning."],
+["INJECT","To introduce a fluid into the body using a syringe."],
+["INJUSTICE","A lack of fairness or justice."],
+["INLAND","Situated in the interior of a country, away from the coast."],
+["INMATE","A person confined to an institution such as a prison or hospital."],
+["INSCRIBE","To write or carve words or symbols onto a surface."],
+["INSECT","A small invertebrate animal with six legs and usually wings."],
+["INSOMNIA","A persistent inability to fall or stay asleep."],
+["INSTINCT","An innate, fixed pattern of behavior in animals in response to certain stimuli."],
+["INSULATE","To protect something from heat, cold, or noise by insulation."],
+["INSURGENT","A person fighting against an established government or authority."],
+["INTEGRITY","The quality of being honest and having strong moral principles."],
+["INTELLECT","The faculty of reasoning and understanding objectively."],
+["INTERCEPT","To stop or seize someone or something before they reach a destination."],
+["INTERIOR","Located within; the inside part of something."],
+["INTERPRET","To explain the meaning of information or actions."],
+["INTERVAL","A pause or space between two events or points."],
+["INTIMATE","Closely acquainted; having a close personal relationship."],
+["INVADER","A person or force that enters a place forcibly to occupy or attack it."],
+["INVENTOR","A person who creates or designs something new."],
+["INVERTEBRATE","An animal lacking a backbone."],
+["INVOICE","A document listing goods or services provided, along with their cost."],
+["IRONIC","Happening in the opposite way to what is expected, in a way that seems deliberately contrary."],
+["IRRIGATE","To supply land or crops with water using channels or sprinklers."],
+["ISLAND","A piece of land completely surrounded by water."],
+["ISOLATE","To separate something from other things or people."],
+["ITINERARY","A planned route or journey."],
+["IVORY","The hard white material forming the tusks of elephants."],
+["JACKAL","A wild dog found in Africa and Asia, known for scavenging."],
+["JACKET","An outer garment covering the upper body, extending to the waist or hips."],
+["JAGGED","Having a rough, sharply uneven edge or surface."],
+["JASMINE","A fragrant flowering shrub often used in perfumes and teas."],
+["JAVELIN","A light spear thrown as a weapon or as a sport."],
+["JEOPARDY","Danger of loss, harm, or failure."],
+["JESTER","A person employed to entertain a medieval king or noble with jokes and tricks."],
+["JEWELER","A person who makes or sells jewelry."],
+["JOSTLE","To bump or push against someone roughly in a crowd."],
+["JOURNAL","A newspaper or magazine dealing with a particular subject, or a personal diary."],
+["JOVIAL","Cheerful and friendly."],
+["JUDICIAL","Relating to a judgment, the administration of justice, or the judiciary."],
+["JUGGLER","A person who keeps several objects moving in the air at once for entertainment."],
+["JUNCTION","A point where two or more things join or meet, especially roads or railways."],
+["JUNGLE","A dense forest found in tropical regions, filled with varied plant and animal life."],
+["JUNIPER","An evergreen shrub or tree with prickly leaves and berrylike cones."],
+["KANGAROO","A large plant-eating marsupial with strong hind legs used for jumping."],
+["KARAOKE","Entertainment in which people sing popular songs over a recorded backing track."],
+["KEEPSAKE","A small item kept in memory of the person who gave it."],
+["KERNEL","The softer, edible part of a nut, seed, or grain inside its shell or husk."],
+["KETTLE","A container with a spout, used for boiling water."],
+["KEYBOARD","A panel of keys used to operate a computer or musical instrument."],
+["KIDNAP","To abduct someone and hold them captive, typically for ransom."],
+["KILOGRAM","A metric unit of mass equal to one thousand grams."],
+["KIMONO","A long, loose Japanese robe with wide sleeves, tied with a sash."],
+["KINDLE","To start a fire burning, or to arouse a feeling or interest."],
+["KINDRED","One's family or relatives, or similar in kind."],
+["KIOSK","A small stall or booth used to sell goods or provide information."],
+["KNAPSACK","A bag carried on the back, used by hikers or soldiers."],
+["KNIGHTHOOD","The rank or dignity of a knight."],
+["KNITTING","The activity of making garments or fabric by looping yarn with needles."],
+["LABEL","A small piece of paper or fabric attached to an object giving information about it."],
+["LABORER","A person doing unskilled manual work for wages."],
+["LABYRINTH","A complicated irregular network of passages or paths; a maze."],
+["LACQUER","A liquid that dries to form a hard protective coating on wood or metal."],
+["LADDER","A structure of horizontal rungs used for climbing up or down."],
+["LADLE","A large deep spoon used for serving liquids such as soup."],
+["LAGOON","A shallow body of water separated from the sea by a sandbar or reef."],
+["LAMINATE","To cover a surface with a thin protective layer, or a material made this way."],
+["LAMPPOST","A tall post supporting a light in a street."],
+["LANDLORD","A person who owns and rents out property to tenants."],
+["LANDSLIDE","The sliding down of a mass of earth or rock from a mountain or cliff."],
+["LANTERN","A portable light source, often housed in a protective case."],
+["LAPTOP","A portable computer suitable for use while traveling."],
+["LARCENY","The theft of personal property."],
+["LARYNX","The hollow muscular organ containing the vocal cords, part of the airway to the lungs."],
+["LATITUDE","The distance north or south of the equator, measured in degrees."],
+["LAUNDRY","Clothes and linens that need to be washed, or the place where washing is done."],
+["LAVENDER","A fragrant purple-flowered plant, or its pale purple color."],
+["LAVISH","Given or produced in generous, extravagant amounts."],
+["LAWSUIT","A claim or dispute brought to a court of law for adjudication."],
+["LAWYER","A person who practices or studies law."],
+["LEAFLET","A printed sheet of paper containing information, often distributed free."],
+["LEATHER","Material made from the tanned hide of an animal."],
+["LECTERN","A tall stand with a slanted top used to hold a book or notes for a speaker."],
+["LECTURE","A talk given to an audience to teach them about a particular subject."],
+["LEDGE","A narrow horizontal surface projecting from a wall or cliff face."],
+["LEGACY","Something handed down from a predecessor, such as money or reputation."],
+["LEGEND","A traditional story regarded as historical but not authenticated."],
+["LEISURE","Free time not occupied by work or duties."],
+["LENGTHY","Of considerable and often excessive length."],
+["LENIENT","Permissive, tolerant, or forgiving in judgment."],
+["LEOPARD","A large wild cat with a spotted coat, found in Africa and Asia."],
+["LEVERAGE","The exertion of force by means of a lever, or the power to influence."],
+["LIABILITY","The state of being legally responsible for something."],
+["LIBERTY","The state of being free from oppressive restrictions on one's way of life."],
+["LICORICE","A black, chewy candy flavored with the root of a certain plant."],
+["LIGAMENT","A short band of tough tissue connecting bones or supporting organs."],
+["LIGHTHOUSE","A tower with a bright light at the top to warn or guide ships."],
+["LIMERICK","A humorous poem of five lines with a specific rhyme scheme."],
+["LINGUIST","A person who studies languages or is skilled in several languages."],
+["LIQUEUR","A strong, sweet alcoholic drink, often served after a meal."],
+["LITERACY","The ability to read and write."],
+["LITIGATE","To go through the process of settling a dispute in court."],
+["LIZARD","A reptile typically having a long body, four legs, and a long tail."],
+["LOBSTER","A large marine crustacean with a hard shell and large front claws."],
+["LOCKSMITH","A person who makes or repairs locks."],
+["LOCOMOTIVE","A powered vehicle used for pulling trains."],
+["LOCUST","A large grasshopper-like insect that travels in swarms and can devastate crops."],
+["LOFTY","Of imposing height, or noble in character."],
+["LOGGER","A person whose job is cutting down trees for timber."],
+["LOITER","To stand or wait around aimlessly or without apparent purpose."],
+["LOTION","A creamy liquid applied to the skin as a cosmetic or medicine."],
+["LOUNGE","A room in a house or public building for relaxing or waiting."],
+["LOYALTY","A strong feeling of support or allegiance."],
+["LULLABY","A soothing song sung to help a child fall asleep."],
+["LUMBER","Timber sawed into boards, or to move in a slow, heavy way."],
+["LUNAR","Relating to the moon."],
+["LUXURY","A state of great comfort, especially involving expensive things."],
+["MACHETE","A broad, heavy knife used as a tool or weapon."],
+["MAGISTRATE","A civil officer who administers the law, especially in minor cases."],
+["MAGNET","An object that produces a field attracting iron and certain other metals."],
+["MAGNITUDE","The great size or extent of something, or its importance."],
+["MAHOGANY","A reddish-brown hardwood used for furniture."],
+["MAIDEN","A young unmarried woman, or something's first occurrence."],
+["MAINLAND","The main landmass of a country, excluding islands and peninsulas."],
+["MAJESTY","Impressive dignity or beauty, or a title used to address a monarch."],
+["MALARIA","An infectious disease transmitted by mosquitoes, causing fever and chills."],
+["MALICE","The intention or desire to do harm to someone."],
+["MALLET","A hammer with a large head, typically made of wood."],
+["MAMMAL","A warm-blooded animal that feeds its young with milk and typically has hair."],
+["MANAGER","A person responsible for controlling or administering an organization or group."],
+["MANDATE","An official order or authorization to act in a particular way."],
+["MANEUVER","A movement or series of moves requiring skill and care."],
+["MANOR","A large country house with lands, historically owned by a lord."],
+["MANSION","A large, impressive house."],
+["MANTLE","A loose cloak, or the layer of the Earth between the crust and the core."],
+["MANTRA","A word or phrase repeated often, especially in meditation."],
+["MANUAL","A book giving instructions, or done using the hands."],
+["MARATHON","A long-distance foot race, typically over 26 miles."],
+["MARBLE","A hard rock formed from limestone under heat and pressure, often used in sculpture."],
+["MARINER","A person who navigates or works on a ship at sea."],
+["MARQUEE","A large tent used for social or commercial events, or a rooftop sign."],
+["MARROW","The soft fatty substance in the cavities of bones."],
+["MARSHAL","A high-ranking military officer, or to arrange in proper order."],
+["MASCARA","A cosmetic used to darken and thicken the eyelashes."],
+["MASCOT","A person, animal, or object thought to bring good luck, especially as an emblem of a team."],
+["MASONRY","Stonework or brickwork."],
+["MASSACRE","An indiscriminate and brutal killing of a large number of people."],
+["MASTIFF","A large, powerful breed of dog."],
+["MATTRESS","A large, flat pad used for sleeping on, typically placed on a bed frame."],
+["MAUSOLEUM","A large, stately tomb or a building housing several tombs."],
+["MEADOW","A field of grass and wildflowers, often used for grazing."],
+["MEASLES","A contagious viral disease causing fever and a red rash."],
+["MECHANIC","A skilled worker who repairs and maintains machinery, especially vehicle engines."],
+["MEDALLION","A large medal, or a piece of jewelry shaped like one."],
+["MEDIATE","To intervene between disputing parties to help them reach an agreement."],
+["MEDIEVAL","Relating to the Middle Ages."],
+["MEDIOCRE","Of only moderate quality; not very good."],
+["MEGAPHONE","A cone-shaped device used to amplify one's voice."],
+["MELANCHOLY","A deep, pensive sadness."],
+["MEMBRANE","A thin, pliable layer of tissue covering a surface or dividing a space."],
+["MEMOIR","A historical account or biography written from personal knowledge."],
+["MENACE","A person or thing that is likely to cause harm; a threat."],
+["MERCHANT","A person who buys and sells goods for profit."],
+["MERIDIAN","An imaginary line on the earth's surface passing through the poles."],
+["MERINGUE","A dessert topping made from whisked egg whites and sugar."],
+["MERMAID","A mythical sea creature with the head and torso of a woman and the tail of a fish."],
+["MESSENGER","A person who carries a message or performs an errand for another."],
+["METABOLISM","The chemical processes in a living organism that maintain life."],
+["METAPHOR","A figure of speech in which a term is applied to something it does not literally denote."],
+["METEOR","A small body of matter from outer space that burns up on entering the atmosphere."],
+["METICULOUS","Showing great attention to detail; very careful and precise."],
+["MICROBE","A microorganism, especially one causing disease."],
+["MIDWIFE","A person trained to assist women during childbirth."],
+["MIGRAINE","A recurring severe headache, often with nausea and sensitivity to light."],
+["MIGRATE","To move from one region or habitat to another, often with the seasons."],
+["MILDEW","A thin coating of fungal growth found on damp surfaces."],
+["MILITIA","A military force raised from the civilian population to supplement a regular army."],
+["MINARET","A tall slender tower on a mosque, from which the call to prayer is made."],
+["MINERAL","A naturally occurring solid substance formed through geological processes."],
+["MINGLE","To mix or mix with others socially."],
+["MINIATURE","A very small copy or model of something."],
+["MINISTER","A senior member of a government, or a member of the clergy."],
+["MINSTREL","A medieval singer or musician, especially one who traveled from place to place."],
+["MIRAGE","An optical illusion caused by atmospheric conditions, often seen in deserts."],
+["MISCHIEF","Playful behavior intended to cause trouble without serious harm."],
+["MISER","A person who hoards wealth and spends as little as possible."],
+["MISFIT","A person who is not suited to a particular environment or situation."],
+["MISHAP","An unlucky accident."],
+["MISSILE","An object or weapon that is thrown or projected at a target."],
+["MISTRESS","A woman having an affair with a married man, or a woman in a position of authority."],
+["MOBILIZE","To organize and prepare people or resources for a task or war."],
+["MODERATE","Average in amount, intensity, or degree; not extreme."],
+["MODEST","Not overly proud or boastful about one's own abilities."],
+["MODIFY","To make partial or minor changes to something."],
+["MOISTURE","Water or another liquid present in small quantities, especially in the air."],
+["MOLECULE","The smallest particle of a substance that retains its chemical properties."],
+["MONARCH","A sovereign head of state, especially a king or queen."],
+["MONASTERY","A building where monks live as a religious community."],
+["MONITOR","A screen used to display images, or a person who checks on something."],
+["MONOPOLY","The exclusive possession or control of the supply of a good or service."],
+["MONSOON","A seasonal wind that brings heavy rainfall to parts of Asia."],
+["MONUMENT","A structure built to commemorate a notable person or event."],
+["MORTGAGE","A loan taken out to buy property, secured by that property."],
+["MOSAIC","A picture made by assembling small pieces of colored stone, glass, or tile."],
+["MOTIVE","A reason for doing something."],
+["MOUNTAIN","A large natural elevation of land, typically rising steeply."],
+["MULTIPLY","To increase greatly in number or amount."],
+["MURMUR","A soft, low, indistinct sound made by a voice or in speech."],
+["MUSCLE","A band of fibrous tissue that contracts to produce movement in the body."],
+["MUSEUM","A building housing a collection of objects of historical or artistic interest."],
+["MUSHROOM","The fleshy spore-bearing body of a fungus, often edible."],
+["MUSKET","A light gun with a long barrel, used before rifles were invented."],
+["MUSTACHE","Hair grown above a man's upper lip."],
+["MUSTARD","A yellow condiment made from the ground seeds of a particular plant."],
+["MUTINY","An open rebellion against authority, especially by soldiers or sailors."],
+["MYSTIC","A person who seeks spiritual truth through contemplation and self-surrender."],
+["NAPKIN","A piece of cloth or paper used at a meal to wipe the mouth or fingers."],
+["NARRATE","To give a spoken or written account of something."],
+["NATIVITY","The birth of a person, especially referring to that of Jesus Christ."],
+["NAUTICAL","Relating to ships, sailing, or navigation."],
+["NAVIGATE","To plan and direct the course of a ship, aircraft, or vehicle."],
+["NECKLACE","An ornament worn around the neck."],
+["NECTAR","A sugary fluid produced by flowers, collected by bees to make honey."],
+["NEGLECT","To fail to care for something or someone properly."],
+["NEGOTIATE","To discuss something with another party in order to reach an agreement."],
+["NEIGHBOR","A person living near or next to another."],
+["NEMESIS","A long-standing rival, or an inescapable agent of someone's downfall."],
+["NEUTRAL","Not aligned with or supporting either side in a dispute."],
+["NEUTRON","A subatomic particle with no electric charge, found in the nucleus of an atom."],
+["NICKNAME","A familiar name given to a person, often descriptive."],
+["NOBLEMAN","A man of noble rank or birth."],
+["NOMAD","A person who moves from place to place rather than settling permanently."],
+["NOMINATE","To propose someone for election or appointment to a position."],
+["NORTHERN","Situated in or facing the north."],
+["NOSTALGIA","A sentimental longing for the past."],
+["NOTORIOUS","Famous or well known, typically for something bad."],
+["NOURISH","To provide the food or nutrients necessary for growth and health."],
+["NOVELTY","The quality of being new, original, or unusual."],
+["NOVICE","A person who is new to and inexperienced in a particular activity."],
+["NUANCE","A subtle difference in meaning, expression, or sound."],
+["NUGGET","A small lump, especially of a precious metal found in the ground."],
+["NUISANCE","A person or thing causing inconvenience or annoyance."],
+["NUMEROUS","Great in number; many."],
+["NURSERY","A room set apart for young children, or a place where young plants are grown."],
+["NUTMEG","A spice made from the ground seed of a tropical tree."],
+["NUTRIENT","A substance that provides nourishment essential for growth and health."],
+["OASIS","A fertile spot in a desert where water can be found."],
+["OBELISK","A tall, four-sided stone pillar tapering to a pyramidal top."],
+["OBITUARY","A notice of a person's death, typically with a short biography."],
+["OBSCURE","Not clearly expressed or easily understood; not well known."],
+["OBSERVE","To watch carefully, or to notice something."],
+["OBSOLETE","No longer produced or used; outdated."],
+["OBSTACLE","Something that blocks or hinders progress."],
+["OBSTINATE","Stubbornly refusing to change one's opinion or course of action."],
+["OCTAGON","A polygon with eight sides and eight angles."],
+["OCTOPUS","A sea mollusk with a soft body and eight long tentacles."],
+["ODYSSEY","A long, eventful journey."],
+["OFFENSE","A breach of a law or rule; an illegal act."],
+["OFFICIAL","A person holding public office or having a role of authority."],
+["OINTMENT","A smooth, greasy preparation applied to the skin for healing or protection."],
+["OMELET","A dish made from beaten eggs cooked in a pan, often with a filling."],
+["OMINOUS","Giving the impression that something bad is about to happen."],
+["OPPONENT","A person who competes with or fights against another."],
+["OPTIMISM","Hopefulness and confidence about the future or the success of something."],
+["ORCHARD","A piece of land planted with fruit trees."],
+["ORDEAL","A painful or horrific experience, especially a testing one."],
+["ORDINANCE","An authoritative order or regulation, especially issued by a local authority."],
+["ORGANISM","An individual animal, plant, or single-celled life form."],
+["ORIGAMI","The traditional art of folding paper into decorative shapes."],
+["ORIGIN","The point or place where something begins or arises."],
+["ORNAMENT","An object used to decorate a room or object."],
+["ORPHANAGE","A residential institution for the care of orphaned or abandoned children."],
+["OSTRICH","A large flightless bird native to Africa, known for its long neck and legs."],
+["OUTBREAK","A sudden occurrence of something unwelcome, such as disease or violence."],
+["OUTCAST","A person who has been rejected or excluded by society."],
+["OUTCOME","The way a thing turns out; a consequence."],
+["OUTFIT","A set of clothes worn together, especially for a particular occasion."],
+["OUTLAW","A person who has broken the law and is being hunted by the authorities."],
+["OUTSKIRTS","The outer parts of a town or city."],
+["OVERCOAT","A long, warm coat worn over other clothing in cold weather."],
+["OVERTURE","An orchestral piece opening an opera or musical work, or an initial approach."],
+["OXYGEN","A colorless gas essential for respiration and combustion."],
+["OYSTER","A shellfish with a hinged shell, some varieties of which produce pearls."],
+["PACIFIST","A person who believes that violence is unjustifiable and opposes war."],
+["PACKAGE","An object or set of objects wrapped or boxed together."],
+["PADDOCK","A small enclosed field, often used for keeping horses."],
+["PADLOCK","A detachable lock hanging by a pivoted hook, secured through a ring."],
+["PAGEANT","A public entertainment involving a procession of people in elaborate costumes."],
+["PALACE","The official residence of a monarch, president, or other dignitary."],
+["PALETTE","A board on which an artist mixes colors, or a range of colors."],
+["PAMPHLET","A small booklet with a paper cover, often on a topical subject."],
+["PANCAKE","A thin, flat cake made from batter and cooked on a griddle."],
+["PANDEMIC","An outbreak of a disease occurring over a very wide area."],
+["PANORAMA","A wide, unbroken view of a landscape or scene."],
+["PANTHER","A large wild cat, especially a black leopard or jaguar."],
+["PANTRY","A small room or cupboard for storing food."],
+["PAPRIKA","A spice made from ground dried sweet red peppers."],
+["PARABLE","A simple story used to illustrate a moral or spiritual lesson."],
+["PARADE","A public procession celebrating a special event."],
+["PARADOX","A statement that seems self-contradictory but may be true."],
+["PARAKEET","A small parrot with a long tail."],
+["PARALLEL","Extending in the same direction and always equidistant, without meeting."],
+["PARALYZE","To deprive a person or part of the body of the power of movement."],
+["PARASITE","An organism that lives on or in another organism, benefiting at its expense."],
+["PARCHMENT","A writing material made from the treated skin of an animal."],
+["PARDON","Forgiveness for an offense, or a release from punishment."],
+["PARLIAMENT","The highest legislature of a country, especially one with elected representatives."],
+["PAROLE","The conditional early release of a prisoner."],
+["PARTRIDGE","A plump game bird with a short tail."],
+["PASSENGER","A traveler in a vehicle other than the driver."],
+["PASSPORT","An official document certifying identity and citizenship for international travel."],
+["PASTOR","A minister in charge of a Christian church or congregation."],
+["PASTURE","Land covered with grass, suitable for grazing animals."],
+["PATCHWORK","Needlework in which small pieces of fabric are sewn together."],
+["PATENT","An official document granting exclusive rights to an invention."],
+["PATIENCE","The capacity to accept delay, trouble, or suffering without becoming upset."],
+["PATRIOT","A person who vigorously supports their country."],
+["PATROL","To keep watch over an area by regularly walking or driving through it."],
+["PAUPER","A very poor person."],
+["PAVILION","A light, ornamental building used for entertainment or shelter."],
+["PEACOCK","A large male bird with an iridescent tail that can be spread in display."],
+["PEASANT","A poor smallholder or farm laborer, especially historically."],
+["PEBBLE","A small, smooth stone, typically found on a beach or riverbed."],
+["PEDDLER","A person who travels around selling small goods."],
+["PEDESTAL","The base or support on which a statue or column stands."],
+["PEDIATRICIAN","A doctor who specializes in the medical care of children."],
+["PENALTY","A punishment imposed for breaking a law, rule, or contract."],
+["PENDANT","A piece of jewelry that hangs from a chain or cord."],
+["PENGUIN","A flightless black-and-white seabird found mainly in Antarctica."],
+["PENINSULA","A piece of land almost surrounded by water, connected to the mainland."],
+["PENNANT","A tapering flag, especially on a ship or as a championship symbol."],
+["PENSION","A regular payment made to a person after they retire."],
+["PERCEIVE","To become aware of something through the senses."],
+["PERFUME","A scented liquid applied to the skin for a pleasant smell."],
+["PERIMETER","The continuous boundary or outer edge of an area or shape."],
+["PERISH","To die, often in a sudden or violent way."],
+["PERJURY","The offense of willfully telling a lie under oath."],
+["PERMIT","An official document giving authorization to do something."],
+["PERPLEX","To cause someone to feel confused because something is difficult to understand."],
+["PERSIST","To continue firmly despite difficulty or opposition."],
+["PESSIMISM","A tendency to see the worst aspect of things or expect the worst outcome."],
+["PESTICIDE","A chemical used to destroy insects or other pests."],
+["PETITION","A formal written request, often signed by many people, appealing for action."],
+["PHANTOM","A ghostly apparition, or something that exists only in the imagination."],
+["PHARMACY","A shop or place where medicines are prepared and sold."],
+["PHEASANT","A long-tailed game bird with brightly colored feathers, especially in the male."],
+["PHILOSOPHY","The study of fundamental questions about existence, knowledge, and ethics."],
+["PHYSICIAN","A person qualified to practice medicine."],
+["PICKAXE","A tool with a curved iron head, used for breaking up hard ground or rock."],
+["PICTURESQUE","Visually attractive, especially in a quaint or charming way."],
+["PIGEON","A stout bird with a small head, common in cities."],
+["PILGRIM","A person who travels to a sacred place for religious reasons."],
+["PILLAGE","To rob a place using violence, especially during wartime."],
+["PINNACLE","The highest point of achievement or success."],
+["PIONEER","A person who is among the first to explore or settle a new area."],
+["PIRACY","Robbery committed at sea, or the illegal copying of protected material."],
+["PISTACHIO","The edible green seed of a small tree, or its pale green color."],
+["PISTON","A cylindrical part that moves back and forth inside a cylinder, especially in an engine."],
+["PITCHFORK","A long-handled farm tool with sharp prongs, used for lifting hay."],
+["PLAGUE","A highly contagious and often fatal epidemic disease."],
+["PLANET","A large celestial body that orbits a star."],
+["PLANTATION","A large estate where crops such as cotton or coffee are grown."],
+["PLASTER","A soft mixture applied to walls that hardens as it dries, or a bandage."],
+["PLATEAU","A large area of flat land raised above the surrounding landscape."],
+["PLATFORM","A raised level surface, such as one at a train station."],
+["PLAYWRIGHT","A person who writes plays."],
+["PLUMAGE","The layer of feathers covering a bird's body."],
+["PLUMBER","A person who installs and repairs pipes and fixtures for water systems."],
+["PLUNDER","To steal goods from a place, typically using force, especially during war."],
+["PODIUM","A small platform on which a person stands to conduct an orchestra or give a speech."],
+["POLLEN","A fine powdery substance produced by flowers, containing male reproductive cells."],
+["POLLUTE","To contaminate the environment with harmful substances."],
+["POMPOUS","Excessively self-important or grand in manner."],
+["POPULACE","The ordinary people of a country or region."],
+["PORCELAIN","A hard, white, translucent ceramic material used for fine dishes and figures."],
+["PORTFOLIO","A large, thin case for carrying documents, or a range of investments."],
+["POSTAGE","The cost of sending a letter or package by mail."],
+["POSTURE","The position in which a person holds their body when standing or sitting."],
+["POTASSIUM","A soft, silvery metallic chemical element essential to living cells."],
+["POTTERY","Objects such as bowls and vases made from fired clay."],
+["POULTRY","Domestic fowl kept for eggs or meat."],
+["POVERTY","The state of being extremely poor."],
+["PRAIRIE","A large area of flat or gently rolling grassland, especially in North America."],
+["PREACHER","A person who delivers religious sermons."],
+["PRECAUTION","An action taken in advance to prevent something dangerous or unpleasant."],
+["PRECIPICE","A very steep cliff face."],
+["PREDATOR","An animal that naturally hunts other animals for food."],
+["PREFACE","An introduction to a book, stating its subject or purpose."],
+["PREGNANT","Carrying an unborn child within the body."],
+["PRELUDE","An action or event serving as an introduction to something more important."],
+["PREMISE","A statement assumed to be true and used as the basis for an argument."],
+["PRESCHOOL","A school for children below the age of primary education."],
+["PRESERVE","To maintain something in its original state, or an area protected from harm."],
+["PRESIDENT","The elected head of a republic, or the head of an organization."],
+["PRESTIGE","Widespread respect and admiration felt for someone due to their achievements."],
+["PRETEND","To behave as if something is true when it is not."],
+["PREVAIL","To prove more powerful than opposing forces; to be victorious."],
+["PRIMROSE","A pale yellow flower that blooms in early spring."],
+["PRISONER","A person legally committed to prison as a punishment or awaiting trial."],
+["PRIVILEGE","A special right or advantage available only to a particular person or group."],
+["PROBATION","A period of testing or supervision, especially for an offender instead of prison."],
+["PROCESSION","A group of people moving forward in an orderly formal way, often ceremonial."],
+["PRODIGY","A young person with exceptional abilities or talents."],
+["PROFOUND","Very great or intense; having deep insight or understanding."],
+["PROGNOSIS","A forecast of the likely course of a disease or ailment."],
+["PROHIBIT","To formally forbid something by law or rule."],
+["PROLONG","To extend the duration of something."],
+["PROPELLER","A rotating device with blades, used to propel a ship or aircraft."],
+["PROPHECY","A prediction of what will happen in the future, especially inspired by a god."],
+["PROSECUTE","To institute legal proceedings against a person or organization."],
+["PROSPER","To succeed in material terms; to flourish."],
+["PROTEIN","An organic compound made of amino acids, essential for body tissue."],
+["PROTEST","A statement or action expressing disapproval of something."],
+["PROTOTYPE","A first, typical or preliminary model of something."],
+["PROVERB","A short, well-known saying that states a general truth or piece of advice."],
+["PROVINCE","A principal administrative division of certain countries or empires."],
+["PROVOKE","To stimulate or incite someone into a reaction, often anger."],
+["PSYCHIC","A person claiming sensitivity to forces beyond the physical senses."],
+["PUBLISH","To prepare and issue a book, journal, or piece of music for public sale."],
+["PUDDLE","A small pool of liquid, especially rainwater, lying on a surface."],
+["PULLEY","A wheel with a groove for a rope, used to lift or move heavy objects."],
+["PULPIT","A raised platform in a church from which the preacher delivers a sermon."],
+["PUMPKIN","A large round orange fruit with thick flesh, often used decoratively in autumn."],
+["PUNCTUAL","Happening or arriving exactly at the time arranged."],
+["PUPPETEER","A person who operates puppets."],
+["PUZZLE","A game or problem designed to test ingenuity or knowledge."],
+["PYRAMID","A monumental structure with a square base and triangular sides meeting at a point."],
+["QUAGMIRE","A soft, boggy area of land, or a difficult, complex situation."],
+["QUAINT","Attractively unusual or old-fashioned."],
+["QUALIFY","To become eligible for a role or benefit by fulfilling conditions."],
+["QUALITY","The standard of something measured against other similar things."],
+["QUANTITY","The amount or number of a material or thing."],
+["QUARANTINE","A state of isolation to prevent the spread of disease."],
+["QUARREL","An angry argument or disagreement."],
+["QUARRY","A large open pit from which stone or minerals are extracted."],
+["QUARTET","A group of four people playing music or singing together."],
+["QUEASY","Feeling nauseous or slightly sick."],
+["QUENCH","To satisfy one's thirst by drinking, or to extinguish a fire."],
+["QUEST","A long or arduous search for something."],
+["QUICKSAND","Loose wet sand that sucks in anything resting on it."],
+["QUIVER","To shake with a slight rapid motion; also, a case for carrying arrows."],
+["QUOTA","A fixed share of something that a person or group is entitled to or required to give."],
+["RABBI","A Jewish scholar or teacher, especially one who studies or teaches Jewish law."],
+["RACCOON","A small nocturnal mammal with a masked face and ringed tail."],
+["RADIANCE","Light or heat emitted from a source, or great happiness or health shown in a face."],
+["RADIATOR","A device that heats a room or cools an engine by radiating heat."],
+["RAINBOW","An arc of colors that appears in the sky when sunlight passes through raindrops."],
+["RAINFOREST","A dense forest found in tropical areas with consistently heavy rainfall."],
+["RAMPAGE","To rush around in a violent, uncontrollable manner."],
+["RAMPART","A defensive wall surrounding a fortified place."],
+["RANSACK","To go through a place stealing things and causing damage."],
+["RANSOM","A sum of money demanded for the release of a captive."],
+["RASPBERRY","A small, soft red fruit made up of many tiny sections."],
+["RATION","A fixed allowance of food or provisions, especially in times of shortage."],
+["RATTLE","A toy or object that makes a sharp clicking sound when shaken."],
+["RATTLESNAKE","A venomous American snake with a segmented rattle on its tail."],
+["RAVAGE","To cause severe and extensive damage to something."],
+["RAVINE","A deep, narrow gorge, typically formed by running water."],
+["REALITY","The state of things as they actually exist, rather than as they may appear."],
+["REBELLION","An act of armed resistance against an established government or leader."],
+["RECEIPT","A written acknowledgment that something has been received or paid for."],
+["RECIPE","A set of instructions for preparing a particular dish."],
+["RECKLESS","Without thinking or caring about the consequences of an action."],
+["RECRUIT","A person newly enlisted in the armed forces or a new member of an organization."],
+["RECTANGLE","A four-sided shape with four right angles, longer than it is wide."],
+["REFEREE","An official who supervises a game to ensure the rules are followed."],
+["REFINERY","An industrial plant where a substance such as oil is purified."],
+["REFLECT","To throw back light, heat, or sound without absorbing it, or to think deeply."],
+["REFUGE","A place offering shelter or protection from danger."],
+["REFUGEE","A person forced to leave their country to escape war, persecution, or disaster."],
+["REGIMENT","A permanent unit of an army."],
+["REHEARSE","To practice a play, piece of music, or other performance before it is presented."],
+["REINDEER","A large deer with branched antlers, found in Arctic regions."],
+["RELIABLE","Consistently good in quality or performance; able to be trusted."],
+["RELIC","An object surviving from an earlier time, often of historical interest."],
+["REMEDY","A medicine or treatment for a disease or injury, or a solution to a problem."],
+["REPLICA","An exact copy or model of something, especially one on a smaller scale."],
+["REPTILE","A cold-blooded animal with scaly skin, such as a snake or lizard."],
+["RESCUE","To save someone from a dangerous or difficult situation."],
+["RESERVOIR","A large natural or artificial lake used as a source of water supply."],
+["RESIDUE","A small amount of something that remains after the main part has gone."],
+["RESIGN","To voluntarily leave a job or position of office."],
+["RESOLVE","To find a solution to a problem, or firm determination to do something."],
+["RESONATE","To produce or be filled with a deep, reverberating sound."],
+["RESTLESS","Unable to stay still or relax due to anxiety or boredom."],
+["RETAILER","A person or business that sells goods to the public."],
+["RETINA","The layer of cells at the back of the eyeball that is sensitive to light."],
+["REVENUE","Income received by an organization from its business activities."],
+["REVOLVER","A pistol with revolving chambers that allow several shots without reloading."],
+["RHUBARB","A plant with long red stalks that are cooked and eaten as a fruit."],
+["RIBBON","A long, narrow strip of fabric used for tying or decoration."],
+["RICOCHET","The action of an object rebounding off a surface at an angle."],
+["RIDDLE","A puzzling question or statement designed to test cleverness."],
+["RIGGING","The ropes and chains used to support the masts and sails of a ship."],
+["RITUAL","A series of actions performed according to a set order, especially in a ceremony."],
+["RIVALRY","Competition between people who are striving for the same goal."],
+["ROADBLOCK","A barrier set up across a road to stop traffic."],
+["ROBUST","Strong and healthy, or sturdy in construction."],
+["ROOSTER","An adult male chicken."],
+["ROSTER","A list of names, especially of people available for duty at a given time."],
+["ROUTINE","A sequence of actions regularly followed; a fixed program."],
+["ROYALTY","Members of a royal family, or a payment made to an owner for use of property."],
+["RUBBLE","Rough fragments of broken stone or brick, especially from a demolished building."],
+["RUCKSACK","A bag carried on the back, especially by hikers."],
+["RUSTIC","Relating to the countryside; rural, often simple or unsophisticated."],
+["SABOTAGE","Deliberate destruction or obstruction to hinder an enemy or competitor."],
+["SADDLE","A seat fixed to the back of an animal, used by a rider."],
+["SAFARI","An expedition to observe or hunt wild animals, especially in Africa."],
+["SALVAGE","To rescue a wrecked or disabled ship or its cargo from loss."],
+["SANCTUARY","A place of refuge or safety, especially for wildlife."],
+["SANDAL","A light shoe with an open upper, held on by straps."],
+["SANDPAPER","Paper coated with abrasive material, used for smoothing surfaces."],
+["SAPPHIRE","A precious blue gemstone."],
+["SATCHEL","A bag with a shoulder strap, used for carrying books or belongings."],
+["SATELLITE","An object that orbits a larger body, natural or artificial."],
+["SAUSAGE","A minced meat mixture stuffed into a casing, often cooked and eaten as food."],
+["SAVANNA","A grassy plain in tropical regions with few trees."],
+["SCAFFOLD","A temporary structure used to support workers during construction."],
+["SCANDAL","An action or event regarded as morally or legally wrong, causing public outrage."],
+["SCARCE","Insufficient for the demand; not easily found."],
+["SCARCITY","The state of being insufficient in amount; a shortage."],
+["SCATTER","To throw or drop things so they land in different places."],
+["SCAVENGER","An animal that feeds on dead or decaying matter."],
+["SCEPTER","A staff carried by a ruler as a symbol of authority."],
+["SCHEDULE","A plan for carrying out a process, giving lists of times."],
+["SCHOLAR","A specialist in a particular branch of study, especially the humanities."],
+["SCORCH","To burn something on the surface, changing its color."],
+["SCORPION","An arachnid with a curved tail bearing a venomous sting."],
+["SCOUNDREL","A dishonest or unscrupulous person."],
+["SCRAPBOOK","A book of blank pages used to keep and display mementos or clippings."],
+["SCRIPTURE","The sacred writings of a religion."],
+["SCULPT","To shape a material such as stone or clay into a work of art."],
+["SCULPTOR","An artist who creates three-dimensional works of art."],
+["SCUTTLE","To hurry with short, quick steps, or to deliberately sink a ship."],
+["SEAGULL","A gray and white bird found near the sea."],
+["SEAWEED","A plant or algae that grows in the sea."],
+["SEDIMENT","Matter that settles to the bottom of a liquid, or rock formed from such material."],
+["SEDUCE","To persuade someone to do something unwise, especially through charm."],
+["SEISMIC","Relating to earthquakes or other vibrations of the earth."],
+["SELDOM","Not often; rarely."],
+["SEMINAR","A small class at a college or university in which a topic is discussed."],
+["SENATOR","A member of a senate, especially a national legislature."],
+["SENTENCE","A punishment given to a person convicted of a crime, or a grammatical unit."],
+["SEPULCHER","A small room or monument used as a burial place."],
+["SEQUEL","A published, broadcast, or recorded work that continues an earlier one."],
+["SEQUENCE","A particular order in which related events or things follow each other."],
+["SERENADE","A piece of music sung or played to honor someone, especially a lover."],
+["SERGEANT","A rank of noncommissioned officer in the army or police."],
+["SERPENT","A large snake, especially one in mythology or folklore."],
+["SESAME","A tropical plant grown for its edible seeds and oil."],
+["SETTLER","A person who moves to a new area to live there permanently."],
+["SEVERE","Very great, serious, or intense."],
+["SHAMROCK","A clover-like plant with three leaflets, associated with Ireland."],
+["SHANTY","A small, crudely built shack, or a sailor's traditional work song."],
+["SHATTER","To break suddenly into many pieces, especially from a blow or impact."],
+["SHELTER","A place giving protection from bad weather or danger."],
+["SHEPHERD","A person who herds and cares for sheep."],
+["SHERIFF","An elected officer responsible for keeping the peace in a county."],
+["SHIMMER","To shine with a soft, wavering, glittering light."],
+["SHINGLE","A small rectangular tile used to cover roofs or walls, or coarse gravel on a beach."],
+["SHIPWRECK","The destruction of a ship at sea, or the wrecked remains."],
+["SHIVER","To tremble slightly, typically as a result of cold or fear."],
+["SHOVEL","A tool with a broad blade and handle, used for digging or moving loose material."],
+["SHRAPNEL","Fragments of a bomb, shell, or other object thrown out by an explosion."],
+["SHREWD","Having sharp powers of judgment; astute."],
+["SHRINE","A place regarded as sacred because of its associations with a holy person."],
+["SHRIVEL","To become dry and wrinkled, especially through loss of moisture."],
+["SHUTTLE","A vehicle or aircraft that travels back and forth on a short route."],
+["SICKLE","A short-handled farming tool with a curved blade, used for cutting crops."],
+["SIEGE","A military operation in which forces surround a place to force its surrender."],
+["SILHOUETTE","The dark shape and outline of someone or something visible against a lighter background."],
+["SIMMER","To cook a liquid gently, just below boiling point."],
+["SINCERE","Free from pretense or deceit; genuine."],
+["SINGLE","Only one; not accompanied by others."],
+["SIPHON","A tube used to convey liquid upward and then down to a lower level."],
+["SKELETON","The internal framework of bones that supports an animal's body."],
+["SKEPTIC","A person inclined to question or doubt accepted opinions."],
+["SKIRMISH","A minor, often unplanned battle between small groups of soldiers."],
+["SKYLINE","The outline of buildings and other features against the sky."],
+["SLEIGH","A vehicle mounted on runners, pulled by horses or reindeer over snow."],
+["SLOGAN","A short, memorable phrase used in advertising or by a political group."],
+["SLUGGISH","Slow-moving or lacking energy."],
+["SMUGGLE","To move goods illegally, often to avoid paying tax on them."],
+["SNORKEL","A tube allowing a swimmer to breathe while their face is underwater."],
+["SOCIETY","The people of a country or region considered as a group, or an organization."],
+["SOLDIER","A person who serves in an army."],
+["SOLITARY","Existing, done, or living alone."],
+["SOLSTICE","Either of the two times a year when the sun reaches its highest or lowest point."],
+["SOLUBLE","Able to be dissolved, especially in water."],
+["SOMBRERO","A wide-brimmed hat, especially one traditionally worn in Mexico."],
+["SONATA","A musical composition for a solo instrument, typically in several movements."],
+["SORCERER","A person who claims to use magic power."],
+["SOUVENIR","A thing kept as a reminder of a person, place, or event."],
+["SOVEREIGN","A supreme ruler, especially a monarch, or having supreme power."],
+["SPACIOUS","Having ample space; roomy."],
+["SPARROW","A small brown and grey songbird, common in many parts of the world."],
+["SPATULA","A flat, broad utensil used for spreading, lifting, or mixing food."],
+["SPECIES","A group of living organisms sharing common characteristics, capable of interbreeding."],
+["SPECIMEN","An individual animal, plant, or piece of a substance used as an example for study."],
+["SPECTACLE","A visually striking public display or event."],
+["SPECTATOR","A person who watches an event, especially a sports match."],
+["SPECULATE","To form a theory without firm evidence; to guess."],
+["SPHERE","A round, three-dimensional shape, like a ball."],
+["SPINACH","A leafy green vegetable rich in iron and vitamins."],
+["SPIRAL","A curve that winds continuously around a fixed point, moving outward."],
+["SPLENDOR","Magnificent and impressive beauty."],
+["SPLINTER","A small, sharp fragment of wood, glass, or other material."],
+["SPONSOR","A person or organization that provides funds for an activity or event, often for promotion."],
+["SPOUSE","A husband or wife, considered in relation to their partner."],
+["SPRAWL","To sit or lie with limbs spread out, or to spread out in an untidy way."],
+["SPROUT","A newly emerging shoot of a plant."],
+["SQUADRON","A unit in an air force, or a detachment of naval ships."],
+["SQUANDER","To waste money, time, or resources in a reckless way."],
+["SQUIRREL","A small rodent with a bushy tail, often found in trees."],
+["STADIUM","A large sports arena with tiered seating for spectators."],
+["STALACTITE","A mineral deposit hanging from the roof of a cave, formed by dripping water."],
+["STALEMATE","A situation in which neither side can make progress; a deadlock."],
+["STAMPEDE","A sudden headlong rush of a group of frightened animals or people."],
+["STATIONERY","Writing materials such as paper, pens, and envelopes."],
+["STATUE","A carved or cast figure of a person or animal, usually life-sized or larger."],
+["STEEPLE","A church tower with a tapering spire on top."],
+["STENCIL","A thin sheet with a pattern cut into it, used to apply paint in a shape."],
+["STENOGRAPHER","A person who writes in shorthand, especially for transcription."],
+["STETHOSCOPE","A medical instrument used to listen to sounds within the body."],
+["STIMULUS","Something that causes growth or activity; something that provokes a response."],
+["STIRRUP","A metal loop attached to a saddle, used to support a rider's foot."],
+["STOWAWAY","A person who hides on a ship, aircraft, or vehicle to travel secretly."],
+["STRAINER","A device with small holes used to separate solids from liquids."],
+["STRANGLE","To kill someone by squeezing their throat so they cannot breathe."],
+["STRATEGY","A plan of action designed to achieve a long-term goal."],
+["STRETCHER","A framework used to carry a sick or injured person lying down."],
+["STRUCTURE","The arrangement of and relations between the parts of something complex."],
+["STUBBORN","Having or showing dogged determination not to change one's attitude or position."],
+["SUBMARINE","A vessel capable of operating underwater, especially a naval warship."],
+["SUBSCRIBE","To arrange to receive a publication or service regularly by paying in advance."],
+["SUBSIDY","A sum of money granted by a government to help an industry or business."],
+["SUBTLE","So delicate or precise as to be difficult to analyze or describe."],
+["SUBURB","A residential area on the outskirts of a city."],
+["SUCCULENT","Juicy and tender, or a plant with thick fleshy leaves that store water."],
+["SUFFRAGE","The right to vote in political elections."],
+["SUGGEST","To put forward an idea or plan for consideration."],
+["SULFUR","A pale yellow chemical element with a strong smell when burned."],
+["SUMMIT","The highest point of a hill or mountain, or a meeting of important leaders."],
+["SUNDIAL","A device that shows the time by the position of a shadow cast by the sun."],
+["SUPERB","Excellent; of very high quality."],
+["SUPERVISE","To observe and direct the execution of a task or activity."],
+["SUPPLEMENT","Something added to complete or enhance a thing."],
+["SURFACE","The outside part or uppermost layer of something."],
+["SURGEON","A doctor who performs operations."],
+["SURPLUS","An amount of something left over when requirements have been met."],
+["SURRENDER","To stop resisting and submit to an opposing force."],
+["SURVEYOR","A person whose job is to measure and record features of land."],
+["SUSPECT","A person thought to be guilty of a crime, or to believe something without proof."],
+["SUSPENSE","A state of anxious uncertainty about what may happen."],
+["SWALLOW","To make food or drink pass down the throat, or a small migratory bird."],
+["SWAMP","An area of low-lying ground that is permanently saturated with water."],
+["SYLLABLE","A unit of pronunciation containing a single vowel sound."],
+["SYMPHONY","An elaborate musical composition for a full orchestra."],
+["SYMPTOM","A physical or mental feature indicating a condition or disease."],
+["SYNAGOGUE","A building where a Jewish assembly meets for religious worship."],
+["TABLET","A small, flat pill, or a portable computer with a touchscreen."],
+["TACTIC","An action or strategy carefully planned to achieve a specific end."],
+["TAILOR","A person whose job is making, repairing, or altering clothes."],
+["TALISMAN","An object believed to have magic powers of protection."],
+["TAMBOURINE","A percussion instrument with jingling metal disks around a small drum."],
+["TANGERINE","A small citrus fruit similar to an orange, with a loose skin."],
+["TANNERY","A place where animal hides are made into leather."],
+["TAPESTRY","A piece of thick woven fabric with pictures or designs, hung on a wall."],
+["TARANTULA","A large hairy spider, some species of which have a painful but harmless bite."],
+["TARIFF","A tax imposed on imported or exported goods."],
+["TARNISH","To lose shine or luster, especially through exposure to air."],
+["TAVERN","A place where alcoholic drinks are sold and drunk."],
+["TAXIDERMY","The art of preparing and mounting animal skins to look lifelike."],
+["TEDIOUS","Too long, slow, or dull; tiresome."],
+["TELESCOPE","An optical instrument used to view distant objects."],
+["TEMPEST","A violent windy storm."],
+["TEMPLATE","A shaped piece of material used as a pattern for cutting or drawing."],
+["TENANT","A person who occupies land or property rented from a landlord."],
+["TENDON","A cord of tissue connecting muscle to bone."],
+["TENTACLE","A long, flexible limb of certain animals, used for grasping or feeling."],
+["TERRACE","A flat outdoor area next to a building, or a row of houses joined together."],
+["TERRAIN","A stretch of land, especially in terms of its physical features."],
+["TERRIFY","To cause extreme fear in someone."],
+["TERRITORY","An area of land under the control of a ruler, state, or organization."],
+["TESTIMONY","A formal statement of evidence, especially one given in a court of law."],
+["TEXTILE","A type of cloth or woven fabric."],
+["THEATER","A building where plays and performances are presented."],
+["THEOLOGY","The study of the nature of God and religious belief."],
+["THERAPY","Treatment intended to relieve or heal a disorder."],
+["THERMOMETER","An instrument for measuring and displaying temperature."],
+["THICKET","A dense group of bushes or small trees."],
+["THIMBLE","A small metal or plastic cap worn to protect the fingertip while sewing."],
+["THISTLE","A prickly plant with purple flowers, often considered a weed."],
+["THRESHOLD","The strip of wood or stone forming the bottom of a doorway."],
+["THRIFT","The quality of using money and resources carefully."],
+["THRIVE","To grow or develop successfully; to flourish."],
+["THUNDER","A loud rumbling or crashing sound heard after a lightning flash."],
+["THYROID","A gland in the neck that regulates growth and metabolism through hormones."],
+["TIMBER","Wood prepared for use in building or carpentry."],
+["TINSEL","Thin strips of shiny material used for decoration, especially at Christmas."],
+["TITANIUM","A strong, lightweight, silver-gray metallic element."],
+["TOASTER","An electrical appliance for toasting bread."],
+["TOLERATE","To allow the existence of something without interference."],
+["TOMAHAWK","A light ax used by Native Americans as a tool or weapon."],
+["TONGUE","The muscular organ in the mouth used for tasting, swallowing, and speech."],
+["TORNADO","A violently rotating column of air that extends from a storm to the ground."],
+["TORPEDO","A self-propelled underwater weapon designed to explode on contact with a target."],
+["TORRENT","A strong, fast-moving stream of liquid."],
+["TORTOISE","A slow-moving land reptile with a domed shell."],
+["TOURNAMENT","A series of contests between competitors, competing for an overall prize."],
+["TOWNSHIP","A district or small town, especially one with its own local government."],
+["TRACTOR","A powerful farm vehicle used for pulling machinery."],
+["TRADEMARK","A symbol or word legally registered to represent a company or product."],
+["TRAFFIC","Vehicles moving on a road, or the movement of goods or people."],
+["TRAGEDY","An event causing great suffering or destruction, or a serious dramatic work."],
+["TRAITOR","A person who betrays their country, cause, or friend."],
+["TRAMPLE","To tread on something heavily, crushing it underfoot."],
+["TRANQUIL","Free from disturbance; calm."],
+["TRANSCRIBE","To put spoken words or music into written form."],
+["TRANSFER","To move something or someone from one place to another."],
+["TRANSIT","The carrying of people or goods from one place to another."],
+["TRANSLATE","To express the meaning of words in another language."],
+["TRAPEZE","A horizontal bar suspended by ropes, used by acrobats."],
+["TRAUMA","A deeply distressing or disturbing experience, or a serious physical injury."],
+["TRAVERSE","To travel across or through something."],
+["TREASON","The crime of betraying one's country, especially by aiding an enemy."],
+["TREASURY","A place where money and valuables are kept, or a government's funds."],
+["TRELLIS","A structure of light wooden bars used to support climbing plants."],
+["TREMOR","A slight shaking movement, often caused by an earthquake."],
+["TRENCH","A long, narrow ditch, especially one used for defense in war."],
+["TRIANGLE","A shape with three straight sides and three angles."],
+["TRIBUNAL","A body established to settle disputes or hear formal claims."],
+["TRIBUTE","An act, statement, or gift intended to show gratitude or respect."],
+["TRICEPS","The large muscle at the back of the upper arm."],
+["TRIGGER","A small lever that releases a spring or catch, especially on a gun."],
+["TRINKET","A small ornament or piece of jewelry of little value."],
+["TRIVIAL","Of little value or importance."],
+["TROMBONE","A brass musical instrument with a sliding tube used to change pitch."],
+["TROPHY","An object, typically a cup, awarded as a prize for victory."],
+["TROUSERS","A garment covering the body from the waist to the ankles, divided for each leg."],
+["TRUMPET","A brass musical instrument with a flared bell, played by blowing."],
+["TSUNAMI","A long, high sea wave caused by an earthquake or other disturbance."],
+["TUITION","Teaching or instruction, or the fee charged for it."],
+["TUMBLE","To fall suddenly and helplessly, often rolling over."],
+["TUNDRA","A vast, flat, treeless region where the ground below the surface stays frozen."],
+["TUNNEL","An underground passage, especially one dug through a hill or under a road."],
+["TURBINE","A machine that produces power by using a moving fluid to spin blades."],
+["TURMOIL","A state of great disturbance, confusion, or uncertainty."],
+["TURNIP","A round root vegetable with white or yellow flesh."],
+["TURQUOISE","A blue-green precious stone, or its color."],
+["TURRET","A small tower on top of a larger building or structure."],
+["TUXEDO","A man's formal black-and-white suit, worn for evening occasions."],
+["TWEEZERS","A small metal tool with two prongs, used for picking up small objects."],
+["TWILIGHT","The soft glowing light in the sky just after sunset or before sunrise."],
+["TYCOON","A wealthy, powerful person in business or industry."],
+["TYPHOON","A violent tropical storm occurring in the western Pacific or Indian Ocean."],
+["ULTIMATE","Being the last or final stage of a process; the best achievable."],
+["UMBRELLA","A device with a folding fabric canopy, used for protection from rain."],
+["UNANIMOUS","Fully in agreement, with no one dissenting."],
+["UNDERGO","To experience or endure something, especially a change or ordeal."],
+["UNICORN","A mythical animal typically depicted as a horse with a single horn."],
+["UNIFORM","Clothing of a distinctive design worn by members of a group or organization."],
+["UNIVERSE","All existing matter and space considered as a whole."],
+["UPHEAVAL","A violent or sudden change or disruption."],
+["UPRISING","An act of resistance or rebellion against authority."],
+["URGENCY","The importance of something requiring swift action."],
+["UTENSIL","A tool or container used in the home, especially in a kitchen."],
+["VACANCY","An unoccupied position, room, or space."],
+["VACCINE","A substance used to stimulate immunity against a disease."],
+["VAGRANT","A person without a settled home or regular work."],
+["VALIANT","Possessing or showing great courage."],
+["VALIDATE","To check or prove that something is accurate or justified."],
+["VANDALISM","Deliberate destruction of or damage to property."],
+["VANILLA","A flavoring derived from the pods of a tropical orchid."],
+["VANQUISH","To defeat someone thoroughly in a battle or contest."],
+["VARIABLE","Something that is likely to change or vary; not constant."],
+["VARNISH","A liquid that dries to form a hard, clear, shiny coating on wood."],
+["VELOCITY","The speed of something in a given direction."],
+["VELVET","A fabric with a soft, dense pile on one side."],
+["VENGEANCE","Punishment inflicted in retaliation for an injury or offense."],
+["VENOMOUS","Producing venom; poisonous when injected into a victim."],
+["VENTURE","A risky or daring undertaking, especially a business one."],
+["VERANDA","A roofed platform along the outside of a house, at ground level."],
+["VERDICT","A decision on a disputed issue in a legal case or after an inquiry."],
+["VERTEBRA","One of the small bones forming the backbone."],
+["VESSEL","A ship or boat, or a hollow container used for holding liquid."],
+["VETERAN","A person who has had long experience in a particular field, especially the military."],
+["VIADUCT","A long bridge-like structure carrying a road or railway over a valley."],
+["VIBRANT","Full of energy and enthusiasm, or bright and striking in color."],
+["VICINITY","The area near or surrounding a particular place."],
+["VICTORY","An act of defeating an enemy or opponent in a battle or contest."],
+["VILLAGE","A small community or settlement, typically in a rural area."],
+["VILLAIN","A character whose evil actions or motives are important to the plot."],
+["VINEGAR","A sour liquid used as a condiment or preservative, made by fermenting alcohol."],
+["VINEYARD","A plantation of grapevines, typically used for making wine."],
+["VIOLATE","To break or fail to comply with a rule or agreement."],
+["VIOLIN","A stringed musical instrument played with a bow, held under the chin."],
+["VIPER","A venomous snake with long, hinged fangs."],
+["VIRTUE","Behavior showing high moral standards."],
+["VISIBLE","Able to be seen."],
+["VITAMIN","An organic compound needed in small amounts for proper body function."],
+["VOCABULARY","The body of words used in a particular language or by a person."],
+["VOLCANO","A mountain with an opening through which molten rock can erupt."],
+["VOLTAGE","An electrical potential difference, expressed in volts."],
+["VOLUME","The amount of space occupied by a substance, or the loudness of sound."],
+["VOUCHER","A small printed piece of paper that entitles the holder to a discount or service."],
+["VOYAGE","A long journey, especially by sea or in space."],
+["VULTURE","A large bird of prey that feeds mainly on dead animals."],
+["WAFFLE","A crisp batter cake with a grid pattern, or to speak vaguely without commitment."],
+["WALLET","A small, flat case used to carry money and cards."],
+["WALNUT","A wrinkled edible nut with a hard shell, produced by a large tree."],
+["WALRUS","A large marine mammal with tusks and thick whiskers, found in Arctic waters."],
+["WARDROBE","A large cupboard for storing clothes, or a person's collection of clothes."],
+["WARFARE","The activity of fighting a war."],
+["WARRANTY","A written guarantee promising to repair or replace a product if needed."],
+["WASTELAND","An empty or devastated area of land."],
+["WATCHDOG","A dog kept to guard property, or a person monitoring practices of a group."],
+["WATERFALL","A cascade of water falling from a height, formed by a stream or river."],
+["WEAKLING","A person or animal lacking physical strength."],
+["WEALTHY","Having a great deal of money, resources, or assets."],
+["WEAPON","A thing designed to inflict physical damage or harm."],
+["WEEVIL","A small beetle with a long snout, often a pest of stored grain."],
+["WHALER","A ship or person engaged in hunting whales."],
+["WHIMSICAL","Playfully quaint or fanciful, especially in an appealing way."],
+["WHIRLWIND","A rapidly rotating column of air, or something happening very quickly."],
+["WHISKER","One of the long, stiff hairs growing near the mouth of a cat or similar animal."],
+["WHISTLE","A small device that produces a high-pitched sound when air is blown through it."],
+["WIGWAM","A dome-shaped dwelling traditionally built by some Native American peoples."],
+["WILDCAT","A small wild animal resembling a domestic cat, or a reckless venture."],
+["WILDLIFE","Animals living in their natural environment, undomesticated."],
+["WINDMILL","A structure with sails or blades turned by the wind to generate power."],
+["WINDOW","An opening in a wall, fitted with glass, to let in light and air."],
+["WINERY","A place where wine is made."],
+["WITHDRAW","To remove or take away something, or to leave a place."],
+["WITNESS","A person who sees an event take place, especially a crime."],
+["WIZARDRY","The art or practice of magic."],
+["WOODLAND","Land covered with trees and shrubs."],
+["WORKSHOP","A room or building where goods are manufactured or repaired."],
+["WRESTLE","To fight by grappling with an opponent and trying to throw them down."],
+["WRINKLE","A small crease or fold, especially in fabric or skin."],
+["YACHT","A medium-sized sailing boat, used for racing or cruising."],
+["YEARLING","An animal that is between one and two years old."],
+["YOGURT","A thick, sour dairy product made from fermented milk."],
+["ZEALOUS","Having or showing great energy or enthusiasm for a cause."],
+["ZEPHYR","A soft, gentle breeze."],
+["ZIRCON","A hard mineral used as a gemstone, sometimes as a diamond substitute."],
+["ZODIAC","A belt of the sky divided into twelve equal parts, each named after a constellation."],
+];
+
+const SHUFFLE_SEED = 20260824;
+const SHUFFLED_ORDER = seededShuffle([...Array(WORDS.length).keys()], mulberry32(SHUFFLE_SEED));
+
+function getTodaysPuzzle(dayIndex){
+  const idx = SHUFFLED_ORDER[dayIndex % WORDS.length];
+  const [word, def] = WORDS[idx];
+  return { word, def, puzzleNum: dayIndex + 1 };
+}
+
+// ═══════════════════════════════════════════════
+//  GUESS SCORING — standard Wordle-style duplicate-letter-safe algorithm.
+//  Pass 1 marks exact-position matches; pass 2 marks present-elsewhere
+//  matches against only the target letters not already claimed by pass 1,
+//  so a guess with more copies of a letter than the target has never
+//  over-credits it.
+// ═══════════════════════════════════════════════
+function evaluateGuess(guess, target){
+  const n = target.length;
+  const result = new Array(n).fill('absent');
+  const targetChars = target.split('');
+  const used = new Array(n).fill(false);
+  for (let i = 0; i < n; i++){
+    if (guess[i] === targetChars[i]){ result[i] = 'correct'; used[i] = true; }
+  }
+  for (let i = 0; i < n; i++){
+    if (result[i] === 'correct') continue;
+    const idx = targetChars.findIndex((ch, j) => ch === guess[i] && !used[j]);
+    if (idx !== -1){ result[i] = 'present'; used[idx] = true; }
+  }
+  return result;
+}
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const STATE_KEY = 'definedle_state_v1';
+const dayIndex = getDayIndex();
+const { word: TARGET, def: DEFINITION, puzzleNum } = getTodaysPuzzle(dayIndex);
+const WORD_LEN = TARGET.length;
+
+let guesses = [];       // array of guessed words (uppercase strings)
+let currentInput = '';
+let status = 'playing';
+let secondsElapsed = 0;
+let timerInterval = null;
+let countdownInterval = null;
+
+const boardEl = document.getElementById('board');
+const keyboardEl = document.getElementById('keyboard');
+const toastEl = document.getElementById('toast');
+const guessCountEl = document.getElementById('guessCountDisplay');
+const timerEl = document.getElementById('timerDisplay');
+
+// ═══════════════════════════════════════════════
+//  TILE SIZE — fit WORD_LEN tiles across the board's width
+// ═══════════════════════════════════════════════
+function updateTileSize(){
+  const frame = document.querySelector('.board-frame');
+  if (!frame) return;
+  const available = frame.clientWidth - 20; // minus frame padding
+  const gap = 6;
+  let size = Math.floor((available - gap * (WORD_LEN - 1)) / WORD_LEN);
+  size = Math.max(30, Math.min(58, size));
+  document.documentElement.style.setProperty('--tile-size', size + 'px');
+}
+window.addEventListener('resize', updateTileSize);
+
+// ═══════════════════════════════════════════════
+//  KEYBOARD (on-screen)
+// ═══════════════════════════════════════════════
+const KB_ROWS = [
+  ['Q','W','E','R','T','Y','U','I','O','P'],
+  ['A','S','D','F','G','H','J','K','L'],
+  ['ENTER','Z','X','C','V','B','N','M','BACK'],
+];
+const keyEls = {};
+KB_ROWS.forEach(row => {
+  const rowEl = document.createElement('div');
+  rowEl.className = 'kb-row';
+  row.forEach(k => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'key' + (k === 'ENTER' || k === 'BACK' ? ' wide' : '');
+    btn.textContent = k === 'BACK' ? '⌫' : (k === 'ENTER' ? 'Enter' : k);
+    btn.dataset.key = k;
+    btn.addEventListener('click', () => handleKey(k));
+    rowEl.appendChild(btn);
+    if (k.length === 1) keyEls[k] = btn;
+  });
+  keyboardEl.appendChild(rowEl);
+});
+
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+function makeRow(letters, states){
+  const row = document.createElement('div');
+  row.className = 'guess-row';
+  for (let i = 0; i < WORD_LEN; i++){
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    const ch = letters[i] || '';
+    if (ch) tile.classList.add('filled');
+    if (states && states[i]) tile.classList.add(states[i]);
+    tile.textContent = ch;
+    row.appendChild(tile);
+  }
+  return row;
+}
+
+function renderBoard(){
+  boardEl.innerHTML = '';
+  guesses.forEach(g => {
+    const states = evaluateGuess(g, TARGET);
+    boardEl.appendChild(makeRow(g.split(''), states));
+  });
+  if (status === 'playing'){
+    boardEl.appendChild(makeRow(currentInput.split('')));
+  }
+  boardEl.scrollTop = boardEl.scrollHeight;
+  guessCountEl.textContent = guesses.length + (guesses.length === 1 ? ' guess' : ' guesses');
+}
+
+function renderKeyboard(){
+  const best = {}; // letter -> best status seen
+  const rank = { absent: 0, present: 1, correct: 2 };
+  guesses.forEach(g => {
+    const states = evaluateGuess(g, TARGET);
+    g.split('').forEach((ch, i) => {
+      if (!best[ch] || rank[states[i]] > rank[best[ch]]) best[ch] = states[i];
+    });
+  });
+  Object.keys(keyEls).forEach(k => {
+    keyEls[k].classList.remove('correct', 'present', 'absent');
+    if (best[k]) keyEls[k].classList.add(best[k]);
+  });
+}
+
+function showToast(msg){
+  toastEl.textContent = msg;
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => { toastEl.textContent = ''; }, 1600);
+}
+
+// ═══════════════════════════════════════════════
+//  INPUT
+// ═══════════════════════════════════════════════
+function ensureTimerRunning(){
+  if (status === 'playing') startTimer();
+}
+
+function handleKey(k){
+  if (status !== 'playing') return;
+  if (k === 'ENTER'){ submitGuess(); return; }
+  if (k === 'BACK'){ currentInput = currentInput.slice(0, -1); renderBoard(); return; }
+  if (/^[A-Z]$/.test(k) && currentInput.length < WORD_LEN){
+    currentInput += k;
+    renderBoard();
+  }
+}
+
+function submitGuess(){
+  if (currentInput.length !== WORD_LEN){
+    showToast(`Enter all ${WORD_LEN} letters`);
+    shakeActiveRow();
+    return;
+  }
+  const guess = currentInput;
+  currentInput = '';
+  guesses.push(guess);
+  ensureTimerRunning();
+  renderBoard();
+  renderKeyboard();
+  popLastRow();
+  saveState();
+  if (guess === TARGET) finishGame();
+}
+
+function shakeActiveRow(){
+  const rows = boardEl.querySelectorAll('.guess-row');
+  const last = rows[rows.length - 1];
+  if (!last) return;
+  last.classList.add('shake');
+  setTimeout(() => last.classList.remove('shake'), 320);
+}
+function popLastRow(){
+  const rows = boardEl.querySelectorAll('.guess-row');
+  const target = rows[rows.length - (status === 'playing' ? 2 : 1)];
+  if (!target) return;
+  target.classList.add('pop');
+  setTimeout(() => target.classList.remove('pop'), 150);
+}
+
+window.addEventListener('keydown', (e) => {
+  if (status !== 'playing') return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const key = e.key;
+  if (key === 'Enter'){ handleKey('ENTER'); return; }
+  if (key === 'Backspace'){ handleKey('BACK'); return; }
+  if (/^[a-zA-Z]$/.test(key)){ handleKey(key.toUpperCase()); }
+});
+
+// ═══════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════
+function fmt(s){
+  const m = Math.floor(s / 60), sec = s % 60;
+  return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+}
+function startTimer(){
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    timerEl.textContent = fmt(secondsElapsed);
+  }, 1000);
+}
+function stopTimer(){
+  clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+// ═══════════════════════════════════════════════
+//  WIN / SHARE / COUNTDOWN
+// ═══════════════════════════════════════════════
+function finishGame(){
+  status = 'won';
+  stopTimer();
+  timerEl.classList.add('won');
+  renderBoard();
+  saveState();
+  setTimeout(showEndPopup, 300);
+}
+
+function showEndPopup(){
+  document.getElementById('endSub').textContent = `The word was ${TARGET}`;
+  document.getElementById('endTime').textContent = fmt(secondsElapsed);
+  document.getElementById('endGuesses').textContent = guesses.length;
+  document.getElementById('endOverlay').classList.add('on');
+  startCountdown();
+}
+
+function startCountdown(){
+  const el = document.getElementById('countdownVal');
+  function tick(){
+    const now = new Date();
+    const nextMidnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+    const diff = Math.max(0, nextMidnight - now.getTime());
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
+  }
+  tick();
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(tick, 1000);
+}
+
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const text = `Define-dle #${puzzleNum} — ${TARGET.length} letters\nGuessed in ${guesses.length} ${guesses.length === 1 ? 'guess' : 'guesses'}, ${fmt(secondsElapsed)} 📖`;
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('shareBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    }).catch(() => {});
+  }
+});
+
+document.getElementById('clearBtn').addEventListener('click', resetBoard);
+document.getElementById('playAgainBtn').addEventListener('click', resetBoard);
+
+function resetBoard(){
+  document.getElementById('endOverlay').classList.remove('on');
+  clearInterval(countdownInterval);
+  stopTimer();
+  guesses = [];
+  currentInput = '';
+  secondsElapsed = 0;
+  status = 'playing';
+  timerEl.textContent = fmt(0);
+  timerEl.classList.remove('won');
+  renderBoard();
+  renderKeyboard();
+  saveState();
+}
+
+// ═══════════════════════════════════════════════
+//  POPUP WIRING
+// ═══════════════════════════════════════════════
+function setupPopup(btnId, overlayId, closeId){
+  document.getElementById(btnId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.add('on'));
+  document.getElementById(closeId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.remove('on'));
+  document.getElementById(overlayId)?.addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('on');
+  });
+}
+setupPopup('helpBtn', 'helpOverlay', 'helpClose');
+setupPopup(null, 'endOverlay', 'endClose');
+
+// ═══════════════════════════════════════════════
+//  STATE PERSISTENCE
+// ═══════════════════════════════════════════════
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed.dayIndex !== dayIndex) return null;
+    return parsed;
+  }catch(e){ return null; }
+}
+function saveState(){
+  try{
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+      dayIndex, guesses, secondsElapsed, status
+    }));
+  }catch(e){}
+}
+
+function replaySavedState(saved){
+  guesses = saved.guesses || [];
+  secondsElapsed = saved.secondsElapsed || 0;
+  status = saved.status || 'playing';
+  timerEl.textContent = fmt(secondsElapsed);
+  renderBoard();
+  renderKeyboard();
+  if (status === 'won'){
+    timerEl.classList.add('won');
+    setTimeout(showEndPopup, 300);
+  } else if (guesses.length > 0){
+    startTimer();
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+function init(){
+  document.getElementById('puzzleNum').textContent = 'Define-dle #' + puzzleNum;
+  document.getElementById('definitionText').textContent = DEFINITION;
+  document.getElementById('definitionMeta').textContent = WORD_LEN + ' letters';
+  document.getElementById('dayInfo').textContent =
+    'Define-dle #' + puzzleNum + ' · ' + WORD_LEN + '-letter word · new puzzle daily at midnight UTC';
+
+  updateTileSize();
+  renderBoard();
+  renderKeyboard();
+  const saved = loadState();
+  if (saved) replaySavedState(saved);
+}
+init();
+</script>
+<script src="/random-game.js" defer></script>
+</body></html>
