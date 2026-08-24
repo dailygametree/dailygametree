@@ -76,5 +76,18 @@
   "dateAdded": "2026-08-24",
   "tags": ["puzzle", "logic", "math", "daily"],
   "hiddenTags": ["sudoku", "mini sudoku", "mini sudoku-dle", "minisudokudle", "6x6 sudoku", "small sudoku", "quick sudoku", "easy sudoku", "number puzzle", "logic puzzle", "wordle", "pencil notes"]
+  },
+  {
+  "id": "define-dle",
+  "folder": "define-dle",
+  "title": "Define-dle",
+  "tagline": "Guess the word from its definition",
+  "description": "A daily word puzzle — read the dictionary definition and guess the word. Unlimited guesses, with Wordle-style letter feedback after each try.",
+  "banner": "define-dle/banner.png",
+  "favicon": "define-dle/favicon.png",
+  "accent": "#1F7A6C",
+  "dateAdded": "2026-08-24",
+  "tags": ["puzzle", "word", "daily"],
+  "hiddenTags": ["define-dle", "definedle", "dictionary game", "definition game", "guess the word", "word puzzle", "wordle", "vocabulary", "vocabulary game", "unlimited guesses", "dictionary"]
   }
 ]
