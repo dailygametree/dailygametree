@@ -264,10 +264,68 @@ a { color: inherit; }
 
 #search-input::placeholder { color: var(--text-faint); }
 
+.filters-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
 .tag-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tag-pill.tag-more {
+  border-style: dashed;
+  color: var(--text-faint);
+}
+
+.tag-pill.tag-more:hover {
+  border-style: solid;
+}
+
+.random-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--accent);
+  background: var(--bg-card);
+  color: var(--accent-dim);
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+
+.random-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  transition: transform 0.4s ease;
+}
+
+.random-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.random-btn:active { transform: scale(0.96); }
+
+.random-btn.is-loading svg { animation: spin 0.6s linear infinite; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 480px) {
+  .random-btn span { display: none; }
+  .random-btn { padding: 8px; }
 }
 
 .tag-pill {
@@ -442,6 +500,27 @@ a { color: inherit; }
   color: var(--amber);
 }
 
+/* ---------- Hills (decorative, homepage only) ---------- */
+
+.hills {
+  width: 100%;
+  height: 120px;
+  margin-top: 24px;
+  overflow: hidden;
+  line-height: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hills svg { display: block; width: 100%; height: 100%; }
+
+.hill-back { fill: #C6A576; opacity: 0.55; }
+.hill-front { fill: var(--accent); opacity: 0.4; }
+
+@media (max-width: 560px) {
+  .hills { height: 80px; }
+}
+
 /* ---------- Footer ---------- */
 
 footer {
@@ -502,7 +581,17 @@ footer {
               </svg>
               <input id="search-input" type="search" placeholder="Search games…" autocomplete="off" />
             </div>
-            <div class="tag-filters" id="tag-filters"></div>
+            <div class="filters-row">
+              <div class="tag-filters" id="tag-filters"></div>
+              <button type="button" class="random-btn" data-random-game-btn aria-label="Play a random game">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+                  <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+                  <line x1="4" y1="4" x2="9" y2="9"/>
+                </svg>
+                <span>Random</span>
+              </button>
+            </div>
           </section>
 
           <section class="games-section">
@@ -518,6 +607,13 @@ footer {
     <aside class="ad-rail right">
       <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
     </aside>
+  </div>
+
+  <div class="hills" aria-hidden="true">
+    <svg viewBox="0 0 1440 220" preserveAspectRatio="none" width="100%" height="100%">
+      <path class="hill-back" d="M0,130 C 220,60 380,170 620,110 C 900,40 1140,150 1440,80 L1440,220 L0,220 Z"/>
+      <path class="hill-front" d="M0,175 C 250,120 470,195 760,150 C 1040,105 1250,190 1440,140 L1440,220 L0,220 Z"/>
+    </svg>
   </div>
 
   <footer>
@@ -640,6 +736,13 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 
 let allGames = [];
 let activeTags = new Set();
+let tagsExpanded = false;
+
+// Broad, genre-level tags that stay visible by default. Anything else
+// (e.g. "puzzle", "daily" — present on nearly every game — plus any new
+// tag a future game introduces) is tucked behind the "More" toggle, so
+// this list is the only thing to touch to promote a new tag to "core".
+const CORE_TAGS = ['history', 'logic', 'math', 'word'];
 
 function daysAgo(dateStr) {
   const then = new Date(dateStr);
@@ -651,24 +754,46 @@ function renderEmpty(message) {
   gridEl.innerHTML = `<div class="empty-state">${message}</div>`;
 }
 
+function makeTagPill(tag) {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'tag-pill';
+  btn.textContent = tag;
+  if (activeTags.has(tag)) btn.classList.add('active');
+  btn.addEventListener('click', () => {
+    if (activeTags.has(tag)) activeTags.delete(tag);
+    else activeTags.add(tag);
+    btn.classList.toggle('active');
+    applyFilters();
+  });
+  return btn;
+}
+
 function renderTagFilters(games) {
   const tagSet = new Set();
   games.forEach((g) => (g.tags || []).forEach((t) => tagSet.add(t)));
-  const tags = [...tagSet].sort();
+  const allTags = [...tagSet].sort();
+  const coreTags = CORE_TAGS.filter((t) => tagSet.has(t));
+  const extraTags = allTags.filter((t) => !CORE_TAGS.includes(t));
+
   tagFiltersEl.innerHTML = '';
-  tags.forEach((tag) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'tag-pill';
-    btn.textContent = tag;
-    btn.addEventListener('click', () => {
-      if (activeTags.has(tag)) activeTags.delete(tag);
-      else activeTags.add(tag);
-      btn.classList.toggle('active');
-      applyFilters();
+  coreTags.forEach((tag) => tagFiltersEl.appendChild(makeTagPill(tag)));
+
+  if (extraTags.length) {
+    if (tagsExpanded) {
+      extraTags.forEach((tag) => tagFiltersEl.appendChild(makeTagPill(tag)));
+    }
+    const moreBtn = document.createElement('button');
+    moreBtn.type = 'button';
+    moreBtn.className = 'tag-pill tag-more';
+    moreBtn.textContent = tagsExpanded ? 'Less −' : `More +${extraTags.length}`;
+    moreBtn.setAttribute('aria-expanded', tagsExpanded ? 'true' : 'false');
+    moreBtn.addEventListener('click', () => {
+      tagsExpanded = !tagsExpanded;
+      renderTagFilters(allGames);
     });
-    tagFiltersEl.appendChild(btn);
-  });
+    tagFiltersEl.appendChild(moreBtn);
+  }
 }
 
 function applyFilters() {
@@ -746,5 +871,6 @@ searchInput.addEventListener('input', applyFilters);
 loadGames();
 
 </script>
+<script src="/random-game.js" defer></script>
 </body>
 </html>
