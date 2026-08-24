@@ -628,97 +628,15 @@ footer {
   </footer>
 
 <script>
-const FALLBACK_GAMES = [
-  {
-    "id": "example-game",
-    "folder": "example-game",
-    "title": "Example Game",
-    "tagline": "A starter branch",
-    "description": "The template game. Duplicate its folder to start a new game, then delete this entry once you've added your own.",
-    "banner": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNDUwIj4KICA8cmVjdCB3aWR0aD0iODAwIiBoZWlnaHQ9IjQ1MCIgZmlsbD0iIzFEMjMxRiIvPgogIDxnIHN0cm9rZT0iIzM0MzkyRiIgc3Ryb2tlLXdpZHRoPSIxIj4KICAgIDxsaW5lIHgxPSIwIiB5MT0iOTAiIHgyPSI4MDAiIHkyPSI5MCIvPgogICAgPGxpbmUgeDE9IjAiIHkxPSIxODAiIHgyPSI4MDAiIHkyPSIxODAiLz4KICAgIDxsaW5lIHgxPSIwIiB5MT0iMjcwIiB4Mj0iODAwIiB5Mj0iMjcwIi8+CiAgICA8bGluZSB4MT0iMCIgeTE9IjM2MCIgeDI9IjgwMCIgeTI9IjM2MCIvPgogIDwvZz4KICA8cmVjdCB4PSIzMzAiIHk9IjE2NSIgd2lkdGg9IjE0MCIgaGVpZ2h0PSIxMjAiIHJ4PSI2IiBmaWxsPSJub25lIiBzdHJva2U9IiNCNEUzM0QiIHN0cm9rZS13aWR0aD0iNSIvPgogIDxjaXJjbGUgY3g9IjQwMCIgY3k9IjIyNSIgcj0iMTgiIGZpbGw9IiNFOEEzM0QiLz4KICA8dGV4dCB4PSI0MDAiIHk9IjMzMCIgZm9udC1mYW1pbHk9Im1vbm9zcGFjZSIgZm9udC1zaXplPSIyMiIgZmlsbD0iIzhCOTE4NiIgdGV4dC1hbmNob3I9Im1pZGRsZSI+Z2FtZXMvZXhhbXBsZS1nYW1lL2Fzc2V0cy9iYW5uZXIuc3ZnPC90ZXh0Pgo8L3N2Zz4K",
-    "favicon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxRDIzMUYiLz4KICA8cmVjdCB4PSIxOCIgeT0iMTgiIHdpZHRoPSIyOCIgaGVpZ2h0PSIyOCIgcng9IjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0I0RTMzRCIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iNSIgZmlsbD0iI0U4QTMzRCIvPgo8L3N2Zz4K",
-    "dateAdded": "2026-08-04",
-    "tags": ["puzzle", "template"]
-  },
-  {
-    "id": "67dle",
-    "folder": "67dle",
-    "title": "The 67 Number Game",
-    "tagline": "Use four numbers and maths to make 67",
-    "description": "A daily math puzzle — combine four numbers with +, −, ×, ÷, ^ and ! to hit exactly 67.",
-    "banner": "67dle/banner.png",
-    "favicon": "67dle/favicon.png",
-    "accent": "#4a9e5c",
-    "dateAdded": "2026-08-05",
-    "tags": ["puzzle", "math", "daily"],
-    "hiddenTags": ["6", "7", "67", "six", "seven", "sixty seven", "sixty-seven", "arithmetic", "numbers game", "wordle"]
-  },
-  {
-    "id": "yeardle",
-    "folder": "yeardle",
-    "title": "Yeardle",
-    "tagline": "Guess the year a historical event happened",
-    "description": "A daily history puzzle — read the clue on the flashcard and guess the year in 4 tries.",
-    "banner": "yeardle/banner.png",
-    "favicon": "yeardle/favicon.png",
-    "accent": "#B25B2F",
-    "dateAdded": "2026-08-21",
-    "tags": ["puzzle", "history", "daily"],
-    "hiddenTags": ["year", "years", "date", "history", "history game", "history quiz", "guess the year", "timeline", "wordle", "yeardle", "year-dle", "year game", "historical events"]
-  },
-  {
-    "id": "hangman",
-    "folder": "hangman",
-    "title": "Daily Hangman",
-    "tagline": "Draw your guess in chalk",
-    "description": "A daily hangman puzzle — draw each letter by hand on a chalkboard and let the board read your handwriting, then confirm your guess before the hangman is complete.",
-    "banner": "hangman/banner.png",
-    "favicon": "hangman/favicon.png",
-    "accent": "#3f5c4d",
-    "dateAdded": "2026-08-22",
-    "tags": ["puzzle", "word", "daily"],
-    "hiddenTags": ["hangman", "hang man", "hangdle", "word game", "letter game", "guess the word", "chalkboard", "chalk", "draw", "handwriting", "wordle"]
-  },
-  {
-    "id": "shikaku",
-    "folder": "shikaku",
-    "title": "Shikaku",
-    "tagline": "Every number is a rectangle's area",
-    "description": "A daily rectangle-division logic puzzle — draw rectangles so each one contains exactly one number, matching its area, until the whole grid is covered.",
-    "banner": "shikaku/banner.png",
-    "favicon": "shikaku/favicon.png",
-    "accent": "#3E6E92",
-    "dateAdded": "2026-08-23",
-    "tags": ["puzzle", "logic", "daily"],
-    "hiddenTags": ["shikaku", "rectangle puzzle", "area puzzle", "block puzzle", "logic puzzle", "grid puzzle", "divide by box", "math puzzle", "japanese puzzle", "tatami", "wordle"]
-  },
-  {
-    "id": "sudoku-dle",
-    "folder": "sudoku-dle",
-    "title": "Sudoku-dle",
-    "tagline": "Fill every row, column and box with 1-9",
-    "description": "A daily Sudoku puzzle — fill the 9×9 grid so every row, column and box holds the digits 1–9, exactly once each.",
-    "banner": "sudoku-dle/banner.png",
-    "favicon": "sudoku-dle/favicon.png",
-    "accent": "#5C4A8C",
-    "dateAdded": "2026-08-24",
-    "tags": ["puzzle", "logic", "math", "daily"],
-    "hiddenTags": ["sudoku", "sudoku-dle", "sudokudle", "number puzzle", "9x9", "logic puzzle", "grid puzzle", "japanese puzzle", "wordle", "pencil notes", "number grid"]
-  },
-  {
-    "id": "mini-sudoku-dle",
-    "folder": "mini-sudoku-dle",
-    "title": "Mini Sudoku-dle",
-    "tagline": "A quicker 6x6 Sudoku, solved in minutes",
-    "description": "A quick daily Mini Sudoku — fill the 6×6 grid so every row, column and 2×3 box holds the digits 1–6, exactly once each.",
-    "banner": "mini-sudoku-dle/banner.png",
-    "favicon": "mini-sudoku-dle/favicon.png",
-    "accent": "#8A5FA8",
-    "dateAdded": "2026-08-24",
-    "tags": ["puzzle", "logic", "math", "daily"],
-    "hiddenTags": ["sudoku", "mini sudoku", "mini sudoku-dle", "minisudokudle", "6x6 sudoku", "small sudoku", "quick sudoku", "easy sudoku", "number puzzle", "logic puzzle", "wordle", "pencil notes"]
-  }
-];
+// NOTE: games.json (fetched below) is the single source of truth for the
+// games grid — adding a new game means adding its folder + an entry in
+// games.json, nothing here needs to change. This file used to also carry
+// a hardcoded FALLBACK_GAMES list for when the fetch fails (e.g. opening
+// this file locally via file:// instead of through a server), but that
+// meant keeping two copies of every game's metadata in sync forever, and
+// the duplicate is exactly the kind of thing that quietly drifts stale.
+// If games.json can't be loaded, we just show a plain "try refreshing"
+// message instead — see the .catch() in loadGames() below.
 
 function initHeroTypewriter() {
   const normalEl = document.getElementById('typed-normal');
@@ -886,11 +804,10 @@ function loadGames() {
       renderGrid(allGames);
     })
     .catch((err) => {
-      console.error('Could not load games.json, using fallback list:', err);
-      allGames = FALLBACK_GAMES.slice();
-      allGames.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+      console.error('Could not load games.json:', err);
+      allGames = [];
       renderTagFilters(allGames);
-      renderGrid(allGames);
+      renderEmpty('Couldn&rsquo;t load the games list right now &mdash; try refreshing the page. (If you&rsquo;re previewing this file locally, games.json usually needs to be served over http:// rather than opened directly.)');
     });
 }
 
