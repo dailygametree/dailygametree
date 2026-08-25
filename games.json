@@ -89,5 +89,18 @@
   "dateAdded": "2026-08-24",
   "tags": ["puzzle", "word", "daily"],
   "hiddenTags": ["define-dle", "definedle", "dictionary game", "definition game", "guess the word", "word puzzle", "wordle", "vocabulary", "vocabulary game", "unlimited guesses", "dictionary"]
+  },
+  {
+  "id": "crossword-dle-mini",
+  "folder": "crossword-dle-mini",
+  "title": "Crossword-dle Mini",
+  "tagline": "A tiny crossword, just three words",
+  "description": "A tiny daily crossword — just three overlapping words and three clues. Quick enough for a coffee break, with a new grid every day.",
+  "banner": "crossword-dle-mini/banner.png",
+  "favicon": "crossword-dle-mini/favicon.png",
+  "accent": "#B4423A",
+  "dateAdded": "2026-08-25",
+  "tags": ["puzzle", "word", "logic", "daily"],
+  "hiddenTags": ["crossword", "crossword puzzle", "mini crossword", "crossword mini", "crossword-dle mini", "crosswordle", "crossword-dle", "word puzzle", "daily crossword", "nyt mini", "wordle", "3 word crossword", "tiny crossword", "clues"]
   }
 ]
