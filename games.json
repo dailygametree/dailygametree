@@ -102,5 +102,38 @@
   "dateAdded": "2026-08-25",
   "tags": ["puzzle", "word", "logic", "daily"],
   "hiddenTags": ["crossword", "crossword puzzle", "mini crossword", "crossword mini", "crossword-dle mini", "crosswordle", "crossword-dle", "word puzzle", "daily crossword", "nyt mini", "wordle", "3 word crossword", "tiny crossword", "clues"]
+  },
+  {
+    "id": "crossword",
+    "folder": "crossword",
+    "title": "Crossword-dle",
+    "tagline": "A full daily crossword, 30 clues",
+    "description": "A full daily crossword — a 9×9 grid with around 30 words, clued across and down. A bigger daily challenge than Crossword-dle Mini.",
+    "banner": "crossword/banner.png",
+    "favicon": "crossword/favicon.png",
+    "accent": "#7A3B69",
+    "dateAdded": "2026-08-25",
+    "tags": [
+      "puzzle",
+      "word",
+      "logic",
+      "daily"
+    ],
+    "hiddenTags": [
+      "crossword",
+      "crossword puzzle",
+      "full crossword",
+      "9x9 crossword",
+      "daily crossword",
+      "crosswordle",
+      "crossword-dle",
+      "word puzzle",
+      "wordle",
+      "nyt crossword",
+      "mini crossword",
+      "across and down",
+      "clues",
+      "large crossword"
+    ]
   }
 ]
