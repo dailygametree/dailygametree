@@ -1,0 +1,1656 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Crossword-dle Mini — dailygametree</title>
+<meta name="description" content="A tiny daily crossword — just three overlapping words and three clues. Quick enough for a coffee break.">
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#F6F5EF" />
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="canonical" href="https://dailygametree.com/crossword-dle/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="DailyGameTree" />
+<meta property="og:title" content="Crossword-dle Mini — dailygametree" />
+<meta property="og:description" content="A tiny daily crossword — just three overlapping words and three clues. Quick enough for a coffee break." />
+<meta property="og:url" content="https://dailygametree.com/crossword-dle/" />
+<meta property="og:image" content="https://dailygametree.com/crossword-dle/banner.png" />
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ---------- Site-wide palette (drives header / ad rails / footer) ---------- */
+:root{
+  --bg: #F6F5EF;
+  --bg-elevated: #EFEDE3;
+  --bg-card: #FFFFFF;
+  --text: #20261C;
+  --text-dim: #5B6255;
+  --text-faint: #9AA091;
+  --accent: #6E9C1E;
+  --accent-dim: #557A16;
+  --accent-soft: #E7F1D4;
+  --amber: #C97A1B;
+  --line: #E1DDCF;
+  --radius: 8px;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: 'Fraunces', serif;
+  --body: 'Public Sans', ui-sans-serif, sans-serif;
+}
+
+html,body{
+  min-height:100%;
+  background:var(--bg);
+  font-family:var(--body);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+a{ color:inherit; }
+
+/* ---------- Header (identical to homepage) ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: rgba(246, 245, 239, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--display), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.logo-mark { width: 55px; height: auto; display: block; }
+
+/* ---------- Ad rails (identical to homepage) ---------- */
+
+.layout {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.ad-rail {
+  flex: 0 0 160px;
+  margin: 0 10px;
+  position: sticky;
+  top: 78px;
+  align-self: stretch;
+  display: flex;
+}
+
+.ad-slot {
+  border: 1px dashed #CBC6B4;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  color: var(--text-faint);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.6;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.main-inner {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+
+@media (max-width: 900px) {
+  .layout { flex-direction: column; align-items: stretch; }
+  .ad-rail { position: static; flex: 0 0 auto; width: 100%; margin: 10px 0; align-self: auto; display: block; }
+  .ad-rail.left { order: -1; }
+  .main-content { order: 0; }
+  .ad-rail.right { order: 1; }
+  .ad-rail .ad-slot { height: 50px; font-size: 9px; letter-spacing: .04em; }
+  .main-inner { padding: 0 14px; }
+}
+
+@media (max-width: 480px) {
+  .logo-text { display: none; }
+  .logo { gap: 0; }
+}
+
+.game-top-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  width:100%;
+  align-self:stretch;
+  margin:24px 4px 0;
+}
+.back-link{
+  display:inline-block;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  margin:0;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--body);
+  transition:border-color .15s,color .15s;
+}
+.back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
+.random-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  background:transparent;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--body);
+  cursor:pointer;
+  margin-left:auto;
+  transition:border-color .15s,color .15s;
+}
+.random-btn svg{ width:13px; height:13px; flex-shrink:0; transition:transform .4s ease; }
+.random-btn:hover{ border-color:var(--accent); color:var(--accent-dim); }
+.random-btn.is-loading svg{ animation:spin .6s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* ---------- Footer (identical to homepage) ---------- */
+
+footer {
+  text-align: center;
+  padding: 28px 24px 40px;
+  color: var(--text-faint);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+.footer-links a:hover { color: var(--accent-dim); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---- Popups (shared pattern) ---- */
+.overlay{display:none;position:fixed;inset:0;background:rgba(32,38,28,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+.overlay.on{display:flex}
+.popup{background:var(--bg-card);border-radius:14px;padding:26px 26px 22px;max-width:400px;width:100%;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.28);color:var(--text)}
+.popup h2{font-family:var(--display);font-size:20px;margin-bottom:10px}
+.popup p{font-size:13.5px;line-height:1.6;color:var(--text-dim)}
+.popup p + p{margin-top:8px}
+.popup code{font-family:var(--mono);background:var(--bg-elevated);padding:1px 5px;border-radius:4px;font-size:12px}
+.popup-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:18px;cursor:pointer;color:inherit;line-height:1;padding:2px 4px}
+.popup-close:hover{opacity:.55}
+
+/* =====================================================================
+   CROSSWORD-DLE GAME
+   ===================================================================== */
+
+.game-wrap{
+  --cw-accent: #B4423A;
+  --cw-accent-dim: #8C332C;
+  --cw-accent-soft: #F3DEDB;
+  --cw-ink: #20261C;
+  --cw-line: #DAD6C8;
+  --cw-grid-line: #B4423A;
+  --cw-grid-bg: #FFFEFA;
+  --cw-block: #2B2622;
+  --cw-bad: #C97A1B;
+  --cw-bad-bg: #FBEEDD;
+  --cw-done-bg: #EAF3E0;
+  margin-top: 14px;
+}
+
+.page{display:flex;justify-content:center;padding:0 24px}
+.game-col{flex:0 0 480px;max-width:480px;padding:28px 24px 56px;width:100%}
+
+@media(max-width:640px){
+  .page{padding:0 6px}
+  .game-col{flex:0 0 auto;max-width:100%;width:100%;padding:14px 12px 32px}
+}
+
+/* ---- Title ---- */
+.title-block{display:flex;flex-direction:column;align-items:center;text-align:center;margin-bottom:14px}
+.title{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,40px);letter-spacing:-0.02em;color:var(--text)}
+.title .dle{color:var(--cw-accent);font-style:italic}
+.subtitle{font-size:12.5px;color:var(--text-dim);margin-top:6px;max-width:380px}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:16px 0 14px;flex-wrap:wrap}
+.toolbar-left,.toolbar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.puzzle-num{font-family:var(--mono);font-size:12px;color:var(--text-dim);font-weight:600;letter-spacing:.02em}
+.icon-btn{width:34px;height:34px;border-radius:50%;border:2px solid var(--text);background:transparent;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s,border-color .15s;flex-shrink:0;padding:0;line-height:1;color:var(--text)}
+.icon-btn:hover{background:var(--text);color:var(--bg)}
+.icon-btn.active{background:var(--cw-accent);border-color:var(--cw-accent);color:#fff}
+
+.timer{font-family:var(--mono);font-size:13px;color:var(--text-dim);background:var(--bg-elevated);border-radius:999px;padding:6px 12px;letter-spacing:.02em;min-width:64px;text-align:center}
+.timer.won{color:#fff;background:var(--cw-accent)}
+.mistakes{font-family:var(--mono);font-size:12px;color:var(--text-dim);background:var(--bg-elevated);border-radius:999px;padding:6px 12px;letter-spacing:.02em;white-space:nowrap}
+.mistakes.has{color:var(--cw-bad)}
+
+/* ---- Current clue bar ---- */
+.clue-bar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:var(--cw-accent-soft);
+  border:1px solid var(--cw-accent);
+  border-radius:10px;
+  padding:10px 14px;
+  margin-bottom:14px;
+}
+.clue-bar-num{
+  flex-shrink:0;
+  width:26px;height:26px;
+  border-radius:50%;
+  background:var(--cw-accent);
+  color:#fff;
+  font-family:var(--mono);
+  font-weight:700;
+  font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+}
+.clue-bar-text{font-size:13.5px;color:var(--cw-accent-dim);font-weight:600;line-height:1.4}
+.clue-bar-dir{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--cw-accent-dim);opacity:.75;display:block;margin-bottom:1px}
+
+/* ---- Board ---- */
+.board-frame{
+  background: var(--cw-grid-bg);
+  border: 1px solid var(--cw-line);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 8px 22px rgba(32,38,28,.08);
+  display:flex;
+  justify-content:center;
+}
+
+.board{
+  position: relative;
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  touch-action: manipulation;
+}
+
+.cw-cell{
+  position:relative;
+  aspect-ratio: 1 / 1;
+  background: var(--cw-grid-bg);
+  border: 1.5px solid var(--cw-grid-line);
+  border-radius: 3px;
+  overflow:hidden;
+}
+.cw-cell.blocked{
+  background: var(--cw-block);
+  border-color: var(--cw-block);
+}
+
+.cw-num{
+  position:absolute;
+  top:2px; left:3px;
+  font-family: var(--mono);
+  font-weight:700;
+  font-size: clamp(7px, 1.6vw, 9.5px);
+  color: var(--cw-accent-dim);
+  z-index:2;
+  pointer-events:none;
+}
+
+.cw-input{
+  width:100%;
+  height:100%;
+  border:none;
+  background:transparent;
+  text-align:center;
+  padding:0;
+  font-family: var(--mono);
+  font-weight: 700;
+  font-size: clamp(16px, 4.6vw, 24px);
+  color: var(--cw-ink);
+  text-transform: uppercase;
+  caret-color: transparent;
+}
+.cw-input:focus{ outline:none; }
+
+.cw-cell.active-word{ background: #FBF6EC; }
+.cw-cell.sel{ background: var(--cw-accent-soft); box-shadow: inset 0 0 0 2.5px var(--cw-accent); z-index:1; }
+.cw-cell.wrong .cw-input{ color: var(--cw-bad); }
+.cw-cell.wrong{ background: var(--cw-bad-bg); }
+.cw-cell.revealed .cw-input{ color: var(--cw-accent-dim); }
+.cw-cell.revealed{ background: var(--cw-accent-soft); }
+
+@keyframes cw-shake{
+  0%,100%{ transform: translateX(0); }
+  20%{ transform: translateX(-3px); }
+  40%{ transform: translateX(3px); }
+  60%{ transform: translateX(-2px); }
+  80%{ transform: translateX(2px); }
+}
+.cw-cell.shake{ animation: cw-shake .3s ease; }
+
+/* ---- Clue list ---- */
+.clues-list{
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+.clue-row{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  width:100%;
+  text-align:left;
+  padding:10px 14px;
+  border:none;
+  border-bottom:1px solid var(--line);
+  background:transparent;
+  cursor:pointer;
+  font-family: var(--body);
+  transition: background .12s;
+}
+.clue-row:last-child{ border-bottom:none; }
+.clue-row:hover{ background: var(--bg-elevated); }
+.clue-row.active{ background: var(--cw-accent-soft); }
+.clue-row.done .clue-row-text{ color: var(--text-faint); text-decoration: line-through; text-decoration-color: var(--text-faint); }
+.clue-row-num{
+  flex-shrink:0;
+  font-family: var(--mono);
+  font-weight:700;
+  font-size:12px;
+  color: var(--cw-accent);
+  min-width:30px;
+}
+.clue-row-num .dir{ display:block; font-size:8.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-faint); font-weight:600; }
+.clue-row-text{ font-size:13px; color:var(--text); line-height:1.4; padding-top:1px }
+
+.day-info{text-align:center;margin-top:16px;font-size:10.5px;color:var(--text-faint);font-family:var(--mono)}
+
+@media(max-width:960px){
+  .toolbar{margin:12px 0 12px}
+  .icon-btn{width:29px;height:29px;font-size:13px}
+  .day-info{margin-top:12px;font-size:9px}
+}
+
+/* ---- Help popup examples ---- */
+.example-grid{display:inline-grid;grid-template-columns:repeat(4,28px);grid-template-rows:repeat(3,28px);gap:2px;margin:10px 0}
+.example-grid div{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:13px;border:1.5px solid var(--cw-grid-line);border-radius:3px;color:var(--cw-ink);background:var(--cw-grid-bg);position:relative}
+.example-grid div.block{background:var(--cw-block);border-color:var(--cw-block)}
+.example-grid div.n::before{content:attr(data-n);position:absolute;top:1px;left:2px;font-size:7px;color:var(--cw-accent-dim)}
+
+/* ---- End popup ---- */
+.end-popup h2{text-align:center;font-size:24px}
+.end-popup .end-sub{font-size:13px;text-align:center;color:var(--text-dim);margin-top:2px}
+.end-popup .end-stats{display:flex;justify-content:center;gap:20px;margin:16px 0}
+.end-popup .end-stat{text-align:center}
+.end-popup .end-stat b{display:block;font-family:var(--display);font-size:22px;color:var(--cw-accent)}
+.end-popup .end-stat span{font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.04em}
+.share-btn{display:block;width:100%;margin:6px auto 0;background:var(--cw-accent);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-family:var(--body);font-weight:700;font-size:14px;cursor:pointer}
+.share-btn:hover{opacity:.9}
+.replay-btn{display:block;width:100%;margin:8px auto 0;background:transparent;color:var(--cw-accent);border:2px solid var(--cw-accent);border-radius:8px;padding:8px 22px;font-family:var(--body);font-weight:700;font-size:14px;cursor:pointer}
+.replay-btn:hover{background:var(--cw-accent-soft)}
+.countdown{text-align:center;font-size:12px;color:var(--text-dim);margin-top:14px}
+.countdown-val{font-weight:800;font-size:16px;color:var(--text);display:block;margin-top:2px;font-family:var(--mono)}
+
+</style>
+</head>
+<body data-game="crossword-dle">
+  <header class="site-header">
+    <a class="logo" href="/">
+      <img src="/logo.png" alt="dailygametree logo" class="logo-mark" />
+      <span class="logo-text">dailygametree</span>
+    </a>
+  </header>
+
+  <div class="layout">
+    <aside class="ad-rail left">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+
+    <div class="main-content">
+      <div class="main-inner">
+        <main>
+          <div class="game-top-row">
+            <a class="back-link" href="/">&larr; All games</a>
+            <button type="button" class="random-btn" data-random-game-btn aria-label="Play a random game">
+              <span>Random</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+                <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+                <line x1="4" y1="4" x2="9" y2="9"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="game-wrap">
+            <div class="page">
+              <div class="game-col">
+
+                <div class="title-block">
+                  <h1 class="title">Crossword<span class="dle">-dle</span> Mini</h1>
+                  <p class="subtitle">A super mini crossword — just three overlapping words and three clues.</p>
+                </div>
+
+                <div class="toolbar">
+                  <div class="toolbar-left">
+                    <span class="puzzle-num" id="puzzleNum">Crossword-dle Mini #&mdash;</span>
+                  </div>
+                  <div class="toolbar-right">
+                    <span class="timer" id="timerDisplay">00:00</span>
+                    <span class="mistakes" id="mistakesDisplay">0 mistakes</span>
+                    <button class="icon-btn" id="revealBtn" title="Reveal selected letter">&#128161;</button>
+                    <button class="icon-btn" id="clearBtn" title="Start over">&#8635;</button>
+                    <button class="icon-btn" id="helpBtn" title="How to play">?</button>
+                  </div>
+                </div>
+
+                <div class="clue-bar">
+                  <span class="clue-bar-num" id="clueBarNum">1</span>
+                  <span>
+                    <span class="clue-bar-dir" id="clueBarDir">Across</span>
+                    <span class="clue-bar-text" id="clueBarText">Loading&hellip;</span>
+                  </span>
+                </div>
+
+                <div class="board-frame">
+                  <div class="board" id="board"><!-- cells injected by JS --></div>
+                </div>
+
+                <div class="clues-list" id="cluesList"><!-- rows injected by JS --></div>
+
+                <p class="day-info" id="dayInfo">Generating today&rsquo;s puzzle&hellip;</p>
+
+              </div>
+            </div>
+
+            <!-- Help popup -->
+            <div class="overlay" id="helpOverlay">
+              <div class="popup">
+                <button class="popup-close" id="helpClose">✕</button>
+                <h2>How to Play</h2>
+                <p>Three words share letters to form one tiny crossword grid. Read the three clues and fill in every cell.</p>
+                <div style="text-align:center">
+                  <div class="example-grid">
+                    <div class="n" data-n="1">D</div><div class="n" data-n="2">R</div><div>E</div><div>A</div>
+                    <div class="block"></div><div>I</div><div class="block"></div><div class="block"></div>
+                    <div class="block"></div><div class="n" data-n="3">V</div><div>E</div><div class="block"></div>
+                  </div>
+                </div>
+                <p>Tap a cell (or a clue below) to select it, then type a letter. Tap a cell a second time to switch between its across and down word. Wrong letters show up in amber so you can spot and fix them.</p>
+                <p>The bulb button <strong>&#128161;</strong> reveals the selected cell&rsquo;s letter if you get stuck. A new Crossword-dle Mini unlocks every day at midnight UTC.</p>
+              </div>
+            </div>
+
+            <!-- End of game popup -->
+            <div class="overlay" id="endOverlay">
+              <div class="popup end-popup">
+                <button class="popup-close" id="endClose">✕</button>
+                <h2>🧩 Solved!</h2>
+                <p class="end-sub" id="endSub"></p>
+                <div class="end-stats">
+                  <div class="end-stat"><b id="endTime">00:00</b><span>Time</span></div>
+                  <div class="end-stat"><b id="endMistakes">0</b><span>Mistakes</span></div>
+                  <div class="end-stat"><b id="endHints">0</b><span>Hints</span></div>
+                </div>
+                <button class="share-btn" id="shareBtn">Share Result</button>
+                <button class="replay-btn" id="playAgainBtn">Play Again</button>
+                <div class="countdown">
+                  Next Crossword-dle Mini in
+                  <span class="countdown-val" id="countdownVal">--:--:--</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </main>
+      </div>
+    </div>
+
+    <aside class="ad-rail right">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+  </div>
+
+  <footer>
+    <nav class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms and Conditions</a>
+      <a href="/about.html">About Us</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+    <p>&copy; <span id="year"></span> dailygametree.com</p>
+  </footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+// ═══════════════════════════════════════════════
+//  DAILY INDEX (same epoch used across the site)
+// ═══════════════════════════════════════════════
+function getDayIndex(){
+  const epoch = Date.UTC(2025, 0, 1);
+  const now = new Date();
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.max(0, Math.floor((today - epoch) / 86400000));
+}
+
+// ═══════════════════════════════════════════════
+//  PUZZLES — each entry is 3 real words that chain together:
+//    a = an Across word starting at the top-left of the grid
+//    d = a Down word whose first letter crosses "a" at column `ai`
+//    c = an Across word starting where "d" ends (its last letter)
+//  So the grid is always a small staircase: a → d → c, with every
+//  triad validated ahead of time so the crossing letters always
+//  agree (see the repo's crossword-dle build script for how this
+//  list was generated & checked).
+// ═══════════════════════════════════════════════
+const PUZZLES = [
+  {a:"ANT",d:"TULIP",c:"PAINT",ai:2,ca:"Small hardworking colony insect",cd:"Cup-shaped spring flower",cc:"Colored liquid applied with a brush"},
+  {a:"ANTHEM",d:"HARBOR",c:"ROOT",ai:3,ca:"A rousing song of loyalty, often national",cd:"Sheltered place where ships dock",cc:"Underground part of a plant"},
+  {a:"CIRCLE",d:"ROPE",c:"EARTH",ai:2,ca:"Perfectly round shape",cd:"Thick twisted cord",cc:"Our home planet"},
+  {a:"DOUBLE",d:"BREATH",c:"HAT",ai:3,ca:"Twice as much",cd:"Air taken into or let out of the lungs",cc:"Covering worn on the head"},
+  {a:"COAST",d:"ANT",c:"TEA",ai:2,ca:"Land bordering the sea",cd:"Small hardworking colony insect",cc:"Hot drink made by steeping leaves"},
+  {a:"FLOWER",d:"LADDER",c:"RESCUE",ai:1,ca:"Colorful blooming part of a plant",cd:"Set of rungs used to climb up or down",cc:"Act of saving someone from danger"},
+  {a:"JUICE",d:"IRIS",c:"STEAM",ai:2,ca:"Liquid extracted from fruit",cd:"The colored part of the eye, or a flower",cc:"The vapor that rises from boiling water"},
+  {a:"START",d:"TACTIC",c:"COPPER",ai:1,ca:"The beginning point of a race",cd:"A specific action used to gain an advantage",cc:"Reddish metal used in wiring"},
+  {a:"ECHO",d:"CAKE",c:"EMBLEM",ai:1,ca:"Repeated sound bouncing off a surface",cd:"Baked dessert, often for celebrations",cc:"A symbol that represents an idea or group"},
+  {a:"DUET",d:"TASK",c:"KEY",ai:3,ca:"A performance by two people",cd:"A piece of work to be done",cc:"Metal tool used to open a lock"},
+  {a:"IRONY",d:"OIL",c:"LAKE",ai:2,ca:"A contrast between expectation and reality",cd:"Slick liquid used as fuel or in cooking",cc:"Large body of still fresh water"},
+  {a:"IRONY",d:"REST",c:"TOE",ai:1,ca:"A contrast between expectation and reality",cd:"A period of relaxation or sleep",cc:"One of the digits of the foot"},
+  {a:"ACTOR",d:"THREAD",c:"DREAM",ai:2,ca:"Person who performs in film or theater",cd:"Thin strand used in sewing",cc:"Series of thoughts during sleep"},
+  {a:"TOWEL",d:"OUTLET",c:"TRUST",ai:1,ca:"Cloth used for drying",cd:"Socket that supplies electrical power",cc:"Firm belief in someone's reliability"},
+  {a:"HOTEL",d:"THROAT",c:"TRAIN",ai:2,ca:"A building offering paid lodging",cd:"The passage at the back of the mouth",cc:"Railway vehicle made of linked cars"},
+  {a:"HOTEL",d:"TIMER",c:"ROSE",ai:2,ca:"A building offering paid lodging",cd:"Device that counts down time",cc:"Fragrant flower with thorns"},
+  {a:"CAMERA",d:"MOVIE",c:"ELBOW",ai:2,ca:"Device used to take pictures",cd:"Motion picture",cc:"Joint in the middle of the arm"},
+  {a:"STAR",d:"REGRET",c:"TEAM",ai:3,ca:"Twinkling point of light in the night sky",cd:"A feeling of sadness over something done or not done",cc:"A group that plays together"},
+  {a:"KOALA",d:"ANSWER",c:"ROAD",ai:2,ca:"Cuddly Australian marsupial that eats eucalyptus",cd:"Response to a question",cc:"Paved route for vehicles"},
+  {a:"SCREEN",d:"ROSE",c:"ESSAY",ai:2,ca:"Flat surface that displays images",cd:"Fragrant flower with thorns",cc:"A short piece of writing on a particular subject"},
+  {a:"COMEDY",d:"OUTLET",c:"TEMPO",ai:1,ca:"Entertainment meant to make people laugh",cd:"Socket that supplies electrical power",cc:"The speed at which a piece of music is played"},
+  {a:"TRACK",d:"REGRET",c:"TODAY",ai:1,ca:"A mark left behind, or a path for running",cd:"A feeling of sadness over something done or not done",cc:"The current day"},
+  {a:"SUMMER",d:"MARS",c:"STEAM",ai:2,ca:"Warmest season of the year",cd:"The Red Planet",cc:"The vapor that rises from boiling water"},
+  {a:"HARBOR",d:"ARMOR",c:"RELAX",ai:1,ca:"Sheltered place where ships dock",cd:"Protective covering worn in battle",cc:"To become less tense or anxious"},
+  {a:"WORD",d:"OVEN",c:"NIGHT",ai:1,ca:"A unit of language with meaning",cd:"Appliance used for baking food",cc:"Time when it's dark outside"},
+  {a:"ELDER",d:"DOG",c:"GALE",ai:2,ca:"An older person, often respected",cd:"Loyal barking pet",cc:"Very strong wind"},
+  {a:"BRUSH",d:"SHELF",c:"FOG",ai:3,ca:"Tool with bristles for painting or grooming",cd:"Flat board used to store or display items",cc:"Thick cloud at ground level, hard to see through"},
+  {a:"ASH",d:"HYMN",c:"NAP",ai:2,ca:"Grey powder left after burning",cd:"A religious song of praise",cc:"A short sleep, usually during the day"},
+  {a:"FLAG",d:"LETTER",c:"ROBIN",ai:1,ca:"A piece of cloth with a design, used as a symbol",cd:"A single character of the alphabet",cc:"Small bird with a red-orange breast"},
+  {a:"GAS",d:"SERIES",c:"SEVEN",ai:2,ca:"Fuel pumped into a car",cd:"A group of related works published in sequence",cc:"The number after six"},
+  {a:"RITUAL",d:"TOOTH",c:"HILL",ai:2,ca:"A series of actions performed in a set order",cd:"Hard structure used for biting",cc:"Small raised piece of land"},
+  {a:"CHORUS",d:"HELMET",c:"TRICK",ai:1,ca:"The repeated part of a song",cd:"Protective headgear for cycling or riding",cc:"A clever or skillful act meant to deceive"},
+  {a:"PIRATE",d:"ISLAND",c:"DRAMA",ai:1,ca:"Seafaring outlaw who plunders ships",cd:"Land surrounded by water",cc:"A serious play or story"},
+  {a:"STEAM",d:"ANTHEM",c:"MOP",ai:3,ca:"The vapor that rises from boiling water",cd:"A rousing song of loyalty, often national",cc:"Tool with a long handle for washing floors"},
+  {a:"BREAD",d:"ARM",c:"MOON",ai:3,ca:"Baked food made from flour and water",cd:"Limb connecting the hand to the shoulder",cc:"Earth's only natural satellite"},
+  {a:"HAND",d:"NEPHEW",c:"WRAP",ai:2,ca:"Part of the body used to grasp things",cd:"The son of one's sibling",cc:"To cover something in paper as a gift"},
+  {a:"FRIDGE",d:"REGRET",c:"TUNNEL",ai:1,ca:"Appliance that keeps food cold",cd:"A feeling of sadness over something done or not done",cc:"Underground passage"},
+  {a:"MELODY",d:"DEBATE",c:"EGG",ai:4,ca:"A pleasing sequence of musical notes",cd:"A formal discussion of opposing views",cc:"Oval food laid by a bird, often fried"},
+  {a:"FENDER",d:"EMBLEM",c:"MERRY",ai:1,ca:"Panel over a vehicle's wheel",cd:"A symbol that represents an idea or group",cc:"Cheerful and full of fun"},
+  {a:"STANZA",d:"ANGEL",c:"LION",ai:2,ca:"A grouped set of lines in a poem",cd:"Heavenly winged being",cc:"Large wild cat known as king of the jungle"},
+  {a:"GRAPE",d:"ROCKET",c:"TOUCH",ai:1,ca:"Small fruit that grows in bunches on a vine",cd:"Vehicle that launches into space",cc:"Sense felt through the skin"},
+  {a:"SPICE",d:"CAMPUS",c:"SEED",ai:3,ca:"Flavorful plant substance used in cooking",cd:"The grounds of a school or university",cc:"What a plant grows from"},
+  {a:"JOINT",d:"NIGHT",c:"TAXI",ai:3,ca:"A point where two bones meet",cd:"Time when it's dark outside",cc:"Car hired for a single trip with a driver"},
+  {a:"GOAL",d:"APPLE",c:"ECHO",ai:2,ca:"The target you're trying to reach or score",cd:"Round fruit that can be red or green",cc:"Repeated sound bouncing off a surface"},
+  {a:"DIET",d:"IRON",c:"NOON",ai:1,ca:"The food a person regularly eats",cd:"Common strong metal, or a pressing appliance",cc:"The middle of the day, 12pm"},
+  {a:"BREEZE",d:"REST",c:"THEME",ai:1,ca:"Gentle wind",cd:"A period of relaxation or sleep",cc:"The central idea or message of a story"},
+  {a:"COMET",d:"MASS",c:"SUGAR",ai:2,ca:"Icy space object with a glowing tail",cd:"The amount of matter in an object",cc:"Sweet crystalline substance"},
+  {a:"RELIEF",d:"LIGHT",c:"THEME",ai:2,ca:"A feeling of reassurance after anxiety",cd:"Illumination, or something not heavy",cc:"The central idea or message of a story"},
+  {a:"PULSE",d:"SINGER",c:"ROCK",ai:3,ca:"The rhythmic beating of blood through arteries",cd:"A person who performs songs",cc:"Hard mineral mass, or a music genre"},
+  {a:"SPACE",d:"PANIC",c:"COTTON",ai:1,ca:"The vast expanse beyond Earth's atmosphere",cd:"Sudden overwhelming fear",cc:"Soft natural fiber used in fabric"},
+  {a:"WAX",d:"ATTIC",c:"COAT",ai:1,ca:"A soft, moldable substance, often from bees",cd:"Storage space just under a roof",cc:"A warm outer garment worn in cold weather"},
+  {a:"SPONGE",d:"PUPPET",c:"THIRST",ai:1,ca:"Soft absorbent material used for cleaning",cd:"A figure moved by a performer's hands or strings",cc:"The feeling of needing to drink"},
+  {a:"SCHOOL",d:"HEART",c:"TRADE",ai:2,ca:"A place where students learn",cd:"Organ that pumps blood",cc:"Exchange of goods or services"},
+  {a:"RACE",d:"CREAM",c:"MOAT",ai:2,ca:"A contest of speed",cd:"Thick, fatty part of milk",cc:"A deep, water-filled ditch around a castle"},
+  {a:"FLAG",d:"ANGEL",c:"LOCK",ai:2,ca:"A piece of cloth with a design, used as a symbol",cd:"Heavenly winged being",cc:"A device that secures a door with a key"},
+  {a:"PALM",d:"ATTIC",c:"COPPER",ai:1,ca:"The inner surface of the hand",cd:"Storage space just under a roof",cc:"Reddish metal used in wiring"},
+  {a:"TWIST",d:"WRIST",c:"TIMER",ai:1,ca:"An unexpected turn in a story",cd:"Joint connecting the hand and arm",cc:"Device that counts down time"},
+  {a:"TEAM",d:"MIST",c:"TEAR",ai:3,ca:"A group that plays together",cd:"Thin fog near the ground",cc:"Drop of liquid from crying"},
+  {a:"COAL",d:"ANTHEM",c:"MEDIA",ai:2,ca:"Black rock burned for fuel",cd:"A rousing song of loyalty, often national",cc:"Means of mass communication"},
+  {a:"TREE",d:"ROBOT",c:"TROPHY",ai:1,ca:"Tall plant with a trunk and branches",cd:"Programmable machine that can perform tasks",cc:"Prize awarded for winning"},
+  {a:"SUBURB",d:"BAT",c:"TEAR",ai:2,ca:"Residential area on a city's edge",cd:"Club used to hit a ball, or a flying mammal",cc:"Drop of liquid from crying"},
+  {a:"CITY",d:"TOAST",c:"TULIP",ai:2,ca:"A large, busy urban settlement",cd:"Bread that's been browned by heat",cc:"Cup-shaped spring flower"},
+  {a:"RITUAL",d:"INFANT",c:"TURTLE",ai:1,ca:"A series of actions performed in a set order",cd:"A very young baby",cc:"Slow reptile with a hard shell"},
+  {a:"ELBOW",d:"BAT",c:"TASK",ai:2,ca:"Joint in the middle of the arm",cd:"Club used to hit a ball, or a flying mammal",cc:"A piece of work to be done"},
+  {a:"HAT",d:"TRUCK",c:"KNEE",ai:2,ca:"Covering worn on the head",cd:"Large vehicle for hauling cargo",cc:"Joint in the middle of the leg"},
+  {a:"ENCORE",d:"COAL",c:"LAUGH",ai:2,ca:"An extra performance requested by an audience",cd:"Black rock burned for fuel",cc:"Sound made when something is funny"},
+  {a:"STREAM",d:"TWIST",c:"TILE",ai:1,ca:"Small narrow river",cd:"An unexpected turn in a story",cc:"A flat piece used to cover floors or walls"},
+  {a:"ORBIT",d:"ROAD",c:"DIET",ai:1,ca:"Path a planet takes around a star",cd:"Paved route for vehicles",cc:"The food a person regularly eats"},
+  {a:"POET",d:"ORBIT",c:"TEAR",ai:1,ca:"A writer of poems",cd:"Path a planet takes around a star",cc:"Drop of liquid from crying"},
+  {a:"FERRY",d:"RIVAL",c:"LOGIC",ai:2,ca:"Boat that carries passengers across water",cd:"A competitor or opponent",cc:"Reasoning conducted according to strict principles"},
+  {a:"TOWER",d:"WRAP",c:"PITCH",ai:2,ca:"Tall, narrow building or structure",cd:"To cover something in paper as a gift",cc:"The playing area for soccer or cricket"},
+  {a:"GLOVE",d:"VACUUM",c:"MOP",ai:3,ca:"Covering worn to protect the hand",cd:"Appliance that sucks up dust and dirt",cc:"Tool with a long handle for washing floors"},
+  {a:"STEW",d:"TWIST",c:"THREAD",ai:1,ca:"Slow-cooked dish of meat and vegetables",cd:"An unexpected turn in a story",cc:"Thin strand used in sewing"},
+  {a:"GATE",d:"ARM",c:"MOP",ai:1,ca:"Hinged barrier in a fence or wall",cd:"Limb connecting the hand to the shoulder",cc:"Tool with a long handle for washing floors"},
+  {a:"GAS",d:"STONE",c:"ELBOW",ai:2,ca:"Fuel pumped into a car",cd:"Small piece of rock",cc:"Joint in the middle of the arm"},
+  {a:"SPARK",d:"ROCKET",c:"TILE",ai:3,ca:"Tiny flash of light or electricity",cd:"Vehicle that launches into space",cc:"A flat piece used to cover floors or walls"},
+  {a:"DETOUR",d:"TACTIC",c:"CRANE",ai:2,ca:"An alternate route around an obstacle",cd:"A specific action used to gain an advantage",cc:"Tall machine used to lift heavy loads"},
+  {a:"REASON",d:"STEEL",c:"LENS",ai:3,ca:"The cause or explanation for something",cd:"Strong metal alloy made from iron",cc:"Curved glass used to focus light"},
+  {a:"BRAIN",d:"ADULT",c:"TRAIL",ai:2,ca:"Organ used for thinking",cd:"A fully grown person",cc:"A path through the wilderness"},
+  {a:"COZY",d:"ZOOM",c:"MAP",ai:2,ca:"Warm and comfortable",cd:"To magnify an image closer",cc:"Drawing that shows geographic locations"},
+  {a:"VERSE",d:"RIVER",c:"REST",ai:2,ca:"A single stanza of a poem or song",cd:"Flowing body of fresh water",cc:"A period of relaxation or sleep"},
+  {a:"TEMPO",d:"MYTH",c:"HOUSE",ai:2,ca:"The speed at which a piece of music is played",cd:"An ancient traditional story, often about gods",cc:"A place where someone lives"},
+  {a:"STREET",d:"TIMER",c:"RUG",ai:1,ca:"A public road lined with buildings",cd:"Device that counts down time",cc:"Small piece of thick fabric flooring"},
+  {a:"CIPHER",d:"ISLAND",c:"DOUBLE",ai:1,ca:"Secret code used to hide a message",cd:"Land surrounded by water",cc:"Twice as much"},
+  {a:"DESK",d:"EAGLE",c:"EXAM",ai:1,ca:"Flat surface used for writing or work",cd:"Large bird of prey with sharp talons",cc:"A test of knowledge"},
+  {a:"ROCK",d:"CASTLE",c:"EIGHT",ai:2,ca:"Hard mineral mass, or a music genre",cd:"Fortified home of royalty",cc:"The number after seven"},
+  {a:"FENCE",d:"EMBLEM",c:"METEOR",ai:1,ca:"Barrier enclosing a yard or field",cd:"A symbol that represents an idea or group",cc:"Rock burning up in the atmosphere"},
+  {a:"THIRST",d:"HIP",c:"PIANO",ai:1,ca:"The feeling of needing to drink",cd:"The joint where the leg meets the torso",cc:"Keyboard instrument with hammers and strings"},
+  {a:"DENIM",d:"METAL",c:"LEG",ai:4,ca:"Sturdy cotton fabric used for jeans",cd:"Hard, often shiny material like iron",cc:"Limb used for standing and walking"},
+  {a:"ROPE",d:"OATH",c:"HONOR",ai:1,ca:"Thick twisted cord",cd:"A formal, solemn promise",cc:"Great respect or high esteem"},
+  {a:"PEDAL",d:"ANT",c:"TEA",ai:3,ca:"Part of a bike pressed by your foot",cd:"Small hardworking colony insect",cc:"Hot drink made by steeping leaves"},
+  {a:"CHOIR",d:"ONION",c:"NORTH",ai:2,ca:"A group of people who sing together",cd:"Layered bulb vegetable that can make you cry",cc:"Compass direction, opposite of south"},
+  {a:"STRIPE",d:"TABLE",c:"EDITOR",ai:1,ca:"A narrow band of color",cd:"Flat furniture piece with legs",cc:"Person who revises and refines written work"},
+  {a:"SEVEN",d:"ELDER",c:"RIVAL",ai:1,ca:"The number after six",cd:"An older person, often respected",cc:"A competitor or opponent"},
+  {a:"KOALA",d:"LAMP",c:"PAST",ai:3,ca:"Cuddly Australian marsupial that eats eucalyptus",cd:"Device that gives off light",cc:"Time that has already happened"},
+  {a:"PLOT",d:"LACE",c:"ELDER",ai:1,ca:"The sequence of events in a story",cd:"Delicate patterned fabric",cc:"An older person, often respected"},
+  {a:"HOUSE",d:"OCEAN",c:"NET",ai:1,ca:"A place where someone lives",cd:"Vast body of salt water",cc:"Mesh barrier used in many sports"},
+  {a:"MASS",d:"STAGE",c:"EGG",ai:2,ca:"The amount of matter in an object",cd:"Platform where performers appear",cc:"Oval food laid by a bird, often fried"},
+  {a:"MARBLE",d:"ADVICE",c:"EXAM",ai:1,ca:"A hard, decorative stone, or a small glass ball",cd:"A recommendation about what to do",cc:"A test of knowledge"},
+  {a:"CRANE",d:"RAIN",c:"NAP",ai:1,ca:"Tall machine used to lift heavy loads",cd:"Water falling from clouds",cc:"A short sleep, usually during the day"},
+  {a:"SCHOOL",d:"COURT",c:"TWELVE",ai:1,ca:"A place where students learn",cd:"Marked area for playing tennis or basketball",cc:"A dozen"},
+  {a:"WRIST",d:"ROBIN",c:"NAIL",ai:1,ca:"Joint connecting the hand and arm",cd:"Small bird with a red-orange breast",cc:"Hard covering at the tip of a finger or toe"},
+  {a:"CROW",d:"RIVAL",c:"LYRICS",ai:1,ca:"Black bird known for its loud caw",cd:"A competitor or opponent",cc:"The words of a song"},
+  {a:"HONOR",d:"NORTH",c:"HOST",ai:2,ca:"Great respect or high esteem",cd:"Compass direction, opposite of south",cc:"A person who welcomes and entertains guests"},
+  {a:"DRAGON",d:"ALBUM",c:"MUSIC",ai:2,ca:"Mythical fire-breathing creature",cd:"A collection of recorded songs",cc:"Organized sound, often with melody and rhythm"},
+  {a:"FRIDGE",d:"DETOUR",c:"ROAD",ai:3,ca:"Appliance that keeps food cold",cd:"An alternate route around an obstacle",cc:"Paved route for vehicles"},
+  {a:"ZOOM",d:"OCEAN",c:"NIGHT",ai:1,ca:"To magnify an image closer",cd:"Vast body of salt water",cc:"Time when it's dark outside"},
+  {a:"EMPIRE",d:"MIST",c:"TEMPO",ai:1,ca:"A large group of territories under one ruler",cd:"Thin fog near the ground",cc:"The speed at which a piece of music is played"},
+  {a:"SUMMER",d:"MIST",c:"TOE",ai:2,ca:"Warmest season of the year",cd:"Thin fog near the ground",cc:"One of the digits of the foot"},
+  {a:"CORNER",d:"ROCKET",c:"TRUNK",ai:2,ca:"The point where two streets meet",cd:"Vehicle that launches into space",cc:"Main stem of a tree, or an elephant's nose"},
+  {a:"PAINT",d:"IRIS",c:"SOUTH",ai:2,ca:"Colored liquid applied with a brush",cd:"The colored part of the eye, or a flower",cc:"Compass direction, opposite of north"},
+  {a:"OCEAN",d:"COURT",c:"TRAIN",ai:1,ca:"Vast body of salt water",cd:"Marked area for playing tennis or basketball",cc:"Railway vehicle made of linked cars"},
+  {a:"FIST",d:"STRESS",c:"SHOCK",ai:2,ca:"A hand tightly closed",cd:"Mental or emotional strain",cc:"A sudden, strong feeling of surprise"},
+  {a:"ROCK",d:"CRANE",c:"EARTH",ai:2,ca:"Hard mineral mass, or a music genre",cd:"Tall machine used to lift heavy loads",cc:"Our home planet"},
+  {a:"WONDER",d:"NAP",c:"PORCH",ai:2,ca:"A feeling of amazement",cd:"A short sleep, usually during the day",cc:"Covered entrance area of a house"},
+  {a:"CASTLE",d:"ADVICE",c:"EDITOR",ai:1,ca:"Fortified home of royalty",cd:"A recommendation about what to do",cc:"Person who revises and refines written work"},
+  {a:"PANDA",d:"ANKLE",c:"ENCORE",ai:1,ca:"Black-and-white bear that eats bamboo",cd:"Joint connecting the foot and leg",cc:"An extra performance requested by an audience"},
+  {a:"RABBIT",d:"ATTIC",c:"COTTON",ai:1,ca:"Long-eared hopping animal",cd:"Storage space just under a roof",cc:"Soft natural fiber used in fabric"},
+  {a:"SPIRAL",d:"PAGE",c:"ECHO",ai:1,ca:"A curve that winds around a center point",cd:"One side of a sheet in a book",cc:"Repeated sound bouncing off a surface"},
+  {a:"NECK",d:"CIRCUS",c:"SCARF",ai:2,ca:"The part connecting the head to the body",cd:"A traveling show with acrobats and animals",cc:"Long piece of fabric worn around the neck"},
+  {a:"ROPE",d:"ORBIT",c:"TRUNK",ai:1,ca:"Thick twisted cord",cd:"Path a planet takes around a star",cc:"Main stem of a tree, or an elephant's nose"},
+  {a:"MASK",d:"SILENT",c:"TOAST",ai:2,ca:"A covering worn over the face",cd:"Making no sound",cc:"Bread that's been browned by heat"},
+  {a:"TASK",d:"START",c:"TOUCH",ai:2,ca:"A piece of work to be done",cd:"The beginning point of a race",cc:"Sense felt through the skin"},
+  {a:"MUSEUM",d:"SHEEP",c:"PASTA",ai:2,ca:"A building that houses historical exhibits",cd:"Woolly farm animal that says baa",cc:"Italian dough food shaped into noodles"},
+  {a:"ARMOR",d:"RECESS",c:"SMOKE",ai:1,ca:"Protective covering worn in battle",cd:"A break from school lessons",cc:"Grey cloud rising from a fire"},
+  {a:"MOVIE",d:"VELVET",c:"TRAIN",ai:2,ca:"Motion picture",cd:"Soft fabric with a dense pile",cc:"Railway vehicle made of linked cars"},
+  {a:"SCREEN",d:"COFFEE",c:"ERRAND",ai:1,ca:"Flat surface that displays images",cd:"Bitter drink brewed from roasted beans",cc:"A short trip to do a task"},
+  {a:"STEEL",d:"THIRST",c:"TAG",ai:1,ca:"Strong metal alloy made from iron",cd:"The feeling of needing to drink",cc:"A label attached to an item"},
+  {a:"SHIELD",d:"EXAM",c:"MOAT",ai:3,ca:"Piece of armor held to block attacks",cd:"A test of knowledge",cc:"A deep, water-filled ditch around a castle"},
+  {a:"SMILE",d:"MASS",c:"SKULL",ai:1,ca:"Happy expression on a face",cd:"The amount of matter in an object",cc:"The bony framework of the head"},
+  {a:"PATH",d:"AUTUMN",c:"NECK",ai:1,ca:"A track made for walking",cd:"Season after summer, also called fall",cc:"The part connecting the head to the body"},
+  {a:"SCREEN",d:"ENGINE",c:"ENVY",ai:3,ca:"Flat surface that displays images",cd:"Machine that converts fuel into motion",cc:"A feeling of wanting what someone else has"},
+  {a:"DECIDE",d:"ICE",c:"ENVY",ai:3,ca:"To make a choice",cd:"Frozen water",cc:"A feeling of wanting what someone else has"},
+  {a:"RESCUE",d:"CANVAS",c:"SCAR",ai:3,ca:"Act of saving someone from danger",cd:"Cloth surface used for painting",cc:"A mark left after a wound heals"},
+  {a:"FOCUS",d:"CLIFF",c:"FLOOR",ai:2,ca:"The point where an image appears sharpest",cd:"Steep rock face by the sea or a canyon",cc:"The surface you walk on inside"},
+  {a:"LENS",d:"EIGHT",c:"TASTE",ai:1,ca:"Curved glass used to focus light",cd:"The number after seven",cc:"Sense detected by the tongue"},
+  {a:"TWELVE",d:"LAMP",c:"POEM",ai:3,ca:"A dozen",cd:"Device that gives off light",cc:"A piece of writing with rhythm, often rhyming"},
+  {a:"DAWN",d:"ANCHOR",c:"ROBOT",ai:1,ca:"The very first light of day",cd:"Heavy device that keeps a ship in place",cc:"Programmable machine that can perform tasks"},
+  {a:"CHOICE",d:"HOTEL",c:"LION",ai:1,ca:"An act of selecting between options",cd:"A building offering paid lodging",cc:"Large wild cat known as king of the jungle"},
+  {a:"OUTLET",d:"LABEL",c:"LAKE",ai:3,ca:"Socket that supplies electrical power",cd:"A small piece of paper attached with information",cc:"Large body of still fresh water"},
+  {a:"CANYON",d:"NORTH",c:"HARP",ai:2,ca:"Deep valley carved by a river",cd:"Compass direction, opposite of south",cc:"Large stringed instrument played upright"},
+  {a:"WISDOM",d:"SCHOOL",c:"LOGIC",ai:2,ca:"Deep understanding gained from experience",cd:"A place where students learn",cc:"Reasoning conducted according to strict principles"},
+  {a:"BRAIN",d:"RECESS",c:"STONE",ai:1,ca:"Organ used for thinking",cd:"A break from school lessons",cc:"Small piece of rock"},
+  {a:"DEGREE",d:"GARLIC",c:"COZY",ai:2,ca:"An academic qualification from a university",cd:"Pungent bulb used to flavor food",cc:"Warm and comfortable"},
+  {a:"CLOUD",d:"OWL",c:"LAMP",ai:2,ca:"Visible mass of water vapor in the sky",cd:"Nocturnal bird known for hooting",cc:"Device that gives off light"},
+  {a:"SHARK",d:"HAT",c:"TASTE",ai:1,ca:"Large predatory fish of the sea",cd:"Covering worn on the head",cc:"Sense detected by the tongue"},
+  {a:"JACKET",d:"CLOSET",c:"TORCH",ai:2,ca:"A light outer garment with sleeves",cd:"Small storage room for clothes",cc:"A stick with a flaming end used for light"},
+  {a:"COUSIN",d:"SAND",c:"DOT",ai:3,ca:"The child of one's aunt or uncle",cd:"Grainy material found on beaches",cc:"A tiny round mark"},
+  {a:"PLANK",d:"LENS",c:"SCARF",ai:1,ca:"A long flat piece of wood",cd:"Curved glass used to focus light",cc:"Long piece of fabric worn around the neck"},
+  {a:"MUSCLE",d:"SWORD",c:"DEW",ai:2,ca:"Body tissue that produces movement",cd:"Bladed weapon used by knights",cc:"Morning droplets of moisture on grass"},
+  {a:"CANDLE",d:"ADULT",c:"THRONE",ai:1,ca:"A wax stick with a wick, burned for light",cd:"A fully grown person",cc:"Ornate chair for a king or queen"},
+  {a:"PLANET",d:"LESSON",c:"NOISE",ai:1,ca:"Large body that orbits a star",cd:"A period of instruction on a topic",cc:"A sound, especially a loud or unpleasant one"},
+  {a:"FLUTE",d:"TORCH",c:"HEEL",ai:3,ca:"Slender wind instrument played sideways",cd:"A stick with a flaming end used for light",cc:"The back part of the foot"},
+  {a:"ALBUM",d:"MAGNET",c:"TEA",ai:4,ca:"A collection of recorded songs",cd:"Object that attracts iron or steel",cc:"Hot drink made by steeping leaves"},
+  {a:"HAND",d:"ALARM",c:"MELON",ai:1,ca:"Part of the body used to grasp things",cd:"Loud signal that wakes you up",cc:"Large, round, juicy fruit"},
+  {a:"HUNGER",d:"GREEN",c:"NET",ai:3,ca:"The feeling of needing food",cd:"Color of grass and leaves",cc:"Mesh barrier used in many sports"},
+  {a:"HAND",d:"DRUM",c:"MYTH",ai:3,ca:"Part of the body used to grasp things",cd:"Percussion instrument you hit",cc:"An ancient traditional story, often about gods"},
+  {a:"SHADOW",d:"HARP",c:"PLEDGE",ai:1,ca:"Dark shape cast when light is blocked",cd:"Large stringed instrument played upright",cc:"A solemn promise or agreement"},
+  {a:"RACE",d:"ARM",c:"MARSH",ai:1,ca:"A contest of speed",cd:"Limb connecting the hand to the shoulder",cc:"Low, wet grassy land"},
+  {a:"FIBER",d:"BELT",c:"TABLE",ai:2,ca:"Plant material that aids digestion",cd:"Strap worn around the waist",cc:"Flat furniture piece with legs"},
+  {a:"TULIP",d:"LYRICS",c:"SAFE",ai:2,ca:"Cup-shaped spring flower",cd:"The words of a song",cc:"A locked container for protecting valuables"},
+  {a:"LESSON",d:"SUBURB",c:"BEACH",ai:2,ca:"A period of instruction on a topic",cd:"Residential area on a city's edge",cc:"Sandy shore beside the sea"},
+  {a:"CHORE",d:"HOOK",c:"KEY",ai:1,ca:"A routine household task",cd:"A curved device used to catch or hang things",cc:"Metal tool used to open a lock"},
+  {a:"TAG",d:"GUEST",c:"TUTOR",ai:2,ca:"A label attached to an item",cd:"A person invited to an event",cc:"A private teacher"},
+  {a:"DEGREE",d:"GOLD",c:"DEER",ai:2,ca:"An academic qualification from a university",cd:"Precious yellow metal",cc:"Antlered woodland animal"},
+  {a:"SIMILE",d:"MAP",c:"PORT",ai:2,ca:"A figure of speech comparing with 'like' or 'as'",cd:"Drawing that shows geographic locations",cc:"A town with docks for ships"},
+  {a:"NEEDLE",d:"EIGHT",c:"TREE",ai:2,ca:"Thin pointed tool used for sewing",cd:"The number after seven",cc:"Tall plant with a trunk and branches"},
+  {a:"HYMN",d:"MARKET",c:"TRADE",ai:2,ca:"A religious song of praise",cd:"Place where goods are bought and sold",cc:"Exchange of goods or services"},
+  {a:"SKILL",d:"INFANT",c:"TOWEL",ai:2,ca:"An ability gained through practice",cd:"A very young baby",cc:"Cloth used for drying"},
+  {a:"STAIRS",d:"ARTIST",c:"TRAIL",ai:2,ca:"Steps used to move between floors",cd:"A person who creates art",cc:"A path through the wilderness"},
+  {a:"PASTA",d:"SOUTH",c:"HOOK",ai:2,ca:"Italian dough food shaped into noodles",cd:"Compass direction, opposite of north",cc:"A curved device used to catch or hang things"},
+  {a:"SHEET",d:"HEAT",c:"TUNE",ai:1,ca:"Thin fabric layer on a bed",cd:"Warmth given off by something hot",cc:"A melody, especially a simple one"},
+  {a:"FILTER",d:"LYRICS",c:"SUN",ai:2,ca:"A device or layer that removes something unwanted",cd:"The words of a song",cc:"Star at the center of our solar system"},
+  {a:"CAMERA",d:"ARTIST",c:"TITLE",ai:1,ca:"Device used to take pictures",cd:"A person who creates art",cc:"The name given to a book, film, or person's role"},
+  {a:"MARSH",d:"STORM",c:"MASK",ai:3,ca:"Low, wet grassy land",cd:"Violent weather with wind and rain",cc:"A covering worn over the face"},
+  {a:"HOST",d:"TOOTH",c:"HEEL",ai:3,ca:"A person who welcomes and entertains guests",cd:"Hard structure used for biting",cc:"The back part of the foot"},
+  {a:"CAROL",d:"ADULT",c:"TUTOR",ai:1,ca:"A song traditionally sung at Christmas",cd:"A fully grown person",cc:"A private teacher"},
+  {a:"FLAVOR",d:"VOW",c:"WORD",ai:3,ca:"The distinctive taste of a food",cd:"A solemn promise",cc:"A unit of language with meaning"},
+  {a:"TRUCK",d:"ROOT",c:"TITLE",ai:1,ca:"Large vehicle for hauling cargo",cd:"Underground part of a plant",cc:"The name given to a book, film, or person's role"},
+  {a:"TASTE",d:"AIR",c:"RHYME",ai:1,ca:"Sense detected by the tongue",cd:"Invisible gas we breathe",cc:"Words that end with the same sound"},
+  {a:"BELT",d:"TOOTH",c:"HARP",ai:3,ca:"Strap worn around the waist",cd:"Hard structure used for biting",cc:"Large stringed instrument played upright"},
+  {a:"WREATH",d:"RECORD",c:"DIET",ai:1,ca:"A circular arrangement of flowers or leaves",cd:"A vinyl disc used to play music",cc:"The food a person regularly eats"},
+  {a:"BASKET",d:"SECRET",c:"THUMB",ai:2,ca:"Woven container, or the hoop in basketball",cd:"Something kept hidden from others",cc:"The short, thick digit of the hand"},
+  {a:"CHIN",d:"HEART",c:"THUMB",ai:1,ca:"The bottom part of the face below the mouth",cd:"Organ that pumps blood",cc:"The short, thick digit of the hand"},
+  {a:"SHEET",d:"HOSTEL",c:"LEAGUE",ai:1,ca:"Thin fabric layer on a bed",cd:"Budget lodging often shared among travelers",cc:"An organized group of sports teams"},
+  {a:"DESK",d:"SCENT",c:"TILE",ai:2,ca:"Flat surface used for writing or work",cd:"A distinctive smell",cc:"A flat piece used to cover floors or walls"},
+  {a:"WRIST",d:"RIB",c:"BROOM",ai:1,ca:"Joint connecting the hand and arm",cd:"Curved bone that protects the chest",cc:"Long-handled tool for sweeping"},
+  {a:"PLANET",d:"LETTER",c:"RESCUE",ai:1,ca:"Large body that orbits a star",cd:"A single character of the alphabet",cc:"Act of saving someone from danger"},
+  {a:"ANCHOR",d:"COUSIN",c:"NAIL",ai:2,ca:"Heavy device that keeps a ship in place",cd:"The child of one's aunt or uncle",cc:"Hard covering at the tip of a finger or toe"},
+  {a:"NUMBER",d:"MANGO",c:"OWL",ai:2,ca:"A mathematical value used for counting",cd:"Sweet tropical fruit with a large pit",cc:"Nocturnal bird known for hooting"},
+  {a:"WATER",d:"TOUCH",c:"HEART",ai:2,ca:"Clear liquid essential for life",cd:"Sense felt through the skin",cc:"Organ that pumps blood"},
+  {a:"TICKET",d:"COLLAR",c:"RIB",ai:2,ca:"Pass allowing entry to an event",cd:"The part of a shirt around the neck",cc:"Curved bone that protects the chest"},
+  {a:"COAT",d:"TACTIC",c:"CHIN",ai:3,ca:"A warm outer garment worn in cold weather",cd:"A specific action used to gain an advantage",cc:"The bottom part of the face below the mouth"},
+  {a:"DESERT",d:"SHELF",c:"FROST",ai:2,ca:"Dry, sandy region with little rainfall",cd:"Flat board used to store or display items",cc:"Thin layer of ice on a cold morning"},
+  {a:"COUCH",d:"COMET",c:"TEAM",ai:3,ca:"Long, cushioned seat for a living room",cd:"Icy space object with a glowing tail",cc:"A group that plays together"},
+  {a:"STANZA",d:"THROAT",c:"TOAST",ai:1,ca:"A grouped set of lines in a poem",cd:"The passage at the back of the mouth",cc:"Bread that's been browned by heat"},
+  {a:"FLAME",d:"MUSEUM",c:"MOAT",ai:3,ca:"The visible part of a fire",cd:"A building that houses historical exhibits",cc:"A deep, water-filled ditch around a castle"},
+  {a:"ORGAN",d:"RIB",c:"BRICK",ai:1,ca:"Large keyboard instrument with pipes",cd:"Curved bone that protects the chest",cc:"A rectangular block used in building"},
+  {a:"TRADE",d:"RHYME",c:"ERRAND",ai:1,ca:"Exchange of goods or services",cd:"Words that end with the same sound",cc:"A short trip to do a task"},
+  {a:"SPINE",d:"POND",c:"DOT",ai:1,ca:"The backbone",cd:"Small still body of water",cc:"A tiny round mark"},
+  {a:"ZIGZAG",d:"GALE",c:"EARTH",ai:2,ca:"A line with sharp back-and-forth turns",cd:"Very strong wind",cc:"Our home planet"},
+  {a:"FLUTE",d:"LUNG",c:"GUEST",ai:1,ca:"Slender wind instrument played sideways",cd:"Organ used for breathing",cc:"A person invited to an event"},
+  {a:"SANDAL",d:"AIR",c:"RHYTHM",ai:1,ca:"Open shoe with straps",cd:"Invisible gas we breathe",cc:"A regular repeated pattern of sound"},
+  {a:"SHEEP",d:"HIP",c:"POET",ai:1,ca:"Woolly farm animal that says baa",cd:"The joint where the leg meets the torso",cc:"A writer of poems"},
+  {a:"DEW",d:"WIND",c:"DOCK",ai:2,ca:"Morning droplets of moisture on grass",cd:"Moving air",cc:"Platform where boats are loaded and tied up"},
+  {a:"COIN",d:"OFFICE",c:"EDITOR",ai:1,ca:"Small round piece of metal money",cd:"A room or building used for work",cc:"Person who revises and refines written work"},
+  {a:"STREAM",d:"ROOF",c:"FOCUS",ai:2,ca:"Small narrow river",cd:"Top covering of a building",cc:"The point where an image appears sharpest"},
+  {a:"VISA",d:"SYRUP",c:"PAGE",ai:2,ca:"Official permission to enter a foreign country",cd:"A thick sweet liquid, sometimes medicinal",cc:"One side of a sheet in a book"},
+  {a:"ESSAY",d:"SALT",c:"TUNE",ai:2,ca:"A short piece of writing on a particular subject",cd:"Mineral seasoning found in seawater",cc:"A melody, especially a simple one"},
+  {a:"ENERGY",d:"NAIL",c:"LIP",ai:1,ca:"The capacity to do work or be active",cd:"Hard covering at the tip of a finger or toe",cc:"Either edge of the mouth's opening"},
+  {a:"GLASS",d:"ARMOR",c:"RUG",ai:2,ca:"Transparent material used for windows",cd:"Protective covering worn in battle",cc:"Small piece of thick fabric flooring"},
+  {a:"WEIGHT",d:"GOAL",c:"LACE",ai:3,ca:"How heavy an object is",cd:"The target you're trying to reach or score",cc:"Delicate patterned fabric"},
+  {a:"CAMERA",d:"ADVICE",c:"EMPIRE",ai:1,ca:"Device used to take pictures",cd:"A recommendation about what to do",cc:"A large group of territories under one ruler"},
+  {a:"SWAMP",d:"MAZE",c:"ENVY",ai:3,ca:"Wet, muddy wooded area",cd:"A confusing network of paths",cc:"A feeling of wanting what someone else has"},
+  {a:"CABIN",d:"BEAT",c:"TIRE",ai:2,ca:"A small, simple wooden house",cd:"A regular rhythmic pulse in music",cc:"Rubber ring around a wheel"},
+  {a:"JACKET",d:"COURT",c:"TONE",ai:2,ca:"A light outer garment with sleeves",cd:"Marked area for playing tennis or basketball",cc:"The quality or character of a sound"},
+  {a:"SPIDER",d:"PALM",c:"MAZE",ai:1,ca:"Eight-legged creature that spins webs",cd:"The inner surface of the hand",cc:"A confusing network of paths"},
+  {a:"STOVE",d:"TAXI",c:"INFANT",ai:1,ca:"Appliance with burners for cooking",cd:"Car hired for a single trip with a driver",cc:"A very young baby"},
+  {a:"NECK",d:"COAL",c:"LAKE",ai:2,ca:"The part connecting the head to the body",cd:"Black rock burned for fuel",cc:"Large body of still fresh water"},
+  {a:"CHEEK",d:"HOOP",c:"PEACH",ai:1,ca:"The side of the face below the eye",cd:"A circular ring, like in basketball",cc:"Fuzzy-skinned stone fruit"},
+  {a:"DREAD",d:"ERRAND",c:"DREAM",ai:2,ca:"A feeling of great fear about something coming",cd:"A short trip to do a task",cc:"Series of thoughts during sleep"},
+  {a:"DUSK",d:"SLEEP",c:"PATIO",ai:2,ca:"The time just after sunset",cd:"State of rest with closed eyes",cc:"Paved outdoor area beside a house"},
+  {a:"GHOST",d:"HELMET",c:"THRONE",ai:1,ca:"Spirit of a dead person",cd:"Protective headgear for cycling or riding",cc:"Ornate chair for a king or queen"},
+  {a:"HAMMER",d:"ARENA",c:"ANSWER",ai:1,ca:"Tool used to drive in nails",cd:"Enclosed venue for events or contests",cc:"Response to a question"},
+  {a:"SNORE",d:"ONION",c:"NIECE",ai:2,ca:"A rough breathing sound made while asleep",cd:"Layered bulb vegetable that can make you cry",cc:"The daughter of one's sibling"},
+  {a:"SHAME",d:"HERO",c:"OATH",ai:1,ca:"A painful feeling of guilt or embarrassment",cd:"The main character who saves the day",cc:"A formal, solemn promise"},
+  {a:"RHYME",d:"HUNGER",c:"RIDDLE",ai:1,ca:"Words that end with the same sound",cd:"The feeling of needing food",cc:"Tricky question with a clever answer"},
+  {a:"SPICE",d:"PANIC",c:"COMET",ai:1,ca:"Flavorful plant substance used in cooking",cd:"Sudden overwhelming fear",cc:"Icy space object with a glowing tail"},
+  {a:"SPRINT",d:"RABBIT",c:"TAG",ai:2,ca:"A short, fast run",cd:"Long-eared hopping animal",cc:"A label attached to an item"},
+  {a:"SCORE",d:"CAP",c:"PALM",ai:1,ca:"The number of points earned in a game",cd:"Soft brimmed hat, or a lid",cc:"The inner surface of the hand"},
+  {a:"PARENT",d:"ROOF",c:"FOAM",ai:2,ca:"A mother or father",cd:"Top covering of a building",cc:"A mass of tiny bubbles"},
+  {a:"RACE",d:"EGG",c:"GIFT",ai:3,ca:"A contest of speed",cd:"Oval food laid by a bird, often fried",cc:"A present given to someone"},
+  {a:"CASTLE",d:"STREET",c:"TALE",ai:2,ca:"Fortified home of royalty",cd:"A public road lined with buildings",cc:"A story, often imaginative"},
+  {a:"CHAIN",d:"NOVEL",c:"LEG",ai:4,ca:"A series of connected metal links",cd:"A long fictional book",cc:"Limb used for standing and walking"},
+  {a:"DECIDE",d:"COAST",c:"THEME",ai:2,ca:"To make a choice",cd:"Land bordering the sea",cc:"The central idea or message of a story"},
+  {a:"PATIO",d:"ANGEL",c:"LIQUID",ai:1,ca:"Paved outdoor area beside a house",cd:"Heavenly winged being",cc:"A substance that flows and takes its container's shape"},
+  {a:"BOAT",d:"ACTOR",c:"ROBIN",ai:2,ca:"Small watercraft",cd:"Person who performs in film or theater",cc:"Small bird with a red-orange breast"},
+  {a:"CAMPUS",d:"MARS",c:"SPACE",ai:2,ca:"The grounds of a school or university",cd:"The Red Planet",cc:"The vast expanse beyond Earth's atmosphere"},
+  {a:"SHIP",d:"HIP",c:"PATIO",ai:1,ca:"Large vessel for sea travel",cd:"The joint where the leg meets the torso",cc:"Paved outdoor area beside a house"},
+  {a:"STONE",d:"TINSEL",c:"LADDER",ai:1,ca:"Small piece of rock",cd:"Shiny, thin strips used to decorate a tree",cc:"Set of rungs used to climb up or down"},
+  {a:"MARS",d:"SINGER",c:"RICE",ai:3,ca:"The Red Planet",cd:"A person who performs songs",cc:"Staple grain cooked and often served steamed"},
+  {a:"CLIMAX",d:"LAUGH",c:"HYMN",ai:1,ca:"The most intense point in a story",cd:"Sound made when something is funny",cc:"A religious song of praise"},
+  {a:"CARPET",d:"ACTOR",c:"RIVER",ai:1,ca:"Soft fabric flooring covering a room",cd:"Person who performs in film or theater",cc:"Flowing body of fresh water"},
+  {a:"ESCAPE",d:"START",c:"THREE",ai:1,ca:"Act of getting free from confinement",cd:"The beginning point of a race",cc:"The number after two"},
+  {a:"RIDDLE",d:"DESERT",c:"TONE",ai:2,ca:"Tricky question with a clever answer",cd:"Dry, sandy region with little rainfall",cc:"The quality or character of a sound"},
+  {a:"SWITCH",d:"WEIGHT",c:"TINSEL",ai:1,ca:"A device used to turn something on or off",cd:"How heavy an object is",cc:"Shiny, thin strips used to decorate a tree"},
+  {a:"CHAIN",d:"ANCHOR",c:"RICE",ai:2,ca:"A series of connected metal links",cd:"Heavy device that keeps a ship in place",cc:"Staple grain cooked and often served steamed"},
+  {a:"CANDLE",d:"ANSWER",c:"RHYTHM",ai:1,ca:"A wax stick with a wick, burned for light",cd:"Response to a question",cc:"A regular repeated pattern of sound"},
+  {a:"THREE",d:"HOST",c:"TRICK",ai:1,ca:"The number after two",cd:"A person who welcomes and entertains guests",cc:"A clever or skillful act meant to deceive"},
+  {a:"CLIFF",d:"LION",c:"NEPHEW",ai:1,ca:"Steep rock face by the sea or a canyon",cd:"Large wild cat known as king of the jungle",cc:"The son of one's sibling"},
+  {a:"DRAFT",d:"ROBOT",c:"TOE",ai:1,ca:"A preliminary version of a piece of writing",cd:"Programmable machine that can perform tasks",cc:"One of the digits of the foot"},
+  {a:"PAST",d:"SOUP",c:"PEAK",ai:2,ca:"Time that has already happened",cd:"Liquid dish often eaten with a spoon",cc:"The very top of a mountain"},
+  {a:"ISLAND",d:"SCARF",c:"FAMILY",ai:1,ca:"Land surrounded by water",cd:"Long piece of fabric worn around the neck",cc:"A group of related people"},
+  {a:"THREE",d:"HEAT",c:"TRUNK",ai:1,ca:"The number after two",cd:"Warmth given off by something hot",cc:"Main stem of a tree, or an elephant's nose"},
+  {a:"SCENT",d:"TOWER",c:"RUG",ai:4,ca:"A distinctive smell",cd:"Tall, narrow building or structure",cc:"Small piece of thick fabric flooring"},
+  {a:"APPLE",d:"PANIC",c:"CARGO",ai:2,ca:"Round fruit that can be red or green",cd:"Sudden overwhelming fear",cc:"Goods carried by a ship, plane, or truck"},
+  {a:"ESCAPE",d:"SERIES",c:"SKULL",ai:1,ca:"Act of getting free from confinement",cd:"A group of related works published in sequence",cc:"The bony framework of the head"},
+  {a:"EAGLE",d:"LEGEND",c:"DOT",ai:3,ca:"Large bird of prey with sharp talons",cd:"A traditional story, often partly true",cc:"A tiny round mark"},
+  {a:"BRAIN",d:"RECESS",c:"SWORD",ai:1,ca:"Organ used for thinking",cd:"A break from school lessons",cc:"Bladed weapon used by knights"},
+  {a:"FINGER",d:"NET",c:"TRUCK",ai:2,ca:"One of the five digits of the hand",cd:"Mesh barrier used in many sports",cc:"Large vehicle for hauling cargo"},
+  {a:"GALAXY",d:"AIR",c:"RAIN",ai:3,ca:"Huge collection of stars and planets",cd:"Invisible gas we breathe",cc:"Water falling from clouds"},
+  {a:"QUIET",d:"IRIS",c:"SHARK",ai:2,ca:"Making little or no noise",cd:"The colored part of the eye, or a flower",cc:"Large predatory fish of the sea"},
+  {a:"STRESS",d:"TITLE",c:"ENGINE",ai:1,ca:"Mental or emotional strain",cd:"The name given to a book, film, or person's role",cc:"Machine that converts fuel into motion"},
+  {a:"STAIRS",d:"TIGER",c:"ROUTE",ai:1,ca:"Steps used to move between floors",cd:"Large striped wild cat",cc:"The path taken to get somewhere"},
+  {a:"CAMEL",d:"MELON",c:"NOISE",ai:2,ca:"Desert animal with one or two humps",cd:"Large, round, juicy fruit",cc:"A sound, especially a loud or unpleasant one"},
+  {a:"FLAME",d:"MYTH",c:"HOOK",ai:3,ca:"The visible part of a fire",cd:"An ancient traditional story, often about gods",cc:"A curved device used to catch or hang things"},
+  {a:"DRILL",d:"RABBIT",c:"TINSEL",ai:1,ca:"Tool used to bore holes",cd:"Long-eared hopping animal",cc:"Shiny, thin strips used to decorate a tree"},
+  {a:"MILK",d:"KNIGHT",c:"TALE",ai:3,ca:"White liquid from cows, often drunk",cd:"Armored medieval warrior",cc:"A story, often imaginative"},
+  {a:"SHADOW",d:"HAMMER",c:"RICE",ai:1,ca:"Dark shape cast when light is blocked",cd:"Tool used to drive in nails",cc:"Staple grain cooked and often served steamed"},
+  {a:"RECORD",d:"CANVAS",c:"STORM",ai:2,ca:"A vinyl disc used to play music",cd:"Cloth surface used for painting",cc:"Violent weather with wind and rain"},
+  {a:"KIDNEY",d:"DRUM",c:"MELON",ai:2,ca:"Organ that filters waste from the blood",cd:"Percussion instrument you hit",cc:"Large, round, juicy fruit"},
+  {a:"SPRINT",d:"PEAK",c:"KNIGHT",ai:1,ca:"A short, fast run",cd:"The very top of a mountain",cc:"Armored medieval warrior"},
+  {a:"PAGE",d:"ESSAY",c:"YAWN",ai:3,ca:"One side of a sheet in a book",cd:"A short piece of writing on a particular subject",cc:"An involuntary open-mouth breath when tired"},
+  {a:"CLIMAX",d:"LIP",c:"PAST",ai:1,ca:"The most intense point in a story",cd:"Either edge of the mouth's opening",cc:"Time that has already happened"},
+  {a:"GALE",d:"LABEL",c:"LAUGH",ai:2,ca:"Very strong wind",cd:"A small piece of paper attached with information",cc:"Sound made when something is funny"},
+  {a:"STAGE",d:"TICKET",c:"TENT",ai:1,ca:"Platform where performers appear",cd:"Pass allowing entry to an event",cc:"Portable shelter made of fabric"},
+  {a:"ICE",d:"CEMENT",c:"TIDE",ai:1,ca:"Frozen water",cd:"Powdery material used to make concrete",cc:"Rise and fall of the sea"},
+  {a:"PHONE",d:"HOOP",c:"PILL",ai:1,ca:"Device used to make calls",cd:"A circular ring, like in basketball",cc:"A small tablet of medicine"},
+  {a:"SPONGE",d:"GARLIC",c:"CAT",ai:4,ca:"Soft absorbent material used for cleaning",cd:"Pungent bulb used to flavor food",cc:"Purring house pet"},
+  {a:"PEACH",d:"COACH",c:"HEAT",ai:3,ca:"Fuzzy-skinned stone fruit",cd:"Person who trains a sports team",cc:"Warmth given off by something hot"},
+  {a:"SHIP",d:"HOUR",c:"ROOF",ai:1,ca:"Large vessel for sea travel",cd:"Sixty minutes",cc:"Top covering of a building"},
+  {a:"ESCAPE",d:"CANVAS",c:"SLOPE",ai:2,ca:"Act of getting free from confinement",cd:"Cloth surface used for painting",cc:"A tilted surface, like a hillside"},
+  {a:"HOSTEL",d:"SHEEP",c:"PRIDE",ai:2,ca:"Budget lodging often shared among travelers",cd:"Woolly farm animal that says baa",cc:"A feeling of satisfaction in one's achievements"},
+  {a:"MEDIA",d:"EMPIRE",c:"ENGINE",ai:1,ca:"Means of mass communication",cd:"A large group of territories under one ruler",cc:"Machine that converts fuel into motion"},
+  {a:"PUPIL",d:"PORT",c:"TIDE",ai:2,ca:"The dark center of the eye that lets in light",cd:"A town with docks for ships",cc:"Rise and fall of the sea"},
+  {a:"FAUCET",d:"COUCH",c:"HOOD",ai:3,ca:"Fixture that controls water flow, also a tap",cd:"Long, cushioned seat for a living room",cc:"Covering that pulls up over the head"},
+  {a:"DOCK",d:"COAT",c:"TORCH",ai:2,ca:"Platform where boats are loaded and tied up",cd:"A warm outer garment worn in cold weather",cc:"A stick with a flaming end used for light"},
+  {a:"SHOCK",d:"HELMET",c:"TOWER",ai:1,ca:"A sudden, strong feeling of surprise",cd:"Protective headgear for cycling or riding",cc:"Tall, narrow building or structure"},
+  {a:"SINK",d:"NEPHEW",c:"WATER",ai:2,ca:"Basin used for washing dishes or hands",cd:"The son of one's sibling",cc:"Clear liquid essential for life"},
+  {a:"SCREW",d:"RELIEF",c:"FOAM",ai:2,ca:"A metal fastener with a spiral thread",cd:"A feeling of reassurance after anxiety",cc:"A mass of tiny bubbles"},
+  {a:"DEBATE",d:"BRUSH",c:"HORSE",ai:2,ca:"A formal discussion of opposing views",cd:"Tool with bristles for painting or grooming",cc:"Large hoofed animal often ridden"},
+  {a:"AMBER",d:"MUSIC",c:"CHOIR",ai:1,ca:"Golden-orange color, or fossilized tree resin",cd:"Organized sound, often with melody and rhythm",cc:"A group of people who sing together"},
+  {a:"ZIGZAG",d:"GHOST",c:"TRUST",ai:2,ca:"A line with sharp back-and-forth turns",cd:"Spirit of a dead person",cc:"Firm belief in someone's reliability"},
+  {a:"ASH",d:"STAIRS",c:"SWORD",ai:1,ca:"Grey powder left after burning",cd:"Steps used to move between floors",cc:"Bladed weapon used by knights"},
+  {a:"OIL",d:"LIP",c:"PIXEL",ai:2,ca:"Slick liquid used as fuel or in cooking",cd:"Either edge of the mouth's opening",cc:"The smallest unit of a digital image"},
+  {a:"SPLASH",d:"POND",c:"DECIDE",ai:1,ca:"Sudden scatter of liquid",cd:"Small still body of water",cc:"To make a choice"},
+  {a:"SWITCH",d:"CLOUD",c:"DOG",ai:4,ca:"A device used to turn something on or off",cd:"Visible mass of water vapor in the sky",cc:"Loyal barking pet"},
+  {a:"ARROW",d:"RITUAL",c:"LOGIC",ai:2,ca:"Pointed projectile shot from a bow",cd:"A series of actions performed in a set order",cc:"Reasoning conducted according to strict principles"},
+  {a:"CAP",d:"AMBER",c:"RIBBON",ai:1,ca:"Soft brimmed hat, or a lid",cd:"Golden-orange color, or fossilized tree resin",cc:"Thin decorative strip of fabric"},
+  {a:"AMBER",d:"MOTOR",c:"RIDER",ai:1,ca:"Golden-orange color, or fossilized tree resin",cd:"Device that produces motion",cc:"Person who rides a horse or bike"},
+  {a:"FINGER",d:"GLASS",c:"SILK",ai:3,ca:"One of the five digits of the hand",cd:"Transparent material used for windows",cc:"Smooth fabric made by silkworms"},
+  {a:"CAVE",d:"APPLE",c:"ENCORE",ai:1,ca:"Hollow space underground or in a hillside",cd:"Round fruit that can be red or green",cc:"An extra performance requested by an audience"},
+  {a:"ANKLE",d:"LUNG",c:"GAS",ai:3,ca:"Joint connecting the foot and leg",cd:"Organ used for breathing",cc:"Fuel pumped into a car"},
+  {a:"WRENCH",d:"RIDER",c:"ROSE",ai:1,ca:"Tool used to turn nuts and bolts",cd:"Person who rides a horse or bike",cc:"Fragrant flower with thorns"},
+  {a:"GLASS",d:"SWIRL",c:"LEAF",ai:3,ca:"Transparent material used for windows",cd:"A twisting, curling shape",cc:"Green part of a plant, often falls in autumn"},
+  {a:"CANDLE",d:"ALARM",c:"MOTH",ai:1,ca:"A wax stick with a wick, burned for light",cd:"Loud signal that wakes you up",cc:"Nocturnal cousin of the butterfly"},
+  {a:"SAFE",d:"FIELD",c:"DRAMA",ai:2,ca:"A locked container for protecting valuables",cd:"Open area of land, often for crops",cc:"A serious play or story"},
+  {a:"TOWEL",d:"WIND",c:"DENIM",ai:2,ca:"Cloth used for drying",cd:"Moving air",cc:"Sturdy cotton fabric used for jeans"},
+  {a:"SCORE",d:"CYMBAL",c:"LIVER",ai:1,ca:"The number of points earned in a game",cd:"Percussion instrument struck to make a crash",cc:"Organ that filters the blood"},
+  {a:"ALBUM",d:"BEAM",c:"MONEY",ai:2,ca:"A collection of recorded songs",cd:"A long sturdy piece of wood or metal, or a ray of light",cc:"Currency used to buy things"},
+  {a:"PUDDLE",d:"DRAWER",c:"ROUTE",ai:2,ca:"Small pool of water after rain",cd:"Sliding storage compartment in furniture",cc:"The path taken to get somewhere"},
+  {a:"MUSCLE",d:"STREET",c:"TRACK",ai:2,ca:"Body tissue that produces movement",cd:"A public road lined with buildings",cc:"A mark left behind, or a path for running"},
+  {a:"SOCK",d:"CIRCUS",c:"SKILL",ai:2,ca:"Fabric covering worn on the foot",cd:"A traveling show with acrobats and animals",cc:"An ability gained through practice"},
+  {a:"STORM",d:"THROAT",c:"TALE",ai:1,ca:"Violent weather with wind and rain",cd:"The passage at the back of the mouth",cc:"A story, often imaginative"},
+  {a:"PEACE",d:"CAP",c:"PORT",ai:3,ca:"Freedom from conflict",cd:"Soft brimmed hat, or a lid",cc:"A town with docks for ships"},
+  {a:"SLOPE",d:"POEM",c:"MOTH",ai:3,ca:"A tilted surface, like a hillside",cd:"A piece of writing with rhythm, often rhyming",cc:"Nocturnal cousin of the butterfly"},
+  {a:"PASTA",d:"SLEEP",c:"PRIDE",ai:2,ca:"Italian dough food shaped into noodles",cd:"State of rest with closed eyes",cc:"A feeling of satisfaction in one's achievements"},
+  {a:"CARPET",d:"ARROW",c:"WREATH",ai:1,ca:"Soft fabric flooring covering a room",cd:"Pointed projectile shot from a bow",cc:"A circular arrangement of flowers or leaves"},
+  {a:"SEAL",d:"LEG",c:"GYM",ai:3,ca:"An official stamped mark, or a marine mammal",cd:"Limb used for standing and walking",cc:"A place equipped for exercise"},
+  {a:"SOFA",d:"FOAM",c:"MASK",ai:2,ca:"Upholstered seat for more than one person",cd:"A mass of tiny bubbles",cc:"A covering worn over the face"},
+  {a:"DRAFT",d:"ARTIST",c:"TABLE",ai:2,ca:"A preliminary version of a piece of writing",cd:"A person who creates art",cc:"Flat furniture piece with legs"},
+  {a:"SMELL",d:"LETTER",c:"ROOT",ai:3,ca:"Sense detected by the nose",cd:"A single character of the alphabet",cc:"Underground part of a plant"},
+  {a:"MOVIE",d:"OWL",c:"LADDER",ai:1,ca:"Motion picture",cd:"Nocturnal bird known for hooting",cc:"Set of rungs used to climb up or down"},
+  {a:"ARTERY",d:"RIVER",c:"RHYTHM",ai:1,ca:"A vessel that carries blood from the heart",cd:"Flowing body of fresh water",cc:"A regular repeated pattern of sound"},
+  {a:"VERSE",d:"SCREW",c:"WEEK",ai:3,ca:"A single stanza of a poem or song",cd:"A metal fastener with a spiral thread",cc:"Period of seven days"},
+  {a:"MEMORY",d:"MANGO",c:"OATH",ai:2,ca:"Ability to recall the past",cd:"Sweet tropical fruit with a large pit",cc:"A formal, solemn promise"},
+  {a:"MOTEL",d:"ONION",c:"NOON",ai:1,ca:"A roadside hotel for travelers by car",cd:"Layered bulb vegetable that can make you cry",cc:"The middle of the day, 12pm"},
+  {a:"JERSEY",d:"RECORD",c:"DEVIL",ai:2,ca:"A sports team's shirt",cd:"A vinyl disc used to play music",cc:"Malevolent supernatural being"},
+  {a:"DESK",d:"SCRIPT",c:"TRACK",ai:2,ca:"Flat surface used for writing or work",cd:"The written text of a play or film",cc:"A mark left behind, or a path for running"},
+  {a:"PRIDE",d:"REASON",c:"NUMBER",ai:1,ca:"A feeling of satisfaction in one's achievements",cd:"The cause or explanation for something",cc:"A mathematical value used for counting"},
+  {a:"ASH",d:"HAMMER",c:"ROUTE",ai:2,ca:"Grey powder left after burning",cd:"Tool used to drive in nails",cc:"The path taken to get somewhere"},
+  {a:"AROMA",d:"RELIEF",c:"FIBER",ai:1,ca:"A pleasant, distinctive smell",cd:"A feeling of reassurance after anxiety",cc:"Plant material that aids digestion"},
+  {a:"FRIDGE",d:"DUET",c:"TAXI",ai:3,ca:"Appliance that keeps food cold",cd:"A performance by two people",cc:"Car hired for a single trip with a driver"},
+  {a:"LESSON",d:"SPRING",c:"GUEST",ai:2,ca:"A period of instruction on a topic",cd:"Season after winter, or a coiled metal part",cc:"A person invited to an event"},
+  {a:"BASKET",d:"SPIRAL",c:"LOCK",ai:2,ca:"Woven container, or the hoop in basketball",cd:"A curve that winds around a center point",cc:"A device that secures a door with a key"},
+  {a:"SPOT",d:"POND",c:"DEW",ai:1,ca:"A small round mark",cd:"Small still body of water",cc:"Morning droplets of moisture on grass"},
+  {a:"DAWN",d:"ARROW",c:"WATER",ai:1,ca:"The very first light of day",cd:"Pointed projectile shot from a bow",cc:"Clear liquid essential for life"},
+  {a:"DOG",d:"GOLD",c:"DREAD",ai:2,ca:"Loyal barking pet",cd:"Precious yellow metal",cc:"A feeling of great fear about something coming"},
+  {a:"MARSH",d:"SERIES",c:"SCAR",ai:3,ca:"Low, wet grassy land",cd:"A group of related works published in sequence",cc:"A mark left after a wound heals"},
+  {a:"SPIDER",d:"PLOT",c:"TIGER",ai:1,ca:"Eight-legged creature that spins webs",cd:"The sequence of events in a story",cc:"Large striped wild cat"},
+  {a:"BUDGET",d:"GOAT",c:"TREE",ai:3,ca:"A plan for spending and saving money",cd:"Horned farm animal known for climbing",cc:"Tall plant with a trunk and branches"},
+  {a:"OPTION",d:"PUPPET",c:"THREAD",ai:1,ca:"One of several possible choices",cd:"A figure moved by a performer's hands or strings",cc:"Thin strand used in sewing"},
+  {a:"BASKET",d:"SHOUT",c:"TUTOR",ai:2,ca:"Woven container, or the hoop in basketball",cd:"To cry out loudly",cc:"A private teacher"},
+  {a:"SHIELD",d:"HABIT",c:"TROPHY",ai:1,ca:"Piece of armor held to block attacks",cd:"A regular practice or tendency",cc:"Prize awarded for winning"},
+  {a:"SMELL",d:"MEDAL",c:"LEAF",ai:1,ca:"Sense detected by the nose",cd:"Award given for achievement",cc:"Green part of a plant, often falls in autumn"},
+  {a:"CUSTOM",d:"SWAMP",c:"PLANE",ai:2,ca:"A traditional practice within a community",cd:"Wet, muddy wooded area",cc:"Aircraft with fixed wings"},
+  {a:"HOSTEL",d:"OIL",c:"LIGHT",ai:1,ca:"Budget lodging often shared among travelers",cd:"Slick liquid used as fuel or in cooking",cc:"Illumination, or something not heavy"},
+  {a:"SCRIPT",d:"CAMPUS",c:"STEEL",ai:1,ca:"The written text of a play or film",cd:"The grounds of a school or university",cc:"Strong metal alloy made from iron"},
+  {a:"SHIP",d:"HOOP",c:"PLEDGE",ai:1,ca:"Large vessel for sea travel",cd:"A circular ring, like in basketball",cc:"A solemn promise or agreement"},
+  {a:"GRADE",d:"DUSK",c:"KEY",ai:3,ca:"A mark showing quality of work",cd:"The time just after sunset",cc:"Metal tool used to open a lock"},
+  {a:"FIST",d:"SOUND",c:"DAISY",ai:2,ca:"A hand tightly closed",cd:"What you perceive with your ears",cc:"Simple white flower with a yellow center"},
+  {a:"SUBWAY",d:"BOOT",c:"TRICK",ai:2,ca:"Underground train system in a city",cd:"Sturdy footwear covering the ankle",cc:"A clever or skillful act meant to deceive"},
+  {a:"CIRCUS",d:"REASON",c:"NOISE",ai:2,ca:"A traveling show with acrobats and animals",cd:"The cause or explanation for something",cc:"A sound, especially a loud or unpleasant one"},
+  {a:"VISA",d:"SOUTH",c:"HOUR",ai:2,ca:"Official permission to enter a foreign country",cd:"Compass direction, opposite of north",cc:"Sixty minutes"},
+  {a:"DUSK",d:"SLEEP",c:"PIZZA",ai:2,ca:"The time just after sunset",cd:"State of rest with closed eyes",cc:"Baked dish topped with cheese and sauce"},
+  {a:"SPONGE",d:"PILLOW",c:"WREATH",ai:1,ca:"Soft absorbent material used for cleaning",cd:"Soft cushion used for resting your head",cc:"A circular arrangement of flowers or leaves"},
+  {a:"WRENCH",d:"RAIN",c:"NOON",ai:1,ca:"Tool used to turn nuts and bolts",cd:"Water falling from clouds",cc:"The middle of the day, 12pm"},
+  {a:"CYMBAL",d:"BEACH",c:"HILL",ai:3,ca:"Percussion instrument struck to make a crash",cd:"Sandy shore beside the sea",cc:"Small raised piece of land"},
+  {a:"LAVA",d:"VENUS",c:"SILK",ai:2,ca:"Molten rock from a volcano",cd:"Second planet from the sun",cc:"Smooth fabric made by silkworms"},
+  {a:"SAND",d:"AUTUMN",c:"NUMBER",ai:1,ca:"Grainy material found on beaches",cd:"Season after summer, also called fall",cc:"A mathematical value used for counting"},
+  {a:"POEM",d:"MOTEL",c:"LAVA",ai:3,ca:"A piece of writing with rhythm, often rhyming",cd:"A roadside hotel for travelers by car",cc:"Molten rock from a volcano"},
+  {a:"POET",d:"TRUST",c:"TUNE",ai:3,ca:"A writer of poems",cd:"Firm belief in someone's reliability",cc:"A melody, especially a simple one"},
+  {a:"POCKET",d:"CHORUS",c:"SCAR",ai:2,ca:"Small pouch sewn into clothing",cd:"The repeated part of a song",cc:"A mark left after a wound heals"},
+  {a:"MUSEUM",d:"SUGAR",c:"RIDER",ai:2,ca:"A building that houses historical exhibits",cd:"Sweet crystalline substance",cc:"Person who rides a horse or bike"},
+  {a:"CLIMAX",d:"LEAF",c:"FABLE",ai:1,ca:"The most intense point in a story",cd:"Green part of a plant, often falls in autumn",cc:"A short story that teaches a moral lesson"},
+  {a:"FACT",d:"ALARM",c:"MOUSE",ai:1,ca:"A thing known to be true",cd:"Loud signal that wakes you up",cc:"Small rodent, or a computer pointing device"},
+  {a:"GHOST",d:"SUBURB",c:"BOAT",ai:3,ca:"Spirit of a dead person",cd:"Residential area on a city's edge",cc:"Small watercraft"},
+  {a:"BORDER",d:"ORGAN",c:"NEEDLE",ai:1,ca:"The line that divides two countries",cd:"Large keyboard instrument with pipes",cc:"Thin pointed tool used for sewing"},
+  {a:"FLAVOR",d:"LIGHT",c:"THRILL",ai:1,ca:"The distinctive taste of a food",cd:"Illumination, or something not heavy",cc:"A sudden feeling of excitement"},
+  {a:"CLOCK",d:"CLOSET",c:"TONE",ai:3,ca:"Device that tells the time",cd:"Small storage room for clothes",cc:"The quality or character of a sound"},
+  {a:"SKULL",d:"KING",c:"GARAGE",ai:1,ca:"The bony framework of the head",cd:"Male monarch",cc:"Building used to store a car"},
+  {a:"SPIDER",d:"PLANET",c:"TIGER",ai:1,ca:"Eight-legged creature that spins webs",cd:"Large body that orbits a star",cc:"Large striped wild cat"},
+  {a:"SOCK",d:"CLOCK",c:"KOALA",ai:2,ca:"Fabric covering worn on the foot",cd:"Device that tells the time",cc:"Cuddly Australian marsupial that eats eucalyptus"},
+  {a:"PAINT",d:"NOVEL",c:"LOCK",ai:3,ca:"Colored liquid applied with a brush",cd:"A long fictional book",cc:"A device that secures a door with a key"},
+  {a:"PUPPET",d:"PARENT",c:"TIRE",ai:2,ca:"A figure moved by a performer's hands or strings",cd:"A mother or father",cc:"Rubber ring around a wheel"},
+  {a:"SPLASH",d:"PUPIL",c:"LIVER",ai:1,ca:"Sudden scatter of liquid",cd:"The dark center of the eye that lets in light",cc:"Organ that filters the blood"},
+  {a:"CHAIN",d:"HILL",c:"LEAGUE",ai:1,ca:"A series of connected metal links",cd:"Small raised piece of land",cc:"An organized group of sports teams"},
+  {a:"JUICE",d:"CLOUD",c:"DOCK",ai:3,ca:"Liquid extracted from fruit",cd:"Visible mass of water vapor in the sky",cc:"Platform where boats are loaded and tied up"},
+  {a:"JUICE",d:"CUSTOM",c:"MILK",ai:3,ca:"Liquid extracted from fruit",cd:"A traditional practice within a community",cc:"White liquid from cows, often drunk"},
+  {a:"ORGAN",d:"GYM",c:"MOTOR",ai:2,ca:"Large keyboard instrument with pipes",cd:"A place equipped for exercise",cc:"Device that produces motion"},
+  {a:"LEMON",d:"MONEY",c:"YAWN",ai:2,ca:"Sour yellow citrus fruit",cd:"Currency used to buy things",cc:"An involuntary open-mouth breath when tired"},
+  {a:"PAPER",d:"PLANK",c:"KNOT",ai:2,ca:"Thin material used for writing or printing",cd:"A long flat piece of wood",cc:"A fastening made by tying rope or string"},
+  {a:"HABIT",d:"BAT",c:"TODAY",ai:2,ca:"A regular practice or tendency",cd:"Club used to hit a ball, or a flying mammal",cc:"The current day"},
+  {a:"CEMENT",d:"MUSIC",c:"CAMEL",ai:2,ca:"Powdery material used to make concrete",cd:"Organized sound, often with melody and rhythm",cc:"Desert animal with one or two humps"},
+  {a:"ZIGZAG",d:"GIFT",c:"TENT",ai:2,ca:"A line with sharp back-and-forth turns",cd:"A present given to someone",cc:"Portable shelter made of fabric"},
+  {a:"SPINE",d:"POCKET",c:"TODAY",ai:1,ca:"The backbone",cd:"Small pouch sewn into clothing",cc:"The current day"},
+  {a:"GRASS",d:"SHELF",c:"FLAG",ai:3,ca:"Green ground-covering plant",cd:"Flat board used to store or display items",cc:"A piece of cloth with a design, used as a symbol"},
+  {a:"SCRIPT",d:"CHORUS",c:"STOVE",ai:1,ca:"The written text of a play or film",cd:"The repeated part of a song",cc:"Appliance with burners for cooking"},
+  {a:"MILK",d:"LEGEND",c:"DRAFT",ai:2,ca:"White liquid from cows, often drunk",cd:"A traditional story, often partly true",cc:"A preliminary version of a piece of writing"},
+  {a:"WAIST",d:"SIGNAL",c:"LAVA",ai:3,ca:"The narrow part of the body above the hips",cd:"Sign or gesture that conveys information",cc:"Molten rock from a volcano"},
+  {a:"STRIPE",d:"THRILL",c:"LIVER",ai:1,ca:"A narrow band of color",cd:"A sudden feeling of excitement",cc:"Organ that filters the blood"},
+  {a:"PALACE",d:"LIQUID",c:"DREAD",ai:2,ca:"Grand residence of royalty",cd:"A substance that flows and takes its container's shape",cc:"A feeling of great fear about something coming"},
+  {a:"CUSTOM",d:"STRESS",c:"SCENT",ai:2,ca:"A traditional practice within a community",cd:"Mental or emotional strain",cc:"A distinctive smell"},
+  {a:"COFFEE",d:"FACT",c:"TRAIL",ai:2,ca:"Bitter drink brewed from roasted beans",cd:"A thing known to be true",cc:"A path through the wilderness"},
+  {a:"MELODY",d:"LEGEND",c:"DRILL",ai:2,ca:"A pleasing sequence of musical notes",cd:"A traditional story, often partly true",cc:"Tool used to bore holes"},
+  {a:"SPRING",d:"PLANK",c:"KNOT",ai:1,ca:"Season after winter, or a coiled metal part",cd:"A long flat piece of wood",cc:"A fastening made by tying rope or string"},
+  {a:"HOUSE",d:"SNOW",c:"WICK",ai:3,ca:"A place where someone lives",cd:"Frozen precipitation",cc:"The string that burns in a candle"},
+  {a:"SPRINT",d:"RIBBON",c:"NOVEL",ai:2,ca:"A short, fast run",cd:"Thin decorative strip of fabric",cc:"A long fictional book"},
+  {a:"FIST",d:"SCREW",c:"WAIST",ai:2,ca:"A hand tightly closed",cd:"A metal fastener with a spiral thread",cc:"The narrow part of the body above the hips"},
+  {a:"JACKET",d:"COLLAR",c:"RELAX",ai:2,ca:"A light outer garment with sleeves",cd:"The part of a shirt around the neck",cc:"To become less tense or anxious"},
+  {a:"ANKLE",d:"KING",c:"GUIDE",ai:2,ca:"Joint connecting the foot and leg",cd:"Male monarch",cc:"A person or book that shows the way"},
+  {a:"ZOOM",d:"OFFICE",c:"EAGLE",ai:1,ca:"To magnify an image closer",cd:"A room or building used for work",cc:"Large bird of prey with sharp talons"},
+  {a:"CYMBAL",d:"MAGIC",c:"CROW",ai:2,ca:"Percussion instrument struck to make a crash",cd:"Supernatural power or illusion",cc:"Black bird known for its loud caw"},
+  {a:"BRUSH",d:"SAND",c:"DAWN",ai:3,ca:"Tool with bristles for painting or grooming",cd:"Grainy material found on beaches",cc:"The very first light of day"},
+  {a:"GLORY",d:"LUNG",c:"GREEN",ai:1,ca:"Great honor or fame",cd:"Organ used for breathing",cc:"Color of grass and leaves"},
+  {a:"FACT",d:"COAST",c:"TOKEN",ai:2,ca:"A thing known to be true",cd:"Land bordering the sea",cc:"Object that represents something of value"},
+  {a:"FOSSIL",d:"SWAMP",c:"PEACE",ai:2,ca:"The preserved remains of an ancient organism",cd:"Wet, muddy wooded area",cc:"Freedom from conflict"},
+  {a:"DANGER",d:"GRASS",c:"SUN",ai:3,ca:"Risk of harm",cd:"Green ground-covering plant",cc:"Star at the center of our solar system"},
+  {a:"SOUP",d:"PROOF",c:"FROG",ai:3,ca:"Liquid dish often eaten with a spoon",cd:"Evidence that establishes a fact",cc:"Amphibian known for jumping and croaking"},
+  {a:"STEW",d:"TIRE",c:"ENERGY",ai:1,ca:"Slow-cooked dish of meat and vegetables",cd:"Rubber ring around a wheel",cc:"The capacity to do work or be active"},
+  {a:"STAGE",d:"GRASS",c:"SOLO",ai:3,ca:"Platform where performers appear",cd:"Green ground-covering plant",cc:"A performance by a single person"},
+  {a:"DEBATE",d:"BREAD",c:"DREAM",ai:2,ca:"A formal discussion of opposing views",cd:"Baked food made from flour and water",cc:"Series of thoughts during sleep"},
+  {a:"FAUCET",d:"AROMA",c:"ARENA",ai:1,ca:"Fixture that controls water flow, also a tap",cd:"A pleasant, distinctive smell",cc:"Enclosed venue for events or contests"},
+  {a:"CARGO",d:"GYM",c:"MOON",ai:3,ca:"Goods carried by a ship, plane, or truck",cd:"A place equipped for exercise",cc:"Earth's only natural satellite"},
+  {a:"BUDGET",d:"GARLIC",c:"CHIN",ai:3,ca:"A plan for spending and saving money",cd:"Pungent bulb used to flavor food",cc:"The bottom part of the face below the mouth"},
+  {a:"SNAKE",d:"KING",c:"GIFT",ai:3,ca:"Legless reptile that slithers",cd:"Male monarch",cc:"A present given to someone"},
+  {a:"SCORE",d:"CANYON",c:"NIECE",ai:1,ca:"The number of points earned in a game",cd:"Deep valley carved by a river",cc:"The daughter of one's sibling"},
+  {a:"GUITAR",d:"THUMB",c:"BELT",ai:3,ca:"Stringed instrument often strummed or picked",cd:"The short, thick digit of the hand",cc:"Strap worn around the waist"},
+  {a:"ICE",d:"CLOSET",c:"TWELVE",ai:1,ca:"Frozen water",cd:"Small storage room for clothes",cc:"A dozen"},
+  {a:"MUSCLE",d:"STREAM",c:"MONTH",ai:2,ca:"Body tissue that produces movement",cd:"Small narrow river",cc:"One of twelve yearly divisions"},
+  {a:"SLOPE",d:"LIQUID",c:"DRAGON",ai:1,ca:"A tilted surface, like a hillside",cd:"A substance that flows and takes its container's shape",cc:"Mythical fire-breathing creature"},
+  {a:"SWIRL",d:"WEIGHT",c:"TICKET",ai:1,ca:"A twisting, curling shape",cd:"How heavy an object is",cc:"Pass allowing entry to an event"},
+  {a:"SUBWAY",d:"BREATH",c:"HONEY",ai:2,ca:"Underground train system in a city",cd:"Air taken into or let out of the lungs",cc:"Sweet substance made by bees"},
+  {a:"PORCH",d:"CARPET",c:"TIDE",ai:3,ca:"Covered entrance area of a house",cd:"Soft fabric flooring covering a room",cc:"Rise and fall of the sea"},
+  {a:"SAFETY",d:"FOCUS",c:"SKILL",ai:2,ca:"State of being protected from harm",cd:"The point where an image appears sharpest",cc:"An ability gained through practice"},
+  {a:"CHORE",d:"HOUR",c:"RELAX",ai:1,ca:"A routine household task",cd:"Sixty minutes",cc:"To become less tense or anxious"},
+  {a:"CABIN",d:"BEAM",c:"MONTH",ai:2,ca:"A small, simple wooden house",cd:"A long sturdy piece of wood or metal, or a ray of light",cc:"One of twelve yearly divisions"},
+  {a:"WICK",d:"CALM",c:"MANGO",ai:2,ca:"The string that burns in a candle",cd:"Free from disturbance or agitation",cc:"Sweet tropical fruit with a large pit"},
+  {a:"SWIRL",d:"WINDOW",c:"WAX",ai:1,ca:"A twisting, curling shape",cd:"Glass opening in a wall",cc:"A soft, moldable substance, often from bees"},
+  {a:"SAIL",d:"AROMA",c:"ARENA",ai:1,ca:"Fabric that catches wind to move a boat",cd:"A pleasant, distinctive smell",cc:"Enclosed venue for events or contests"},
+  {a:"COACH",d:"ALLEY",c:"YAWN",ai:2,ca:"Person who trains a sports team",cd:"A narrow passage between buildings",cc:"An involuntary open-mouth breath when tired"},
+  {a:"MEDAL",d:"DRAGON",c:"NERVE",ai:2,ca:"Award given for achievement",cd:"Mythical fire-breathing creature",cc:"A fiber that carries signals in the body"},
+  {a:"SWITCH",d:"WIZARD",c:"DRUM",ai:1,ca:"A device used to turn something on or off",cd:"Practitioner of magic in fantasy tales",cc:"Percussion instrument you hit"},
+  {a:"SPLASH",d:"PILL",c:"LACE",ai:1,ca:"Sudden scatter of liquid",cd:"A small tablet of medicine",cc:"Delicate patterned fabric"},
+  {a:"COMEDY",d:"MONTH",c:"HOOD",ai:2,ca:"Entertainment meant to make people laugh",cd:"One of twelve yearly divisions",cc:"Covering that pulls up over the head"},
+  {a:"KNIGHT",d:"NERVE",c:"ENERGY",ai:1,ca:"Armored medieval warrior",cd:"A fiber that carries signals in the body",cc:"The capacity to do work or be active"},
+  {a:"PENCIL",d:"CELLO",c:"OVEN",ai:3,ca:"Wooden writing tool with graphite",cd:"Large stringed instrument played while seated",cc:"Appliance used for baking food"},
+  {a:"WHEEL",d:"HONOR",c:"RIBBON",ai:1,ca:"Round object that rotates for movement",cd:"Great respect or high esteem",cc:"Thin decorative strip of fabric"},
+  {a:"STUDIO",d:"DENIM",c:"MAZE",ai:3,ca:"A place where art, music, or film is made",cd:"Sturdy cotton fabric used for jeans",cc:"A confusing network of paths"},
+  {a:"BUCKLE",d:"CREAM",c:"MOTOR",ai:2,ca:"A fastener that clasps two ends of a strap",cd:"Thick, fatty part of milk",cc:"Device that produces motion"},
+  {a:"THRONE",d:"HOOD",c:"DUET",ai:1,ca:"Ornate chair for a king or queen",cd:"Covering that pulls up over the head",cc:"A performance by two people"},
+  {a:"FAUCET",d:"CREAM",c:"MOTH",ai:3,ca:"Fixture that controls water flow, also a tap",cd:"Thick, fatty part of milk",cc:"Nocturnal cousin of the butterfly"},
+  {a:"FLOWER",d:"WORD",c:"DROP",ai:3,ca:"Colorful blooming part of a plant",cd:"A unit of language with meaning",cc:"A single small bead of liquid"},
+  {a:"JESTER",d:"SOAP",c:"PIANO",ai:2,ca:"A court entertainer who tells jokes",cd:"Substance used with water for washing",cc:"Keyboard instrument with hammers and strings"},
+  {a:"SMELL",d:"MAP",c:"PUDDLE",ai:1,ca:"Sense detected by the nose",cd:"Drawing that shows geographic locations",cc:"Small pool of water after rain"},
+  {a:"SWAN",d:"WIZARD",c:"DANCER",ai:1,ca:"Elegant white water bird with a long neck",cd:"Practitioner of magic in fantasy tales",cc:"A person who performs dance"},
+  {a:"CALM",d:"MAGIC",c:"CAKE",ai:3,ca:"Free from disturbance or agitation",cd:"Supernatural power or illusion",cc:"Baked dessert, often for celebrations"},
+  {a:"MAGIC",d:"GOAT",c:"TOKEN",ai:2,ca:"Supernatural power or illusion",cd:"Horned farm animal known for climbing",cc:"Object that represents something of value"},
+  {a:"SWAN",d:"WINDOW",c:"WRENCH",ai:1,ca:"Elegant white water bird with a long neck",cd:"Glass opening in a wall",cc:"Tool used to turn nuts and bolts"},
+  {a:"GOAL",d:"OVEN",c:"NERVE",ai:1,ca:"The target you're trying to reach or score",cd:"Appliance used for baking food",cc:"A fiber that carries signals in the body"},
+  {a:"HORSE",d:"SHADOW",c:"WOOL",ai:3,ca:"Large hoofed animal often ridden",cd:"Dark shape cast when light is blocked",cc:"Warm fabric made from sheep's hair"},
+  {a:"STRIPE",d:"TENT",c:"TONGUE",ai:1,ca:"A narrow band of color",cd:"Portable shelter made of fabric",cc:"The muscle in the mouth used for tasting and speech"},
+  {a:"FOSSIL",d:"STAMP",c:"PITCH",ai:2,ca:"The preserved remains of an ancient organism",cd:"A mark pressed onto paper, or a postage sticker",cc:"The playing area for soccer or cricket"},
+  {a:"CABLE",d:"BROOM",c:"MERRY",ai:2,ca:"A bundled set of wires",cd:"Long-handled tool for sweeping",cc:"Cheerful and full of fun"},
+  {a:"MEDAL",d:"DROP",c:"PLOT",ai:2,ca:"Award given for achievement",cd:"A single small bead of liquid",cc:"The sequence of events in a story"},
+  {a:"CIRCLE",d:"CROW",c:"WALL",ai:3,ca:"Perfectly round shape",cd:"Black bird known for its loud caw",cc:"Vertical structure that divides a room"},
+  {a:"VISA",d:"SHIELD",c:"DEVIL",ai:2,ca:"Official permission to enter a foreign country",cd:"Piece of armor held to block attacks",cc:"Malevolent supernatural being"},
+  {a:"SPINE",d:"PROOF",c:"FAIR",ai:1,ca:"The backbone",cd:"Evidence that establishes a fact",cc:"An event with games, rides, and exhibits"},
+  {a:"KIDNEY",d:"DROP",c:"PANDA",ai:2,ca:"Organ that filters waste from the blood",cd:"A single small bead of liquid",cc:"Black-and-white bear that eats bamboo"},
+  {a:"SILVER",d:"VOW",c:"WRAP",ai:3,ca:"Shiny precious metal, often used in jewelry",cd:"A solemn promise",cc:"To cover something in paper as a gift"},
+  {a:"COFFEE",d:"FABRIC",c:"CHEEK",ai:2,ca:"Bitter drink brewed from roasted beans",cd:"Woven or knitted cloth material",cc:"The side of the face below the eye"},
+  {a:"SOFA",d:"FOG",c:"GRADE",ai:2,ca:"Upholstered seat for more than one person",cd:"Thick cloud at ground level, hard to see through",cc:"A mark showing quality of work"},
+  {a:"SQUARE",d:"QUEEN",c:"NEEDLE",ai:1,ca:"Shape with four equal sides",cd:"Female monarch",cc:"Thin pointed tool used for sewing"},
+  {a:"VOW",d:"WINDOW",c:"WHALE",ai:2,ca:"A solemn promise",cd:"Glass opening in a wall",cc:"Enormous marine mammal"},
+  {a:"SOAP",d:"PILLOW",c:"WEEK",ai:3,ca:"Substance used with water for washing",cd:"Soft cushion used for resting your head",cc:"Period of seven days"},
+  {a:"SWAN",d:"WAIST",c:"TOKEN",ai:1,ca:"Elegant white water bird with a long neck",cd:"The narrow part of the body above the hips",cc:"Object that represents something of value"},
+  {a:"OPTION",d:"PROOF",c:"FAIR",ai:1,ca:"One of several possible choices",cd:"Evidence that establishes a fact",cc:"An event with games, rides, and exhibits"},
+  {a:"FABRIC",d:"BALLAD",c:"DOOR",ai:2,ca:"Woven or knitted cloth material",cd:"A narrative poem or song, often about love",cc:"Hinged panel used to enter a room"},
+  {a:"DANCER",d:"AUTUMN",c:"NIECE",ai:1,ca:"A person who performs dance",cd:"Season after summer, also called fall",cc:"The daughter of one's sibling"},
+  {a:"SPACE",d:"PIZZA",c:"AUTHOR",ai:1,ca:"The vast expanse beyond Earth's atmosphere",cd:"Baked dish topped with cheese and sauce",cc:"The writer of a book"},
+  {a:"COUSIN",d:"SPARK",c:"KNOT",ai:3,ca:"The child of one's aunt or uncle",cd:"Tiny flash of light or electricity",cc:"A fastening made by tying rope or string"},
+  {a:"FINISH",d:"STEW",c:"WAX",ai:4,ca:"The end point of a race",cd:"Slow-cooked dish of meat and vegetables",cc:"A soft, moldable substance, often from bees"},
+  {a:"SPRING",d:"PEACH",c:"HARBOR",ai:1,ca:"Season after winter, or a coiled metal part",cd:"Fuzzy-skinned stone fruit",cc:"Sheltered place where ships dock"},
+  {a:"FABRIC",d:"BALLAD",c:"DAISY",ai:2,ca:"Woven or knitted cloth material",cd:"A narrative poem or song, often about love",cc:"Simple white flower with a yellow center"},
+  {a:"PHONE",d:"HEEL",c:"LEAGUE",ai:1,ca:"Device used to make calls",cd:"The back part of the foot",cc:"An organized group of sports teams"},
+  {a:"SINGER",d:"GUARD",c:"DOOR",ai:3,ca:"A person who performs songs",cd:"A person who protects a place or person",cc:"Hinged panel used to enter a room"},
+  {a:"QUEST",d:"STAMP",c:"PEAK",ai:3,ca:"A long, difficult journey with a goal",cd:"A mark pressed onto paper, or a postage sticker",cc:"The very top of a mountain"},
+  {a:"BUCKLE",d:"COACH",c:"HONEY",ai:2,ca:"A fastener that clasps two ends of a strap",cd:"Person who trains a sports team",cc:"Sweet substance made by bees"},
+  {a:"ZEBRA",d:"BREATH",c:"HABIT",ai:2,ca:"Striped African animal related to the horse",cd:"Air taken into or let out of the lungs",cc:"A regular practice or tendency"},
+  {a:"FROST",d:"SPARK",c:"KNEE",ai:3,ca:"Thin layer of ice on a cold morning",cd:"Tiny flash of light or electricity",cc:"Joint in the middle of the leg"},
+  {a:"MAGNET",d:"GOLD",c:"DRILL",ai:2,ca:"Object that attracts iron or steel",cd:"Precious yellow metal",cc:"Tool used to bore holes"},
+  {a:"DESERT",d:"SEED",c:"DEVIL",ai:2,ca:"Dry, sandy region with little rainfall",cd:"What a plant grows from",cc:"Malevolent supernatural being"},
+  {a:"JESTER",d:"SNOW",c:"WOOL",ai:2,ca:"A court entertainer who tells jokes",cd:"Frozen precipitation",cc:"Warm fabric made from sheep's hair"},
+  {a:"JESTER",d:"STAMP",c:"PUPIL",ai:2,ca:"A court entertainer who tells jokes",cd:"A mark pressed onto paper, or a postage sticker",cc:"The dark center of the eye that lets in light"},
+  {a:"JERSEY",d:"SOUP",c:"PORE",ai:3,ca:"A sports team's shirt",cd:"Liquid dish often eaten with a spoon",cc:"A tiny opening in the skin"},
+  {a:"SUBWAY",d:"BALLAD",c:"DAISY",ai:2,ca:"Underground train system in a city",cd:"A narrative poem or song, often about love",cc:"Simple white flower with a yellow center"},
+  {a:"SUNSET",d:"SOAP",c:"PILL",ai:3,ca:"The sun going down at day's end",cd:"Substance used with water for washing",cc:"A small tablet of medicine"},
+  {a:"WISDOM",d:"SOUND",c:"DANCE",ai:2,ca:"Deep understanding gained from experience",cd:"What you perceive with your ears",cc:"Rhythmic movement to music"},
+  {a:"BRICK",d:"CLOCK",c:"KNEE",ai:3,ca:"A rectangular block used in building",cd:"Device that tells the time",cc:"Joint in the middle of the leg"},
+  {a:"MOUSE",d:"SNOW",c:"WOOL",ai:3,ca:"Small rodent, or a computer pointing device",cd:"Frozen precipitation",cc:"Warm fabric made from sheep's hair"},
+  {a:"CELLO",d:"LABEL",c:"LEMON",ai:2,ca:"Large stringed instrument played while seated",cd:"A small piece of paper attached with information",cc:"Sour yellow citrus fruit"},
+  {a:"FABLE",d:"AUTHOR",c:"RIDDLE",ai:1,ca:"A short story that teaches a moral lesson",cd:"The writer of a book",cc:"Tricky question with a clever answer"},
+  {a:"CROWN",d:"WIZARD",c:"DOOR",ai:3,ca:"Royal headpiece worn by monarchs",cd:"Practitioner of magic in fantasy tales",cc:"Hinged panel used to enter a room"},
+  {a:"SMILE",d:"MEDIA",c:"AUTHOR",ai:1,ca:"Happy expression on a face",cd:"Means of mass communication",cc:"The writer of a book"},
+  {a:"CLOWN",d:"WIND",c:"DEER",ai:3,ca:"A comic performer, often at a circus",cd:"Moving air",cc:"Antlered woodland animal"},
+  {a:"SPIRAL",d:"PILLOW",c:"WISDOM",ai:1,ca:"A curve that winds around a center point",cd:"Soft cushion used for resting your head",cc:"Deep understanding gained from experience"},
+  {a:"WICK",d:"CLIFF",c:"FLUTE",ai:2,ca:"The string that burns in a candle",cd:"Steep rock face by the sea or a canyon",cc:"Slender wind instrument played sideways"},
+  {a:"SEASON",d:"SAW",c:"WEEK",ai:3,ca:"One of four yearly divisions like winter",cd:"Tool with a toothed blade for cutting",cc:"Period of seven days"},
+  {a:"VELVET",d:"VENUS",c:"SOFA",ai:3,ca:"Soft fabric with a dense pile",cd:"Second planet from the sun",cc:"Upholstered seat for more than one person"},
+  {a:"SMILE",d:"MARKET",c:"TONGUE",ai:1,ca:"Happy expression on a face",cd:"Place where goods are bought and sold",cc:"The muscle in the mouth used for tasting and speech"},
+  {a:"FIBER",d:"BROOM",c:"MOON",ai:2,ca:"Plant material that aids digestion",cd:"Long-handled tool for sweeping",cc:"Earth's only natural satellite"},
+  {a:"SAFETY",d:"FINISH",c:"HONEY",ai:2,ca:"State of being protected from harm",cd:"The end point of a race",cc:"Sweet substance made by bees"},
+  {a:"FOSSIL",d:"SEQUEL",c:"LEMON",ai:2,ca:"The preserved remains of an ancient organism",cd:"A story that continues an earlier one",cc:"Sour yellow citrus fruit"},
+  {a:"SMOKE",d:"MAGNET",c:"TALENT",ai:1,ca:"Grey cloud rising from a fire",cd:"Object that attracts iron or steel",cc:"A natural ability to do something well"},
+  {a:"ZEBRA",d:"BREAD",c:"DANCE",ai:2,ca:"Striped African animal related to the horse",cd:"Baked food made from flour and water",cc:"Rhythmic movement to music"},
+  {a:"VACUUM",d:"CALM",c:"MOTEL",ai:2,ca:"Appliance that sucks up dust and dirt",cd:"Free from disturbance or agitation",cc:"A roadside hotel for travelers by car"},
+  {a:"SAFE",d:"FROG",c:"GUARD",ai:2,ca:"A locked container for protecting valuables",cd:"Amphibian known for jumping and croaking",cc:"A person who protects a place or person"},
+  {a:"PULSE",d:"SAW",c:"WALL",ai:3,ca:"The rhythmic beating of blood through arteries",cd:"Tool with a toothed blade for cutting",cc:"Vertical structure that divides a room"},
+  {a:"SPOT",d:"PITCH",c:"HORSE",ai:1,ca:"A small round mark",cd:"The playing area for soccer or cricket",cc:"Large hoofed animal often ridden"},
+  {a:"CAVE",d:"VENUS",c:"STEAK",ai:2,ca:"Hollow space underground or in a hillside",cd:"Second planet from the sun",cc:"Thick slice of meat, often grilled"},
+  {a:"SPICE",d:"POCKET",c:"TALENT",ai:1,ca:"Flavorful plant substance used in cooking",cd:"Small pouch sewn into clothing",cc:"A natural ability to do something well"},
+  {a:"VACUUM",d:"COUCH",c:"HAIKU",ai:2,ca:"Appliance that sucks up dust and dirt",cd:"Long, cushioned seat for a living room",cc:"A short Japanese poem of three lines"},
+  {a:"SEASON",d:"SYRUP",c:"PATH",ai:3,ca:"One of four yearly divisions like winter",cd:"A thick sweet liquid, sometimes medicinal",cc:"A track made for walking"},
+  {a:"CABLE",d:"BAND",c:"DANCE",ai:2,ca:"A bundled set of wires",cd:"A group of musicians who perform together",cc:"Rhythmic movement to music"},
+  {a:"CABIN",d:"BEAM",c:"MERRY",ai:2,ca:"A small, simple wooden house",cd:"A long sturdy piece of wood or metal, or a ray of light",cc:"Cheerful and full of fun"},
+  {a:"OFFICE",d:"FROG",c:"GRADE",ai:2,ca:"A room or building used for work",cd:"Amphibian known for jumping and croaking",cc:"A mark showing quality of work"},
+  {a:"SYMBOL",d:"BEACH",c:"HERO",ai:3,ca:"A mark or sign that represents something",cd:"Sandy shore beside the sea",cc:"The main character who saves the day"},
+  {a:"ZIPPER",d:"PATH",c:"HAIKU",ai:2,ca:"Sliding fastener on clothing",cd:"A track made for walking",cc:"A short Japanese poem of three lines"},
+  {a:"SPOT",d:"PARENT",c:"TURTLE",ai:1,ca:"A small round mark",cd:"A mother or father",cc:"Slow reptile with a hard shell"},
+  {a:"PAPER",d:"PANDA",c:"ALLEY",ai:2,ca:"Thin material used for writing or printing",cd:"Black-and-white bear that eats bamboo",cc:"A narrow passage between buildings"},
+  {a:"VAPOR",d:"PORCH",c:"HAIKU",ai:2,ca:"A substance in gas form, like steam",cd:"Covered entrance area of a house",cc:"A short Japanese poem of three lines"},
+  {a:"SQUARE",d:"QUIET",c:"TURTLE",ai:1,ca:"Shape with four equal sides",cd:"Making little or no noise",cc:"Slow reptile with a hard shell"},
+  {a:"VERSE",d:"SOUND",c:"DEER",ai:3,ca:"A single stanza of a poem or song",cd:"What you perceive with your ears",cc:"Antlered woodland animal"},
+  {a:"SAFETY",d:"FOG",c:"GLORY",ai:2,ca:"State of being protected from harm",cd:"Thick cloud at ground level, hard to see through",cc:"Great honor or fame"},
+  {a:"OPTION",d:"PIZZA",c:"ARTERY",ai:1,ca:"One of several possible choices",cd:"Baked dish topped with cheese and sauce",cc:"A vessel that carries blood from the heart"},
+  {a:"PUDDLE",d:"DRAMA",c:"ALLEY",ai:2,ca:"Small pool of water after rain",cd:"A serious play or story",cc:"A narrow passage between buildings"},
+  {a:"PULSE",d:"SAW",c:"WAVE",ai:3,ca:"The rhythmic beating of blood through arteries",cd:"Tool with a toothed blade for cutting",cc:"Ridge of moving water"},
+  {a:"SMOKE",d:"MARKET",c:"TROPHY",ai:1,ca:"Grey cloud rising from a fire",cd:"Place where goods are bought and sold",cc:"Prize awarded for winning"},
+  {a:"FROST",d:"SYRUP",c:"PORE",ai:3,ca:"Thin layer of ice on a cold morning",cd:"A thick sweet liquid, sometimes medicinal",cc:"A tiny opening in the skin"},
+  {a:"BUBBLE",d:"BRANCH",c:"HERO",ai:2,ca:"A thin sphere of liquid filled with gas",cd:"Woody arm growing from a tree trunk",cc:"The main character who saves the day"},
+  {a:"STORY",d:"TALENT",c:"TUNNEL",ai:1,ca:"A told or written account of events",cd:"A natural ability to do something well",cc:"Underground passage"},
+  {a:"SQUARE",d:"QUIET",c:"THRILL",ai:1,ca:"Shape with four equal sides",cd:"Making little or no noise",cc:"A sudden feeling of excitement"},
+];
+
+function getTodaysPuzzle(dayIndex){
+  const p = PUZZLES[dayIndex % PUZZLES.length];
+  return { ...p, puzzleNum: dayIndex + 1 };
+}
+
+// ═══════════════════════════════════════════════
+//  GRID LAYOUT
+//  Builds a {width, height, grid, meta} structure from the 3 words.
+//  grid[r][c] is either null (blocked) or {solution, words:[ids]}.
+// ═══════════════════════════════════════════════
+function buildLayout(p){
+  const width = Math.max(p.a.length, p.ai + p.c.length);
+  const height = p.d.length;
+  const meta = {
+    a: { id: 'a', dir: 'across', row: 0,          col: 0,    len: p.a.length, word: p.a, clue: p.ca, num: 1 },
+    d: { id: 'd', dir: 'down',   row: 0,          col: p.ai, len: p.d.length, word: p.d, clue: p.cd, num: 2 },
+    c: { id: 'c', dir: 'across', row: height - 1, col: p.ai, len: p.c.length, word: p.c, clue: p.cc, num: 3 }
+  };
+  const grid = Array.from({ length: height }, () => Array.from({ length: width }, () => null));
+  ['a', 'd', 'c'].forEach((id) => {
+    const m = meta[id];
+    for (let i = 0; i < m.len; i++) {
+      const row = m.dir === 'across' ? m.row : m.row + i;
+      const col = m.dir === 'across' ? m.col + i : m.col;
+      if (!grid[row][col]) grid[row][col] = { solution: m.word[i], words: [] };
+      grid[row][col].words.push(id);
+    }
+  });
+  return { width, height, grid, meta };
+}
+
+function cellAt(m, i) {
+  return {
+    row: m.dir === 'across' ? m.row : m.row + i,
+    col: m.dir === 'across' ? m.col + i : m.col
+  };
+}
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const STATE_KEY = 'crossworddlemini_state_v1';
+const dayIndex = getDayIndex();
+const puzzle = getTodaysPuzzle(dayIndex);
+const { width, height, grid, meta } = buildLayout(puzzle);
+const WORD_ORDER = ['a', 'd', 'c'];
+
+let letters = Array.from({ length: height }, () => Array.from({ length: width }, () => ''));
+let revealedCells = new Set(); // "r_c" keys that were filled via the hint button
+let selected = null;           // { r, c }
+let currentWordId = 'a';
+let mistakes = 0;
+let hintsUsed = 0;
+let secondsElapsed = 0;
+let status = 'playing';
+let timerInterval = null;
+let countdownInterval = null;
+
+const boardEl = document.getElementById('board');
+const cluesListEl = document.getElementById('cluesList');
+const mistakesEl = document.getElementById('mistakesDisplay');
+const timerEl = document.getElementById('timerDisplay');
+const clueBarNumEl = document.getElementById('clueBarNum');
+const clueBarDirEl = document.getElementById('clueBarDir');
+const clueBarTextEl = document.getElementById('clueBarText');
+
+// ═══════════════════════════════════════════════
+//  BOARD BUILD
+// ═══════════════════════════════════════════════
+boardEl.style.gridTemplateColumns = `repeat(${width}, 1fr)`;
+boardEl.style.gridTemplateRows = `repeat(${height}, 1fr)`;
+boardEl.style.maxWidth = Math.min(width * 68, 440) + 'px';
+
+const cellEls = {};   // "r_c" -> wrapper div
+const inputEls = {};  // "r_c" -> input element
+
+for (let r = 0; r < height; r++) {
+  for (let c = 0; c < width; c++) {
+    const data = grid[r][c];
+    const wrap = document.createElement('div');
+    wrap.className = 'cw-cell';
+    if (!data) {
+      wrap.classList.add('blocked');
+      boardEl.appendChild(wrap);
+      continue;
+    }
+    wrap.dataset.r = r;
+    wrap.dataset.c = c;
+
+    const startId = WORD_ORDER.find((id) => meta[id].row === r && meta[id].col === c);
+    if (startId) {
+      const num = document.createElement('span');
+      num.className = 'cw-num';
+      num.textContent = meta[startId].num;
+      wrap.appendChild(num);
+    }
+
+    const input = document.createElement('input');
+    input.className = 'cw-input';
+    input.maxLength = 1;
+    input.autocomplete = 'off';
+    input.autocapitalize = 'characters';
+    input.setAttribute('autocorrect', 'off');
+    input.spellcheck = false;
+    input.inputMode = 'text';
+    input.setAttribute('aria-label', `Row ${r + 1}, column ${c + 1}`);
+
+    input.addEventListener('click', () => handleCellClick(r, c));
+    input.addEventListener('input', (e) => onType(r, c, e.target.value));
+    input.addEventListener('keydown', (e) => onKeyDown(r, c, e));
+
+    wrap.appendChild(input);
+    boardEl.appendChild(wrap);
+    cellEls[`${r}_${c}`] = wrap;
+    inputEls[`${r}_${c}`] = input;
+  }
+}
+
+// Clue list
+WORD_ORDER.forEach((id) => {
+  const m = meta[id];
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'clue-row';
+  btn.dataset.word = id;
+  btn.innerHTML = `
+    <span class="clue-row-num">${m.num}<span class="dir">${m.dir === 'across' ? 'Across' : 'Down'}</span></span>
+    <span class="clue-row-text">${m.clue}</span>
+  `;
+  btn.addEventListener('click', () => selectWord(id));
+  cluesListEl.appendChild(btn);
+});
+
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+function wordIndexOf(id, r, c) {
+  const m = meta[id];
+  return m.dir === 'across' ? c - m.col : r - m.row;
+}
+
+function isWordComplete(id) {
+  const m = meta[id];
+  for (let i = 0; i < m.len; i++) {
+    const { row, col } = cellAt(m, i);
+    if (letters[row][col] !== m.word[i]) return false;
+  }
+  return true;
+}
+
+function firstEmptyInWord(id) {
+  const m = meta[id];
+  for (let i = 0; i < m.len; i++) {
+    const { row, col } = cellAt(m, i);
+    if (!letters[row][col]) return { row, col, i };
+  }
+  return null;
+}
+
+function pickDefaultWord(r, c) {
+  const data = grid[r][c];
+  const startId = data.words.find((id) => meta[id].row === r && meta[id].col === c);
+  return startId || data.words[0];
+}
+
+// ═══════════════════════════════════════════════
+//  SELECTION
+// ═══════════════════════════════════════════════
+function selectCell(r, c, opts = {}) {
+  const data = grid[r][c];
+  if (!data) return;
+  const sameCell = selected && selected.r === r && selected.c === c;
+
+  if (opts.toggle && sameCell && data.words.length > 1) {
+    const idx = data.words.indexOf(currentWordId);
+    currentWordId = data.words[(idx + 1) % data.words.length];
+  } else if (opts.preferDir) {
+    const match = data.words.find((id) => meta[id].dir === opts.preferDir);
+    currentWordId = match || (data.words.includes(currentWordId) ? currentWordId : pickDefaultWord(r, c));
+  } else if (!data.words.includes(currentWordId)) {
+    currentWordId = pickDefaultWord(r, c);
+  }
+
+  selected = { r, c };
+  render();
+  const el = inputEls[`${r}_${c}`];
+  if (el) el.focus({ preventScroll: true });
+}
+
+function selectWord(id) {
+  currentWordId = id;
+  const m = meta[id];
+  const empty = firstEmptyInWord(id);
+  const target = empty || cellAt(m, 0);
+  selected = { r: target.row, c: target.col };
+  render();
+  const el = inputEls[`${target.row}_${target.col}`];
+  if (el) el.focus({ preventScroll: true });
+}
+
+function handleCellClick(r, c) {
+  if (status !== 'playing') return;
+  selectCell(r, c, { toggle: true });
+}
+
+// ═══════════════════════════════════════════════
+//  TYPING
+// ═══════════════════════════════════════════════
+function setLetter(r, c, ch) {
+  const data = grid[r][c];
+  if (!data) return;
+  const prev = letters[r][c];
+  const isWrong = ch !== '' && ch !== data.solution;
+  if (ch !== '' && prev !== ch && isWrong) mistakes++;
+  letters[r][c] = ch;
+  if (ch === '') revealedCells.delete(`${r}_${c}`);
+  return isWrong;
+}
+
+function onType(r, c, raw) {
+  if (status !== 'playing') return;
+  let ch = raw.replace(/[^a-zA-Z]/g, '').toUpperCase().slice(-1);
+  const input = inputEls[`${r}_${c}`];
+  input.value = ch;
+  if (!ch) { render(); return; }
+  const isWrong = setLetter(r, c, ch);
+  ensureTimerRunning();
+  render();
+  if (isWrong) flashWrong(r, c);
+  saveState();
+  checkWin();
+  moveToNextCell(r, c);
+}
+
+function onKeyDown(r, c, e) {
+  if (status !== 'playing') return;
+  if (e.key === 'Backspace' || e.key === 'Delete') {
+    e.preventDefault();
+    if (letters[r][c]) {
+      setLetter(r, c, '');
+      inputEls[`${r}_${c}`].value = '';
+      render();
+      saveState();
+    } else {
+      const m = meta[currentWordId];
+      const idx = wordIndexOf(currentWordId, r, c);
+      if (idx > 0) {
+        const prevCell = cellAt(m, idx - 1);
+        setLetter(prevCell.row, prevCell.col, '');
+        inputEls[`${prevCell.row}_${prevCell.col}`].value = '';
+        selectCell(prevCell.row, prevCell.col);
+        saveState();
+      }
+    }
+    return;
+  }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); moveArrow(r, c, 0, -1, 'across'); return; }
+  if (e.key === 'ArrowRight') { e.preventDefault(); moveArrow(r, c, 0, 1, 'across'); return; }
+  if (e.key === 'ArrowUp') { e.preventDefault(); moveArrow(r, c, -1, 0, 'down'); return; }
+  if (e.key === 'ArrowDown') { e.preventDefault(); moveArrow(r, c, 1, 0, 'down'); return; }
+}
+
+function moveArrow(r, c, dr, dc, dir) {
+  const nr = r + dr, nc = c + dc;
+  if (nr < 0 || nr >= height || nc < 0 || nc >= width) return;
+  if (!grid[nr][nc]) return;
+  selectCell(nr, nc, { preferDir: dir });
+}
+
+function moveToNextCell(r, c) {
+  const m = meta[currentWordId];
+  const idx = wordIndexOf(currentWordId, r, c);
+  if (idx + 1 < m.len) {
+    const next = cellAt(m, idx + 1);
+    selectCell(next.row, next.col);
+    return;
+  }
+  // word finished — hop to the next word that still has an empty cell
+  const startIdx = WORD_ORDER.indexOf(currentWordId);
+  for (let step = 1; step <= WORD_ORDER.length; step++) {
+    const id = WORD_ORDER[(startIdx + step) % WORD_ORDER.length];
+    const empty = firstEmptyInWord(id);
+    if (empty) { selectWord(id); return; }
+  }
+}
+
+function flashWrong(r, c) {
+  const cell = cellEls[`${r}_${c}`];
+  if (!cell) return;
+  cell.classList.remove('shake');
+  void cell.offsetWidth;
+  cell.classList.add('shake');
+  setTimeout(() => cell.classList.remove('shake'), 300);
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+function render() {
+  for (let r = 0; r < height; r++) {
+    for (let c = 0; c < width; c++) {
+      const data = grid[r][c];
+      if (!data) continue;
+      const cell = cellEls[`${r}_${c}`];
+      const input = inputEls[`${r}_${c}`];
+      const val = letters[r][c];
+      if (input.value !== val) input.value = val;
+
+      const isSel = selected && selected.r === r && selected.c === c;
+      const inActiveWord = data.words.includes(currentWordId) &&
+        wordIndexOf(currentWordId, r, c) >= 0 && wordIndexOf(currentWordId, r, c) < meta[currentWordId].len &&
+        cellAt(meta[currentWordId], wordIndexOf(currentWordId, r, c)).row === r &&
+        cellAt(meta[currentWordId], wordIndexOf(currentWordId, r, c)).col === c;
+
+      cell.classList.toggle('sel', !!isSel);
+      cell.classList.toggle('active-word', inActiveWord && !isSel);
+      cell.classList.toggle('wrong', !!val && val !== data.solution);
+      cell.classList.toggle('revealed', revealedCells.has(`${r}_${c}`) && val === data.solution);
+    }
+  }
+
+  cluesListEl.querySelectorAll('.clue-row').forEach((btn) => {
+    const id = btn.dataset.word;
+    btn.classList.toggle('active', id === currentWordId);
+    btn.classList.toggle('done', isWordComplete(id));
+  });
+
+  const m = meta[currentWordId];
+  clueBarNumEl.textContent = m.num;
+  clueBarDirEl.textContent = m.dir === 'across' ? 'Across' : 'Down';
+  clueBarTextEl.textContent = m.clue;
+
+  mistakesEl.textContent = mistakes + (mistakes === 1 ? ' mistake' : ' mistakes');
+  mistakesEl.classList.toggle('has', mistakes > 0);
+}
+
+// ═══════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════
+function fmt(s) {
+  const m = Math.floor(s / 60), sec = s % 60;
+  return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+}
+function ensureTimerRunning() { if (status === 'playing') startTimer(); }
+function startTimer() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    timerEl.textContent = fmt(secondsElapsed);
+  }, 1000);
+}
+function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+
+// ═══════════════════════════════════════════════
+//  WIN / SHARE / COUNTDOWN
+// ═══════════════════════════════════════════════
+function checkWin() {
+  for (let r = 0; r < height; r++) {
+    for (let c = 0; c < width; c++) {
+      const data = grid[r][c];
+      if (!data) continue;
+      if (letters[r][c] !== data.solution) return;
+    }
+  }
+  finishGame();
+}
+
+function finishGame() {
+  status = 'won';
+  stopTimer();
+  timerEl.classList.add('won');
+  saveState();
+  setTimeout(showEndPopup, 250);
+}
+
+function showEndPopup() {
+  document.getElementById('endSub').textContent = `${puzzle.a} · ${puzzle.d} · ${puzzle.c}`;
+  document.getElementById('endTime').textContent = fmt(secondsElapsed);
+  document.getElementById('endMistakes').textContent = mistakes;
+  document.getElementById('endHints').textContent = hintsUsed;
+  document.getElementById('endOverlay').classList.add('on');
+  startCountdown();
+}
+
+function startCountdown() {
+  const el = document.getElementById('countdownVal');
+  function tick() {
+    const now = new Date();
+    const nextMidnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+    const diff = Math.max(0, nextMidnight - now.getTime());
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = [h, m, s].map((v) => String(v).padStart(2, '0')).join(':');
+  }
+  tick();
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(tick, 1000);
+}
+
+document.getElementById('shareBtn').addEventListener('click', () => {
+  let text = `Crossword-dle Mini #${puzzle.puzzleNum} — solved in ${fmt(secondsElapsed)}`;
+  if (mistakes) text += ` with ${mistakes} mistake${mistakes === 1 ? '' : 's'}`;
+  if (hintsUsed) text += ` (${hintsUsed} hint${hintsUsed === 1 ? '' : 's'})`;
+  text += ' 🧩';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('shareBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    }).catch(() => {});
+  }
+});
+
+document.getElementById('clearBtn').addEventListener('click', resetBoard);
+document.getElementById('playAgainBtn').addEventListener('click', resetBoard);
+
+function resetBoard() {
+  document.getElementById('endOverlay').classList.remove('on');
+  clearInterval(countdownInterval);
+  stopTimer();
+  letters = Array.from({ length: height }, () => Array.from({ length: width }, () => ''));
+  revealedCells = new Set();
+  currentWordId = 'a';
+  secondsElapsed = 0;
+  mistakes = 0;
+  hintsUsed = 0;
+  status = 'playing';
+  timerEl.textContent = fmt(0);
+  timerEl.classList.remove('won');
+  selectWord('a');
+  saveState();
+}
+
+// ═══════════════════════════════════════════════
+//  HINT
+// ═══════════════════════════════════════════════
+document.getElementById('revealBtn').addEventListener('click', () => {
+  if (status !== 'playing') return;
+  let target = selected;
+  if (!target || letters[target.r][target.c] === grid[target.r][target.c].solution) {
+    // nothing useful selected — reveal the first empty cell of the active word instead
+    const empty = firstEmptyInWord(currentWordId);
+    if (empty) target = { r: empty.row, c: empty.col };
+  }
+  if (!target) return;
+  const data = grid[target.r][target.c];
+  if (!data) return;
+  if (letters[target.r][target.c] !== data.solution) hintsUsed++;
+  letters[target.r][target.c] = data.solution;
+  revealedCells.add(`${target.r}_${target.c}`);
+  ensureTimerRunning();
+  selectCell(target.r, target.c);
+  saveState();
+  checkWin();
+});
+
+// ═══════════════════════════════════════════════
+//  POPUP WIRING
+// ═══════════════════════════════════════════════
+function setupPopup(btnId, overlayId, closeId) {
+  document.getElementById(btnId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.add('on'));
+  document.getElementById(closeId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.remove('on'));
+  document.getElementById(overlayId)?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('on');
+  });
+}
+setupPopup('helpBtn', 'helpOverlay', 'helpClose');
+setupPopup(null, 'endOverlay', 'endClose');
+
+// ═══════════════════════════════════════════════
+//  STATE PERSISTENCE
+// ═══════════════════════════════════════════════
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed.dayIndex !== dayIndex) return null;
+    return parsed;
+  } catch (e) { return null; }
+}
+function saveState() {
+  try {
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+      dayIndex, letters, revealed: [...revealedCells],
+      secondsElapsed, mistakes, hintsUsed, status
+    }));
+  } catch (e) {}
+}
+
+function replaySavedState(saved) {
+  letters = saved.letters || letters;
+  revealedCells = new Set(saved.revealed || []);
+  secondsElapsed = saved.secondsElapsed || 0;
+  mistakes = saved.mistakes || 0;
+  hintsUsed = saved.hintsUsed || 0;
+  status = saved.status || 'playing';
+  timerEl.textContent = fmt(secondsElapsed);
+  selectWord('a');
+  if (status === 'won') {
+    timerEl.classList.add('won');
+    setTimeout(showEndPopup, 250);
+  } else {
+    const hasProgress = letters.some((row) => row.some((v) => v !== ''));
+    if (hasProgress) startTimer();
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+function init() {
+  document.getElementById('puzzleNum').textContent = 'Crossword-dle Mini #' + puzzle.puzzleNum;
+  document.getElementById('dayInfo').textContent =
+    'Crossword-dle Mini #' + puzzle.puzzleNum + ' · 3 words, 3 clues · new puzzle daily at midnight UTC';
+
+  selectWord('a');
+  const saved = loadState();
+  if (saved) replaySavedState(saved);
+}
+init();
+</script>
+<script src="/random-game.js" defer></script>
+</body>
+</html>
