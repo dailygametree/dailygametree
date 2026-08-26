@@ -135,5 +135,37 @@
       "clues",
       "large crossword"
     ]
+  },
+  {
+    "id": "cryptic-dle",
+    "folder": "cryptic-dle",
+    "title": "Cryptic-dle",
+    "tagline": "One cryptic crossword clue, one word to guess",
+    "description": "A daily cryptic crossword clue — crack the anagram, hidden word, reversal, charade, double definition or homophone, then guess the word. Unlimited guesses, but no letter-by-letter hints — the clue is the only way in.",
+    "banner": "cryptic-dle/banner.png",
+    "favicon": "cryptic-dle/favicon.png",
+    "accent": "#9C6B12",
+    "dateAdded": "2026-08-26",
+    "tags": [
+      "puzzle",
+      "word",
+      "daily"
+    ],
+    "hiddenTags": [
+      "cryptic crossword",
+      "cryptic clue",
+      "cryptic-dle",
+      "crypticdle",
+      "anagram",
+      "wordplay",
+      "guess the word",
+      "word puzzle",
+      "wordle",
+      "unlimited guesses",
+      "hidden word",
+      "charade clue",
+      "double definition",
+      "homophone"
+    ]
   }
 ]
