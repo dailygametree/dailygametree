@@ -1,0 +1,932 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sequence-dle — dailygametree</title>
+<meta name="description" content="A daily number sequence puzzle. A couple of numbers are missing — work out the pattern and fill them in. Unlimited guesses.">
+<meta name="robots" content="index, follow" />
+<meta name="theme-color" content="#F6F5EF" />
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="canonical" href="https://dailygametree.com/sequence-dle/" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="DailyGameTree" />
+<meta property="og:title" content="Sequence-dle — dailygametree" />
+<meta property="og:description" content="A daily number sequence puzzle. A couple of numbers are missing — work out the pattern and fill them in." />
+<meta property="og:url" content="https://dailygametree.com/sequence-dle/" />
+<meta property="og:image" content="https://dailygametree.com/sequence-dle/banner.png" />
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,700&display=swap');
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+/* ---------- Site-wide palette (drives header / ad rails / footer) ---------- */
+:root{
+  --bg: #F6F5EF;
+  --bg-elevated: #EFEDE3;
+  --bg-card: #FFFFFF;
+  --text: #20261C;
+  --text-dim: #5B6255;
+  --text-faint: #9AA091;
+  --accent: #6E9C1E;
+  --accent-dim: #557A16;
+  --accent-soft: #E7F1D4;
+  --amber: #C97A1B;
+  --line: #E1DDCF;
+  --radius: 8px;
+  --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --display: 'Fraunces', serif;
+  --body: 'Public Sans', ui-sans-serif, sans-serif;
+}
+
+html,body{
+  min-height:100%;
+  background:var(--bg);
+  font-family:var(--body);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+a{ color:inherit; }
+
+/* ---------- Header (identical to homepage) ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  background: rgba(246, 245, 239, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--display), sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+}
+
+.logo-mark { width: 55px; height: auto; display: block; }
+
+/* ---------- Ad rails (identical to homepage) ---------- */
+
+.layout {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.ad-rail {
+  flex: 0 0 160px;
+  margin: 0 10px;
+  position: sticky;
+  top: 78px;
+  align-self: stretch;
+  display: flex;
+}
+
+.ad-slot {
+  border: 1px dashed #CBC6B4;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  color: var(--text-faint);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.6;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.main-inner {
+  width: 100%;
+  max-width: 1000px;
+  padding: 0 20px;
+}
+
+@media (max-width: 900px) {
+  /* Simple, robust stacking — no forced viewport heights or clipped
+     overflow. The page just flows top-to-bottom and scrolls normally. */
+  .layout { flex-direction: column; align-items: stretch; }
+  .ad-rail { position: static; flex: 0 0 auto; width: 100%; margin: 10px 0; align-self: auto; display: block; }
+  .ad-rail.left { order: -1; }
+  .main-content { order: 0; }
+  .ad-rail.right { order: 1; }
+  .ad-rail .ad-slot { height: 50px; font-size: 9px; letter-spacing: .04em; }
+  .main-inner { padding: 0 14px; }
+}
+
+@media (max-width: 480px) {
+  .logo-text { display: none; }
+  .logo { gap: 0; }
+}
+
+.game-top-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  flex-wrap:wrap;
+  width:100%;
+  align-self:stretch;
+  margin:24px 4px 0;
+}
+.back-link{
+  display:inline-block;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  margin:0;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--body);
+  transition:border-color .15s,color .15s;
+}
+.back-link:hover{ border-color:var(--accent); color:var(--accent-dim); }
+.random-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:12.5px;
+  color:var(--text-dim);
+  text-decoration:none;
+  background:transparent;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 12px;
+  font-family:var(--body);
+  cursor:pointer;
+  margin-left:auto;
+  transition:border-color .15s,color .15s;
+}
+.random-btn svg{ width:13px; height:13px; flex-shrink:0; transition:transform .4s ease; }
+.random-btn:hover{ border-color:var(--accent); color:var(--accent-dim); }
+.random-btn.is-loading svg{ animation:spin .6s linear infinite; }
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* ---------- Footer (identical to homepage) ---------- */
+
+footer {
+  text-align: center;
+  padding: 28px 24px 40px;
+  color: var(--text-faint);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 10px;
+}
+
+.footer-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+}
+
+.footer-links a:hover { color: var(--accent-dim); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =====================================================================
+   GAME CONTENT — palette scoped to .game-wrap
+   ===================================================================== */
+
+.game-wrap{
+  --accent:#2B5FA8;
+  --accent-dim:#204A85;
+  --accent-soft:#E7EEF9;
+  --ink:#1C2430;
+  --ink-dim:#5B6577;
+  --ink-faint:#96A0B5;
+  --good:#2E7D46;
+  --good-soft:#E4F3E8;
+  --bad:#C0392B;
+  --card:#FFFFFF;
+  --card-line:#D7E1EE;
+  --paper:#F5F8FC;
+  --grid-line:#E2E9F5;
+  --font-b:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  background:
+    linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0/26px 26px,
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0/26px 26px,
+    var(--paper);
+  border-radius: var(--radius);
+  margin-top: 14px;
+  font-family: var(--font-b);
+  color: var(--ink);
+}
+
+.page{ display:flex; justify-content:center; padding:0 24px; }
+.game-col{ flex:0 0 620px; max-width:620px; padding:32px 24px 60px; }
+
+@media(max-width:960px){
+  .page{ padding:0 6px; }
+  .game-col{ flex:0 0 auto; max-width:100%; width:100%; padding:18px 12px 40px; }
+}
+
+.title-block{ text-align:left; }
+.title{
+  font-family: var(--font-b);
+  font-weight: 700;
+  font-size: clamp(24px, 4.6vw, 38px);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+.title .suffix{ color:var(--accent); font-style:italic; }
+.divider{
+  border:none; height:2px;
+  background:linear-gradient(to right,var(--accent),#9CB9E0,var(--accent));
+  margin:12px 0 20px; border-radius:2px; opacity:.65;
+}
+
+.toolbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
+.toolbar-left{ font-size:11.5px; color:var(--ink-dim); letter-spacing:.03em; }
+.toolbar-left strong{ color:var(--ink); }
+.toolbar-right{ display:flex; align-items:center; gap:8px; }
+.icon-btn{
+  width:32px; height:32px; border-radius:50%; border:2px solid var(--ink);
+  background:transparent; font-family:var(--font-b); font-size:14px; font-weight:700;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  transition:background .15s,color .15s; flex-shrink:0; padding:0; color:var(--ink);
+}
+.icon-btn:hover{ background:var(--ink); color:var(--paper); }
+.timer{ font-family:var(--font-b); font-size:14px; letter-spacing:.5px; min-width:58px; text-align:right; color:var(--accent); flex-shrink:0; font-weight:700; }
+
+/* ── Sequence tiles ── */
+.seq-row{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+  gap:10px 6px; margin:10px 0 30px;
+}
+.seq-tile{
+  width:68px; height:68px; border-radius:14px; display:flex; align-items:center;
+  justify-content:center; box-shadow:0 3px 10px rgba(28,36,48,.10); flex-shrink:0;
+}
+.seq-tile.given{
+  background:var(--card); border:2px solid var(--card-line); color:var(--ink);
+  font-weight:700; font-size:19px;
+}
+.seq-tile.given.tight{ font-size:15px; }
+.seq-tile.given.tighter{ font-size:12.5px; }
+
+.seq-tile.blank{ background:var(--accent-soft); border:2px solid var(--accent); padding:0; }
+.seq-tile.blank.correct{ background:var(--good-soft); border-color:var(--good); }
+.seq-tile.blank.shake{ animation:seqShake .32s ease; }
+@keyframes seqShake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-6px); } 75%{ transform:translateX(6px); } }
+
+.seq-input{
+  width:100%; height:100%; border:none; background:transparent; text-align:center;
+  font-family:var(--font-b); font-weight:700; font-size:18px; color:var(--accent-dim);
+  outline:none; border-radius:12px;
+}
+.seq-input.tight{ font-size:14.5px; }
+.seq-input:disabled{ color:var(--good); opacity:1; }
+.seq-input::placeholder{ color:var(--ink-faint); font-weight:400; }
+
+@media(max-width:480px){
+  .seq-tile{ width:52px; height:52px; border-radius:11px; }
+  .seq-tile.given{ font-size:14.5px; }
+  .seq-tile.given.tight{ font-size:12px; }
+  .seq-tile.given.tighter{ font-size:10.5px; }
+  .seq-input{ font-size:14.5px; }
+  .seq-input.tight{ font-size:12px; }
+}
+
+.action-row{ display:flex; gap:10px; justify-content:center; margin-top:4px; }
+.action-btn{
+  font-family:var(--font-b); font-size:13px; font-weight:700; padding:10px 22px;
+  border-radius:8px; cursor:pointer; border:1.5px solid var(--card-line);
+  background:var(--card); color:var(--ink); transition:background .12s,border-color .12s;
+}
+.action-btn.primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+.action-btn.primary:hover{ background:var(--accent-dim); border-color:var(--accent-dim); }
+.action-btn.secondary:hover{ background:#EEF2F8; }
+
+.feedback-msg{ min-height:20px; text-align:center; font-size:12.5px; color:var(--bad); margin-top:14px; font-weight:600; }
+.feedback-msg.ok{ color:var(--good); }
+
+.day-info{ font-size:11px; color:var(--ink-faint); text-align:center; margin-top:24px; }
+@media(max-width:960px){ .day-info{ margin-top:18px; font-size:10px; } }
+
+/* ── Popups ── */
+.overlay{ display:none; position:fixed; inset:0; background:rgba(20,26,36,.5); z-index:200; align-items:center; justify-content:center; padding:16px; }
+.overlay.on{ display:flex; }
+.popup{
+  background:var(--paper); border-radius:14px; padding:26px 26px 22px; max-width:400px;
+  width:100%; position:relative; box-shadow:0 10px 40px rgba(0,0,0,.28);
+  font-family:var(--font-b); color:var(--ink);
+}
+.popup h2{ font-family:var(--font-b); font-weight:700; font-size:19px; margin-bottom:12px; }
+.popup p,.popup li{ font-size:13px; line-height:1.7; }
+.popup ul{ padding-left:18px; margin-top:6px; }
+.popup ul li{ margin-bottom:4px; }
+.popup-close{ position:absolute; top:12px; right:14px; background:none; border:none; font-size:18px; cursor:pointer; color:var(--ink); line-height:1; padding:2px 4px; }
+.popup-close:hover{ opacity:.55; }
+.popup code{ background:var(--accent-soft); border-radius:3px; padding:1px 5px; font-family:var(--font-b); font-size:12px; color:var(--accent-dim); }
+
+.win-popup h2{ color:var(--good); font-size:23px; text-align:center; }
+.win-seq{ font-size:14px; text-align:center; margin:12px 0 4px; word-break:break-word; font-weight:700; letter-spacing:.02em; }
+.win-rule{ font-size:12px; text-align:center; color:var(--ink-dim); font-style:italic; margin-bottom:6px; }
+.win-stats{ display:flex; justify-content:center; gap:26px; margin:16px 0 4px; }
+.win-stat{ text-align:center; }
+.win-stat-val{ display:block; font-size:20px; font-weight:700; color:var(--ink); }
+.win-stat-label{ font-size:10px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.05em; }
+.share-btn{
+  display:block; margin:18px auto 4px; background:var(--accent); color:#fff; border:none;
+  border-radius:8px; padding:10px 24px; font-family:var(--font-b); font-weight:700;
+  font-size:13.5px; cursor:pointer;
+}
+.share-btn:hover{ background:var(--accent-dim); }
+.countdown-line{ text-align:center; font-size:11px; color:var(--ink-faint); margin-top:16px; }
+.countdown-val{ font-weight:700; color:var(--ink-dim); }
+.hint-note{ margin-top:10px; font-size:11px; color:var(--ink-faint); }
+
+</style>
+</head>
+<body data-game="sequence-dle">
+  <header class="site-header">
+    <a class="logo" href="/">
+      <img src="/logo.png" alt="dailygametree logo" class="logo-mark" />
+      <span class="logo-text">dailygametree</span>
+    </a>
+  </header>
+
+  <div class="layout">
+    <aside class="ad-rail left">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+
+    <div class="main-content">
+      <div class="main-inner">
+        <main>
+          <div class="game-top-row">
+            <a class="back-link" href="/">&larr; All games</a>
+            <button type="button" class="random-btn" data-random-game-btn aria-label="Play a random game">
+              <span>Random</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+                <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+                <line x1="4" y1="4" x2="9" y2="9"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="game-wrap">
+            <div class="page">
+              <div class="game-col">
+                <div class="title-block">
+                  <h1 class="title">Sequence<span class="suffix">-dle</span></h1>
+                  <hr class="divider">
+                </div>
+
+                <div class="toolbar">
+                  <div class="toolbar-left" id="checksLabel">Checks: <strong>0</strong></div>
+                  <div class="toolbar-right">
+                    <button class="icon-btn" id="hintBtn" title="Hint">💡</button>
+                    <button class="icon-btn" id="helpBtn" title="How to play">?</button>
+                    <span class="timer" id="timerDisplay">00:00</span>
+                  </div>
+                </div>
+
+                <div class="seq-row" id="seqRow"></div>
+
+                <div class="action-row">
+                  <button class="action-btn secondary" id="clearBtn">✕ Clear</button>
+                  <button class="action-btn primary" id="checkBtn">Check</button>
+                </div>
+                <div class="feedback-msg" id="feedbackMsg"></div>
+
+                <div class="day-info" id="dayInfo"></div>
+              </div>
+            </div>
+
+            <!-- Popups live inside .game-wrap (rather than as siblings of
+                 it) purely so they inherit this game's palette variables
+                 (--accent, --ink, --paper, etc.), which are scoped to
+                 .game-wrap. They're position:fixed, so this nesting has
+                 no effect on where they render — still full-viewport. -->
+
+            <!-- Help popup -->
+            <div class="overlay" id="helpOverlay">
+              <div class="popup">
+                <button class="popup-close" id="helpClose">✕</button>
+                <h2>How to Play</h2>
+                <p>Every day a new sequence of seven numbers appears, with a couple of them missing. Work out the pattern and type the missing numbers into the blank tiles.</p>
+                <ul>
+                  <li>Press <strong>Check</strong> to test your answers — correct ones lock in green, wrong ones shake so you can try again.</li>
+                  <li><strong>Unlimited guesses</strong> — take as long as you like.</li>
+                  <li>Sequences can go up, down, or alternate — and can involve addition, multiplication, squares, cubes, primes and more.</li>
+                  <li>Stuck? The <code>💡</code> hint reveals the type of pattern, without giving away any numbers.</li>
+                </ul>
+                <p style="margin-top:10px;font-size:12px;color:var(--ink-faint)">A new sequence every day at midnight UTC.</p>
+              </div>
+            </div>
+
+            <!-- Hint popup -->
+            <div class="overlay" id="hintOverlay">
+              <div class="popup">
+                <button class="popup-close" id="hintClose">✕</button>
+                <h2>Hint</h2>
+                <p id="hintContent"></p>
+                <p class="hint-note">More rewarding solved without help!</p>
+              </div>
+            </div>
+
+            <!-- Win popup -->
+            <div class="overlay" id="winOverlay">
+              <div class="popup win-popup">
+                <button class="popup-close" id="winClose">✕</button>
+                <h2>🎉 Solved it!</h2>
+                <p class="win-seq" id="winSeq"></p>
+                <p class="win-rule" id="winRule"></p>
+                <div class="win-stats">
+                  <div class="win-stat">
+                    <span class="win-stat-val" id="winTime">0:00</span>
+                    <span class="win-stat-label">Time</span>
+                  </div>
+                  <div class="win-stat">
+                    <span class="win-stat-val" id="winChecks">0</span>
+                    <span class="win-stat-label">Checks</span>
+                  </div>
+                </div>
+                <button class="share-btn" id="shareBtn">Share Result</button>
+                <p class="countdown-line">Next sequence in <span class="countdown-val" id="countdownVal">00:00:00</span></p>
+              </div>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+
+    <aside class="ad-rail right">
+      <div class="ad-slot"><!-- Replace with your AdSense unit --></div>
+    </aside>
+  </div>
+
+  <footer>
+    <nav class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms and Conditions</a>
+      <a href="/about.html">About Us</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+    <p>&copy; <span id="year"></span> dailygametree.com</p>
+  </footer>
+
+<script>
+// ═══════════════════════════════════════════════
+//  SEEDED RNG — deterministic per UTC day, so every
+//  visitor gets the same sequence on the same day.
+// ═══════════════════════════════════════════════
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function pickInt(rng, min, max){ return min + Math.floor(rng() * (max - min + 1)); }
+function pickFrom(rng, arr){ return arr[Math.floor(rng() * arr.length)]; }
+
+// ═══════════════════════════════════════════════
+//  SEQUENCE GENERATORS — each returns 7 terms plus
+//  metadata used to pick safe blank positions and to
+//  write the hint text. `order` says how many leading
+//  terms must stay visible for the sequence to always
+//  be solvable left-to-right:
+//    0 = closed-form (n-th term computed directly, any
+//        term can be blanked)
+//    1 = each term derives from the ONE before it
+//        (term 0 must stay visible)
+//    2 = each term derives from the TWO before it
+//        (terms 0 and 1 must stay visible)
+// ═══════════════════════════════════════════════
+const SEQ_LEN = 7;
+
+function genArithmetic(rng){
+  const d = pickFrom(rng, [-9,-8,-7,-6,-5,-4,-3,-2,2,3,4,5,6,7,8,9]);
+  const a = pickInt(rng, -30, 40);
+  const values = [];
+  for (let i = 0; i < SEQ_LEN; i++) values.push(a + i * d);
+  return { values, order: 1, ruleText: `Each number is the previous one ${d > 0 ? 'plus' : 'minus'} ${Math.abs(d)}.` };
+}
+
+function genGeometric(rng){
+  const r = pickFrom(rng, [2, 3, -2, -3]);
+  const a = pickFrom(rng, [1, 2, 3, 4, -1, -2, -3, -4]);
+  const values = [];
+  let v = a;
+  for (let i = 0; i < SEQ_LEN; i++){ values.push(v); v *= r; }
+  return { values, order: 1, ruleText: `Each number is the previous one multiplied by ${r}.` };
+}
+
+function genSquares(rng){
+  const n0 = pickInt(rng, 1, 6);
+  const values = [];
+  for (let i = 0; i < SEQ_LEN; i++){ const n = n0 + i; values.push(n * n); }
+  return { values, order: 0, ruleText: `These are perfect squares — n².` };
+}
+
+function genCubes(rng){
+  const n0 = pickInt(rng, -3, 3);
+  const values = [];
+  for (let i = 0; i < SEQ_LEN; i++){ const n = n0 + i; values.push(n * n * n); }
+  return { values, order: 0, ruleText: `These are perfect cubes — n³.` };
+}
+
+function genTriangular(rng){
+  const n0 = pickInt(rng, 1, 5);
+  const values = [];
+  for (let i = 0; i < SEQ_LEN; i++){ const n = n0 + i; values.push(n * (n + 1) / 2); }
+  return { values, order: 0, ruleText: `These are triangular numbers — each is n×(n+1)÷2.` };
+}
+
+function isPrime(n){
+  if (n < 2) return false;
+  for (let i = 2; i * i <= n; i++) if (n % i === 0) return false;
+  return true;
+}
+function firstNPrimes(n){
+  const out = []; let x = 1;
+  while (out.length < n){ x++; if (isPrime(x)) out.push(x); }
+  return out;
+}
+const PRIME_POOL = firstNPrimes(40);
+function genPrimes(rng){
+  const startIdx = pickInt(rng, 0, PRIME_POOL.length - SEQ_LEN);
+  const values = PRIME_POOL.slice(startIdx, startIdx + SEQ_LEN);
+  return { values, order: 0, ruleText: `These are consecutive prime numbers.` };
+}
+
+function genFibLike(rng){
+  const a0 = pickInt(rng, 1, 9);
+  const a1 = pickInt(rng, 1, 9);
+  const values = [a0, a1];
+  for (let i = 2; i < SEQ_LEN; i++) values.push(values[i - 1] + values[i - 2]);
+  return { values, order: 2, ruleText: `Each number is the sum of the two numbers before it.` };
+}
+
+function genGrowingStep(rng){
+  const a0 = pickInt(rng, -10, 15);
+  const s0 = pickFrom(rng, [2, 3, 4, 5, 6]) * pickFrom(rng, [1, -1]);
+  const inc = pickFrom(rng, [1, 2, 3]) * pickFrom(rng, [1, -1]);
+  const values = [a0];
+  let step = s0;
+  for (let i = 1; i < SEQ_LEN; i++){ values.push(values[i - 1] + step); step += inc; }
+  return { values, order: 2, ruleText: `The gap between numbers grows (or shrinks) by the same amount each step.` };
+}
+
+const FAMILIES = [genArithmetic, genGeometric, genSquares, genCubes, genTriangular, genPrimes, genFibLike, genGrowingStep];
+
+// Picks 2 distinct blank positions. Since every generator above is only
+// ever resolved left-to-right (each term needs just the already-known
+// terms before it, or none at all for the closed-form ones), any blank
+// position works as long as the recurrence's own "seed" terms — index 0
+// for order 1, indices 0 and 1 for order 2 — stay visible.
+function pickBlankIndices(rng, order){
+  const start = order === 2 ? 2 : 1;
+  const eligible = [];
+  for (let i = start; i < SEQ_LEN; i++) eligible.push(i);
+  const i1 = pickFrom(rng, eligible);
+  let i2;
+  do { i2 = pickFrom(rng, eligible); } while (i2 === i1);
+  return [i1, i2].sort((a, b) => a - b);
+}
+
+function getTodaysPuzzle(){
+  const epoch = Date.UTC(2025, 0, 1);
+  const now = new Date();
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  const dayIndex = Math.max(0, Math.floor((today - epoch) / 86400000));
+
+  const rng = mulberry32((dayIndex ^ 0x53455144) >>> 0); // "SEQD" salt
+  const typeIdx = Math.floor(rng() * FAMILIES.length);
+  const gen = FAMILIES[typeIdx](rng);
+  const blanks = pickBlankIndices(rng, gen.order);
+
+  return {
+    dayIndex,
+    puzzleNum: dayIndex + 1,
+    values: gen.values,
+    blanks,
+    ruleText: gen.ruleText
+  };
+}
+
+// ═══════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════
+const puzzle = getTodaysPuzzle();
+const STATE_KEY = 'sequencedle_state_v1';
+
+let secondsElapsed = 0;
+let timerInterval = null;
+let checks = 0;
+let status = 'playing'; // 'playing' | 'won'
+let hintUsed = false;
+
+function fmtTime(s){
+  const m = Math.floor(s / 60), sec = s % 60;
+  return String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    secondsElapsed++;
+    document.getElementById('timerDisplay').textContent = fmtTime(secondsElapsed);
+  }, 1000);
+}
+function stopTimer(){ clearInterval(timerInterval); }
+
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed.dayIndex !== puzzle.dayIndex) return null;
+    return parsed;
+  } catch (e) { return null; }
+}
+function saveState(){
+  try {
+    const filled = {};
+    puzzle.blanks.forEach(i => {
+      const input = document.querySelector(`.seq-input[data-index="${i}"]`);
+      filled[i] = {
+        value: input ? input.value : '',
+        correct: input ? input.disabled : false
+      };
+    });
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+      dayIndex: puzzle.dayIndex,
+      filled,
+      checks,
+      status,
+      hintUsed,
+      secondsElapsed
+    }));
+  } catch (e) {}
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER SEQUENCE ROW
+// ═══════════════════════════════════════════════
+const seqRowEl = document.getElementById('seqRow');
+
+function digitClass(n){
+  const len = String(Math.abs(n)).length + (n < 0 ? 1 : 0);
+  if (len >= 5) return 'tighter';
+  if (len >= 4) return 'tight';
+  return '';
+}
+
+function buildRow(){
+  seqRowEl.innerHTML = '';
+  puzzle.values.forEach((v, i) => {
+    const isBlank = puzzle.blanks.includes(i);
+    const tile = document.createElement('div');
+    if (isBlank){
+      tile.className = 'seq-tile blank';
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.inputMode = 'numeric';
+      input.autocomplete = 'off';
+      input.className = 'seq-input ' + (digitClass(v) === '' ? '' : 'tight');
+      input.maxLength = 6;
+      input.dataset.index = String(i);
+      input.setAttribute('aria-label', 'Missing number');
+      input.addEventListener('input', () => {
+        input.value = input.value.replace(/[^0-9-]/g, '').replace(/(?!^)-/g, '');
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); checkAnswers(); }
+      });
+      tile.appendChild(input);
+    } else {
+      tile.className = 'seq-tile given ' + digitClass(v);
+      tile.textContent = String(v);
+    }
+    seqRowEl.appendChild(tile);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  CHECK / CLEAR
+// ═══════════════════════════════════════════════
+const feedbackEl = document.getElementById('feedbackMsg');
+const checksLabelEl = document.getElementById('checksLabel');
+
+function updateChecksLabel(){
+  checksLabelEl.innerHTML = 'Checks: <strong>' + checks + '</strong>';
+}
+
+function allCorrect(){
+  return puzzle.blanks.every(i => {
+    const input = document.querySelector(`.seq-input[data-index="${i}"]`);
+    return input && input.disabled;
+  });
+}
+
+function checkAnswers(){
+  if (status !== 'playing') return;
+  let anyEmpty = false;
+  let anyWrong = false;
+
+  puzzle.blanks.forEach(i => {
+    const input = document.querySelector(`.seq-input[data-index="${i}"]`);
+    if (!input || input.disabled) return;
+    const raw = input.value.trim();
+    if (raw === '' || raw === '-'){ anyEmpty = true; return; }
+    const guess = parseInt(raw, 10);
+    const tile = input.closest('.seq-tile');
+    if (guess === puzzle.values[i]){
+      input.disabled = true;
+      tile.classList.add('correct');
+    } else {
+      anyWrong = true;
+      tile.classList.remove('shake');
+      void tile.offsetWidth;
+      tile.classList.add('shake');
+    }
+  });
+
+  checks++;
+  updateChecksLabel();
+
+  if (allCorrect()){
+    status = 'won';
+    stopTimer();
+    feedbackEl.textContent = '';
+    saveState();
+    setTimeout(showWinPopup, 350);
+    return;
+  }
+
+  if (anyEmpty && !anyWrong){
+    feedbackEl.className = 'feedback-msg';
+    feedbackEl.textContent = 'Fill in every blank before checking.';
+  } else {
+    feedbackEl.className = 'feedback-msg';
+    feedbackEl.textContent = 'Not quite — the red tiles are still wrong.';
+  }
+  saveState();
+}
+
+function clearAnswers(){
+  if (status !== 'playing') return;
+  puzzle.blanks.forEach(i => {
+    const input = document.querySelector(`.seq-input[data-index="${i}"]`);
+    if (input && !input.disabled) input.value = '';
+  });
+  feedbackEl.textContent = '';
+  saveState();
+}
+
+document.getElementById('checkBtn').addEventListener('click', checkAnswers);
+document.getElementById('clearBtn').addEventListener('click', clearAnswers);
+
+// ═══════════════════════════════════════════════
+//  HINT
+// ═══════════════════════════════════════════════
+document.getElementById('hintContent').textContent = puzzle.ruleText;
+document.getElementById('hintBtn').addEventListener('click', () => { hintUsed = true; saveState(); });
+
+// ═══════════════════════════════════════════════
+//  WIN POPUP + SHARE + COUNTDOWN
+// ═══════════════════════════════════════════════
+let countdownInterval = null;
+
+function showWinPopup(){
+  document.getElementById('winSeq').textContent = puzzle.values.join(', ');
+  document.getElementById('winRule').textContent = puzzle.ruleText;
+  document.getElementById('winTime').textContent = fmtTime(secondsElapsed);
+  document.getElementById('winChecks').textContent = String(checks);
+  document.getElementById('winOverlay').classList.add('on');
+  startCountdown();
+}
+
+function startCountdown(){
+  const el = document.getElementById('countdownVal');
+  function tick(){
+    const now = new Date();
+    const nextMidnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+    const diff = Math.max(0, nextMidnight - now.getTime());
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    el.textContent = [h, m, s].map(x => String(x).padStart(2, '0')).join(':');
+  }
+  tick();
+  clearInterval(countdownInterval);
+  countdownInterval = setInterval(tick, 1000);
+}
+
+document.getElementById('shareBtn').addEventListener('click', () => {
+  const text = `Sequence-dle #${puzzle.puzzleNum}\n✅ Solved in ${fmtTime(secondsElapsed)} (${checks} check${checks === 1 ? '' : 's'})`;
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('shareBtn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    }).catch(() => {});
+  }
+});
+
+// ═══════════════════════════════════════════════
+//  POPUP WIRING
+// ═══════════════════════════════════════════════
+function setupPopup(btnId, overlayId, closeId){
+  document.getElementById(btnId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.add('on'));
+  document.getElementById(closeId)?.addEventListener('click', () =>
+    document.getElementById(overlayId).classList.remove('on'));
+  document.getElementById(overlayId)?.addEventListener('click', e => {
+    if (e.target === e.currentTarget) e.currentTarget.classList.remove('on');
+  });
+}
+setupPopup('helpBtn', 'helpOverlay', 'helpClose');
+setupPopup('hintBtn', 'hintOverlay', 'hintClose');
+setupPopup(null, 'winOverlay', 'winClose');
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+function replaySavedState(saved){
+  checks = saved.checks || 0;
+  status = saved.status || 'playing';
+  hintUsed = !!saved.hintUsed;
+  secondsElapsed = saved.secondsElapsed || 0;
+  updateChecksLabel();
+  document.getElementById('timerDisplay').textContent = fmtTime(secondsElapsed);
+
+  const filled = saved.filled || {};
+  puzzle.blanks.forEach(i => {
+    const entry = filled[i];
+    if (!entry) return;
+    const input = document.querySelector(`.seq-input[data-index="${i}"]`);
+    if (!input) return;
+    input.value = entry.value || '';
+    if (entry.correct){
+      input.disabled = true;
+      input.closest('.seq-tile').classList.add('correct');
+    }
+  });
+
+  if (status === 'won'){
+    setTimeout(showWinPopup, 200);
+  }
+}
+
+function init(){
+  document.getElementById('year').textContent = new Date().getFullYear();
+  document.getElementById('dayInfo').textContent = 'Sequence-dle #' + puzzle.puzzleNum + ' · New sequence daily at midnight UTC';
+
+  buildRow();
+
+  const saved = loadState();
+  if (saved) replaySavedState(saved);
+
+  if (status === 'playing') startTimer();
+  updateChecksLabel();
+}
+
+init();
+</script>
+<script src="/random-game.js" defer></script>
+</body>
+</html>
