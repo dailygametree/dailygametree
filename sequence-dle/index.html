@@ -300,21 +300,29 @@ footer {
 .seq-tile.given.tight{ font-size:15px; }
 .seq-tile.given.tighter{ font-size:12.5px; }
 
-.seq-tile.blank{ background:var(--accent-soft); border:2px solid var(--accent); padding:0; }
-.seq-tile.blank.correct{ background:var(--good-soft); border-color:var(--good); }
+.seq-tile.blank{ background:var(--accent-soft); border:2px solid var(--accent); padding:0; cursor:pointer; transition:box-shadow .15s,border-color .15s; }
+.seq-tile.blank.active{ border-color:var(--accent-dim); box-shadow:0 3px 10px rgba(28,36,48,.10), 0 0 0 3px var(--accent-soft), 0 0 0 4px var(--accent); }
+.seq-tile.blank.correct{ background:var(--good-soft); border-color:var(--good); cursor:default; }
 .seq-tile.blank.wrong{ background:#FBEAEA; border-color:var(--bad); }
 .seq-tile.blank.wrong .seq-input{ color:var(--bad); }
 .seq-tile.blank.shake{ animation:seqShake .32s ease; }
 @keyframes seqShake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-6px); } 75%{ transform:translateX(6px); } }
 
+/* seq-input is now a plain <div> (not a native <input>) so that typing on
+   mobile never opens the OS keyboard — all entry goes through the on-screen
+   keypad below (or a physical-keydown listener on desktop). This is the
+   same reason Yeardle/Define-dle/Cryptic-dle don't use native inputs either:
+   a native input's mobile keyboard covers the puzzle and forces awkward
+   auto-scrolling every time it opens. */
 .seq-input{
-  width:100%; height:100%; border:none; background:transparent; text-align:center;
+  width:100%; height:100%; display:flex; align-items:center; justify-content:center;
   font-family:var(--font-b); font-weight:700; font-size:18px; color:var(--accent-dim);
-  outline:none; border-radius:12px;
+  border-radius:12px; user-select:none; -webkit-user-select:none;
 }
 .seq-input.tight{ font-size:14.5px; }
-.seq-input:disabled{ color:var(--good); opacity:1; }
-.seq-input::placeholder{ color:var(--ink-faint); font-weight:400; }
+.seq-tile.blank.correct .seq-input{ color:var(--good); }
+.seq-input .seq-cursor{ display:inline-block; width:2px; margin-left:1px; background:var(--accent-dim); animation:seqBlink 1s step-end infinite; align-self:center; height:0.9em; }
+@keyframes seqBlink{ 0%,49%{ opacity:1; } 50%,100%{ opacity:0; } }
 
 @media(max-width:480px){
   .seq-tile{ width:52px; height:52px; border-radius:11px; }
@@ -323,6 +331,28 @@ footer {
   .seq-tile.given.tighter{ font-size:10.5px; }
   .seq-input{ font-size:14.5px; }
   .seq-input.tight{ font-size:12px; }
+}
+
+/* ── On-screen keypad (replaces the native mobile keyboard entirely) ── */
+.keypad{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:8px;
+  max-width:220px; margin:6px auto 22px;
+}
+.keypad-btn{
+  height:46px; border-radius:10px; border:1.5px solid var(--card-line);
+  background:var(--card); color:var(--ink); font-family:var(--font-b);
+  font-weight:700; font-size:17px; cursor:pointer;
+  transition:background .12s,border-color .12s; display:flex;
+  align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent;
+}
+.keypad-btn:hover{ background:#EEF2F8; }
+.keypad-btn:active{ background:var(--accent-soft); border-color:var(--accent); }
+.keypad-btn.keypad-sign{ color:var(--accent-dim); font-size:15px; }
+.keypad-btn.keypad-back{ color:var(--bad); font-size:16px; }
+
+@media(max-width:480px){
+  .keypad{ max-width:none; }
+  .keypad-btn{ height:50px; }
 }
 
 .action-row{ display:flex; gap:10px; justify-content:center; margin-top:4px; }
@@ -422,6 +452,8 @@ footer {
                 </div>
 
                 <div class="seq-row" id="seqRow"></div>
+
+                <div class="keypad" id="keypad" role="group" aria-label="Number entry"></div>
 
                 <div class="action-row">
                   <button class="action-btn secondary" id="clearBtn">✕ Clear</button>
@@ -687,10 +719,9 @@ function saveState(){
   try {
     const filled = {};
     puzzle.blanks.forEach(i => {
-      const input = document.querySelector(`.seq-input[data-index="${i}"]`);
       filled[i] = {
-        value: input ? input.value : '',
-        correct: input ? input.disabled : false
+        value: blankValues[i] || '',
+        correct: !!blankCorrect[i]
       };
     });
     localStorage.setItem(STATE_KEY, JSON.stringify({
@@ -706,8 +737,18 @@ function saveState(){
 
 // ═══════════════════════════════════════════════
 //  RENDER SEQUENCE ROW
+//
+//  Blanks are plain <div>s, not <input>s — entry happens only through the
+//  on-screen keypad (built below) or a physical-keydown listener, so no
+//  native input ever grabs focus and no OS keyboard ever opens. That's the
+//  same trick Yeardle/Define-dle/Cryptic-dle use for exactly the same
+//  reason: a native input's mobile keyboard covers the puzzle and the
+//  browser re-scrolls awkwardly every time it opens/closes.
 // ═══════════════════════════════════════════════
 const seqRowEl = document.getElementById('seqRow');
+let blankValues = {};   // index -> string being typed, e.g. "", "-", "48", "-192"
+let blankCorrect = {};  // index -> true once locked in
+let selectedIndex = puzzle.blanks[0];
 
 function digitClass(n){
   const len = String(Math.abs(n)).length + (n < 0 ? 1 : 0);
@@ -723,28 +764,57 @@ function buildRow(){
     const tile = document.createElement('div');
     if (isBlank){
       tile.className = 'seq-tile blank';
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.inputMode = 'numeric';
-      input.autocomplete = 'off';
-      input.className = 'seq-input ' + (digitClass(v) === '' ? '' : 'tight');
-      input.maxLength = 6;
-      input.dataset.index = String(i);
-      input.setAttribute('aria-label', 'Missing number');
-      input.addEventListener('input', () => {
-        input.value = input.value.replace(/[^0-9-]/g, '').replace(/(?!^)-/g, '');
-        tile.classList.remove('wrong');
+      tile.dataset.index = String(i);
+      tile.setAttribute('role', 'button');
+      tile.setAttribute('tabindex', '0');
+      tile.setAttribute('aria-label', 'Missing number');
+      const disp = document.createElement('div');
+      disp.className = 'seq-input';
+      disp.dataset.index = String(i);
+      tile.appendChild(disp);
+      tile.addEventListener('click', () => selectBlank(i));
+      tile.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectBlank(i); }
       });
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); checkAnswers(); }
-      });
-      tile.appendChild(input);
     } else {
       tile.className = 'seq-tile given ' + digitClass(v);
       tile.textContent = String(v);
     }
     seqRowEl.appendChild(tile);
   });
+  puzzle.blanks.forEach(i => { blankValues[i] = blankValues[i] || ''; });
+  renderBlanks();
+}
+
+function renderBlank(i){
+  const tile = seqRowEl.querySelector(`.seq-tile[data-index="${i}"]`);
+  const disp = tile.querySelector('.seq-input');
+  const val = blankValues[i] || '';
+  const len = val.replace('-', '').length;
+  disp.className = 'seq-input ' + (len >= 4 ? 'tight' : '');
+  disp.textContent = val;
+  if (i === selectedIndex && !blankCorrect[i]){
+    const cursor = document.createElement('span');
+    cursor.className = 'seq-cursor';
+    disp.appendChild(cursor);
+  }
+  tile.classList.toggle('active', i === selectedIndex && !blankCorrect[i]);
+}
+
+function renderBlanks(){
+  puzzle.blanks.forEach(renderBlank);
+}
+
+function selectBlank(i){
+  if (blankCorrect[i] || status !== 'playing') return;
+  selectedIndex = i;
+  renderBlanks();
+}
+
+// Picks the first still-open blank, if any — used to auto-advance
+// selection once the currently-selected blank gets locked in correct.
+function firstOpenBlank(){
+  return puzzle.blanks.find(i => !blankCorrect[i]);
 }
 
 // ═══════════════════════════════════════════════
@@ -758,10 +828,7 @@ function updateChecksLabel(){
 }
 
 function allCorrect(){
-  return puzzle.blanks.every(i => {
-    const input = document.querySelector(`.seq-input[data-index="${i}"]`);
-    return input && input.disabled;
-  });
+  return puzzle.blanks.every(i => blankCorrect[i]);
 }
 
 function checkAnswers(){
@@ -770,14 +837,13 @@ function checkAnswers(){
   let anyWrong = false;
 
   puzzle.blanks.forEach(i => {
-    const input = document.querySelector(`.seq-input[data-index="${i}"]`);
-    if (!input || input.disabled) return;
-    const raw = input.value.trim();
+    if (blankCorrect[i]) return;
+    const raw = (blankValues[i] || '').trim();
+    const tile = seqRowEl.querySelector(`.seq-tile[data-index="${i}"]`);
     if (raw === '' || raw === '-'){ anyEmpty = true; return; }
     const guess = parseInt(raw, 10);
-    const tile = input.closest('.seq-tile');
     if (guess === puzzle.values[i]){
-      input.disabled = true;
+      blankCorrect[i] = true;
       tile.classList.remove('wrong');
       tile.classList.add('correct');
     } else {
@@ -801,6 +867,14 @@ function checkAnswers(){
     return;
   }
 
+  // Once a blank locks in, hop selection to whichever blank is still open
+  // so the keypad is immediately ready for it.
+  if (blankCorrect[selectedIndex]){
+    const next = firstOpenBlank();
+    if (next !== undefined) selectedIndex = next;
+  }
+  renderBlanks();
+
   if (anyEmpty && !anyWrong){
     feedbackEl.className = 'feedback-msg';
     feedbackEl.textContent = 'Fill in every blank before checking.';
@@ -814,18 +888,82 @@ function checkAnswers(){
 function clearAnswers(){
   if (status !== 'playing') return;
   puzzle.blanks.forEach(i => {
-    const input = document.querySelector(`.seq-input[data-index="${i}"]`);
-    if (input && !input.disabled){
-      input.value = '';
-      input.closest('.seq-tile').classList.remove('wrong');
-    }
+    if (blankCorrect[i]) return;
+    blankValues[i] = '';
+    seqRowEl.querySelector(`.seq-tile[data-index="${i}"]`).classList.remove('wrong');
   });
+  renderBlanks();
   feedbackEl.textContent = '';
   saveState();
 }
 
 document.getElementById('checkBtn').addEventListener('click', checkAnswers);
 document.getElementById('clearBtn').addEventListener('click', clearAnswers);
+
+// ═══════════════════════════════════════════════
+//  ON-SCREEN KEYPAD — the only way blanks get filled (see note above
+//  buildRow). A physical-keyboard listener further down mirrors the same
+//  pressDigit/pressSign/pressBack actions for desktop users.
+// ═══════════════════════════════════════════════
+const keypadEl = document.getElementById('keypad');
+const MAX_DIGITS = 6;
+
+function pressDigit(d){
+  if (status !== 'playing' || blankCorrect[selectedIndex]) return;
+  const cur = blankValues[selectedIndex] || '';
+  const digitsOnly = cur.replace('-', '');
+  if (digitsOnly.length >= MAX_DIGITS) return;
+  blankValues[selectedIndex] = cur + d;
+  seqRowEl.querySelector(`.seq-tile[data-index="${selectedIndex}"]`).classList.remove('wrong');
+  renderBlank(selectedIndex);
+}
+
+function pressSign(){
+  if (status !== 'playing' || blankCorrect[selectedIndex]) return;
+  const cur = blankValues[selectedIndex] || '';
+  blankValues[selectedIndex] = cur.startsWith('-') ? cur.slice(1) : ('-' + cur);
+  seqRowEl.querySelector(`.seq-tile[data-index="${selectedIndex}"]`).classList.remove('wrong');
+  renderBlank(selectedIndex);
+}
+
+function pressBack(){
+  if (status !== 'playing' || blankCorrect[selectedIndex]) return;
+  const cur = blankValues[selectedIndex] || '';
+  blankValues[selectedIndex] = cur.slice(0, -1);
+  renderBlank(selectedIndex);
+}
+
+const KEYPAD_KEYS = ['7','8','9','4','5','6','1','2','3','±','0','⌫'];
+KEYPAD_KEYS.forEach(k => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'keypad-btn' + (k === '±' ? ' keypad-sign' : '') + (k === '⌫' ? ' keypad-back' : '');
+  btn.textContent = k;
+  btn.setAttribute('aria-label', k === '±' ? 'Toggle negative' : (k === '⌫' ? 'Backspace' : k));
+  btn.addEventListener('click', () => {
+    if (k === '±') pressSign();
+    else if (k === '⌫') pressBack();
+    else pressDigit(k);
+  });
+  keypadEl.appendChild(btn);
+});
+
+// Physical keyboard fallback (desktop) — mirrors the on-screen keypad.
+window.addEventListener('keydown', (e) => {
+  if (status !== 'playing') return;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (e.key === 'Enter') { e.preventDefault(); checkAnswers(); return; }
+  if (e.key === 'Backspace') { e.preventDefault(); pressBack(); return; }
+  if (e.key === '-') { e.preventDefault(); pressSign(); return; }
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const idx = puzzle.blanks.indexOf(selectedIndex);
+    const next = puzzle.blanks[(idx + 1) % puzzle.blanks.length];
+    selectBlank(next);
+    return;
+  }
+  if (/^[0-9]$/.test(e.key)) { pressDigit(e.key); }
+});
 
 // ═══════════════════════════════════════════════
 //  HINT
@@ -906,14 +1044,14 @@ function replaySavedState(saved){
   puzzle.blanks.forEach(i => {
     const entry = filled[i];
     if (!entry) return;
-    const input = document.querySelector(`.seq-input[data-index="${i}"]`);
-    if (!input) return;
-    input.value = entry.value || '';
+    blankValues[i] = entry.value || '';
     if (entry.correct){
-      input.disabled = true;
-      input.closest('.seq-tile').classList.add('correct');
+      blankCorrect[i] = true;
+      seqRowEl.querySelector(`.seq-tile[data-index="${i}"]`).classList.add('correct');
     }
   });
+  selectedIndex = firstOpenBlank() ?? puzzle.blanks[0];
+  renderBlanks();
 
   if (status === 'won'){
     setTimeout(showWinPopup, 200);
