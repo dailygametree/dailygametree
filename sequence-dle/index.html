@@ -302,6 +302,8 @@ footer {
 
 .seq-tile.blank{ background:var(--accent-soft); border:2px solid var(--accent); padding:0; }
 .seq-tile.blank.correct{ background:var(--good-soft); border-color:var(--good); }
+.seq-tile.blank.wrong{ background:#FBEAEA; border-color:var(--bad); }
+.seq-tile.blank.wrong .seq-input{ color:var(--bad); }
 .seq-tile.blank.shake{ animation:seqShake .32s ease; }
 @keyframes seqShake{ 0%,100%{ transform:translateX(0); } 25%{ transform:translateX(-6px); } 75%{ transform:translateX(6px); } }
 
@@ -731,6 +733,7 @@ function buildRow(){
       input.setAttribute('aria-label', 'Missing number');
       input.addEventListener('input', () => {
         input.value = input.value.replace(/[^0-9-]/g, '').replace(/(?!^)-/g, '');
+        tile.classList.remove('wrong');
       });
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') { e.preventDefault(); checkAnswers(); }
@@ -775,9 +778,11 @@ function checkAnswers(){
     const tile = input.closest('.seq-tile');
     if (guess === puzzle.values[i]){
       input.disabled = true;
+      tile.classList.remove('wrong');
       tile.classList.add('correct');
     } else {
       anyWrong = true;
+      tile.classList.add('wrong');
       tile.classList.remove('shake');
       void tile.offsetWidth;
       tile.classList.add('shake');
@@ -810,7 +815,10 @@ function clearAnswers(){
   if (status !== 'playing') return;
   puzzle.blanks.forEach(i => {
     const input = document.querySelector(`.seq-input[data-index="${i}"]`);
-    if (input && !input.disabled) input.value = '';
+    if (input && !input.disabled){
+      input.value = '';
+      input.closest('.seq-tile').classList.remove('wrong');
+    }
   });
   feedbackEl.textContent = '';
   saveState();
