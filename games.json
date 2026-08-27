@@ -167,5 +167,40 @@
       "double definition",
       "homophone"
     ]
+  },
+  {
+    "id": "sequence-dle",
+    "folder": "sequence-dle",
+    "title": "Sequence-dle",
+    "tagline": "Spot the pattern, fill the gaps",
+    "description": "A daily number sequence puzzle — a couple of numbers are missing from the sequence. Work out the pattern and fill them in. Unlimited guesses.",
+    "banner": "sequence-dle/banner.png",
+    "favicon": "sequence-dle/favicon.png",
+    "accent": "#2B5FA8",
+    "dateAdded": "2026-08-27",
+    "tags": [
+      "puzzle",
+      "math",
+      "logic",
+      "daily"
+    ],
+    "hiddenTags": [
+      "sequence",
+      "number sequence",
+      "sequence puzzle",
+      "sequencedle",
+      "sequence-dle",
+      "missing number",
+      "fill in the blank",
+      "pattern puzzle",
+      "math puzzle",
+      "logic puzzle",
+      "wordle",
+      "iq test",
+      "number pattern",
+      "arithmetic sequence",
+      "geometric sequence",
+      "fibonacci"
+    ]
   }
 ]
