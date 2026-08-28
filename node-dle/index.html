@@ -392,7 +392,8 @@ footer {
                 <button class="popup-close" id="helpClose">✕</button>
                 <h2>How to Play</h2>
                 <p>Every day's board is a fixed network of nodes with grey lines already drawn between them. Your job is to trace over every single line, turning it solid &mdash; without ever tracing the same line twice.</p>
-                <p>Press down on a node and drag along a grey line to trace it. Keep dragging through neighbouring nodes to trace several lines in one continuous stroke, or lift and start again from anywhere.</p>
+                <p>Press down on a node and drag your finger along a grey line, staying close to it, until you reach the node at its far end &mdash; a solid line follows your finger as you go. Each node gets numbered the first time you reach it (1, 2, 3&hellip;), so you can see the order you've traced things in. You can only start your next stroke from wherever the path currently ends &mdash; that node stays filled in, even if it's an earlier, lower number the path has looped back around to. You can't jump to a different, unconnected node.</p>
+                <p>Where you start matters &mdash; not every node leads to a full solve, and picking the wrong one can leave you stuck with connections you can no longer reach. The board won't let you needlessly strand a connection when a safer move is sitting right there, but it can't save you from a bad starting node. If you get stuck, Undo your way back and try again.</p>
                 <p>The puzzle is solved once every line is traced. It's always possible to do the whole board in a <strong>single unbroken stroke</strong> &mdash; that's a perfect solve. Every extra time you have to lift and restart counts against you.</p>
                 <p style="margin-top:10px;font-size:12px;color:var(--text-faint)">A new Node-dle unlocks every day at midnight UTC. Both the shape and the number of connections change daily.</p>
               </div>
@@ -565,7 +566,7 @@ const dayIndex = getDayIndex();
 const puzzle = generateDailyPuzzle(dayIndex);
 const NODE_COUNT = puzzle.N;
 const TOTAL_EDGES = puzzle.edges.length;
-const STATE_KEY = 'nodedle_state_v2';
+const STATE_KEY = 'nodedle_state_v3';
 
 // adjacency: for each node, list of {to, edgeIdx}
 const adj = Array.from({ length: NODE_COUNT }, () => []);
@@ -575,10 +576,13 @@ puzzle.edges.forEach(([a, b], idx) => {
 });
 
 let traced = new Array(TOTAL_EDGES).fill(false);
-let traceLog = []; // [{edgeIdx, newStroke}]
+let traceLog = []; // [{edgeIdx, from, to, newStroke}] — the path built so far, in order
 let currentPos = null;   // node index the "pen" is currently at, or null
 let strokeActive = false;
 let pendingNewStroke = true;
+let liveTip = null;      // {x,y} current pointer position while dragging (rubber-band line)
+let lastPt = null;       // {x,y} previous pointer sample, for step interpolation
+let activeFollow = null; // {to, edgeIdx} — the untraced edge the pointer is currently tracking
 let status = 'playing';
 let secondsElapsed = 0;
 let timerInterval = null;
@@ -586,6 +590,50 @@ let countdownInterval = null;
 
 function tracedCount(){ return traced.filter(Boolean).length; }
 function strokeCount(){ return traceLog.filter((e) => e.newStroke).length; }
+
+// The whole board is one single growing path: once any connection has been
+// drawn, the next stroke can only pick up again from wherever that path
+// currently ends — never from a fresh, unconnected node. Returns null when
+// nothing has been traced yet (any node is a valid start).
+function pathEndNode(){
+  return traceLog.length ? traceLog[traceLog.length - 1].to : null;
+}
+
+// Since the whole board now has to be traced as one single path, the FIRST
+// press matters too: a graph with exactly two odd-degree nodes can only be
+// fully traced by a trail that starts at one of those two (and ends at the
+// other) — starting anywhere else guarantees getting stuck partway through,
+// no matter how carefully the rest is played. When every node has even
+// degree, it's a full circuit and any node works as a start.
+function validStartNodes(){
+  const degree = new Array(NODE_COUNT).fill(0);
+  puzzle.edges.forEach(([a, b]) => { degree[a]++; degree[b]++; });
+  const odds = [];
+  for (let v = 0; v < NODE_COUNT; v++) if (degree[v] % 2 === 1) odds.push(v);
+  if (odds.length === 2) return odds;
+  return Array.from({ length: NODE_COUNT }, (_, i) => i);
+}
+
+// Node labels: each node shows the step number at which it was FIRST
+// visited (1, 2, 3, ... in path order) and keeps that number for good —
+// passing back through a node later doesn't renumber it. That keeps the
+// numbers on the board reading as a clean, stable 1, 2, 3, 4, 5... instead
+// of jumping to a big number every time the path loops back on itself.
+// Which node to continue from is shown separately (it's the highlighted
+// one, in render() below), not by whichever number happens to be highest.
+function computeNodeLabels(){
+  const labels = new Array(NODE_COUNT).fill(null);
+  let nextLabel = 1;
+  traceLog.forEach((entry, i) => {
+    if (i === 0 && labels[entry.from] === null){
+      labels[entry.from] = nextLabel++;
+    }
+    if (labels[entry.to] === null){
+      labels[entry.to] = nextLabel++;
+    }
+  });
+  return labels;
+}
 
 // ═══════════════════════════════════════════════
 //  BOARD / SVG RENDER
@@ -596,6 +644,11 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 
 const NODE_R = 12;
 const HIT_R = 28;
+// How close (in viewBox units) the pointer has to stay to an edge's actual
+// drawn line to be considered "tracing" it — this is what stops a drag from
+// jumping straight between two nodes that happen to be connected; you have
+// to keep your finger near the real line the whole way along it.
+const SNAP_DIST = 24;
 
 function svgPointFromClient(clientX, clientY){
   const rect = boardEl.getBoundingClientRect();
@@ -614,6 +667,30 @@ function nodeAt(pt){
   return best;
 }
 
+// Perpendicular distance from point P to segment AB, plus how far along the
+// segment (0 = at A, 1 = at B) the closest point falls.
+function segPointDist(px, py, ax, ay, bx, by){
+  const abx = bx - ax, aby = by - ay;
+  const apx = px - ax, apy = py - ay;
+  const abLen2 = abx * abx + aby * aby;
+  let t = abLen2 > 0 ? (apx * abx + apy * aby) / abLen2 : 0;
+  t = Math.max(0, Math.min(1, t));
+  const cx = ax + abx * t, cy = ay + aby * t;
+  return { dist: Math.hypot(px - cx, py - cy), t };
+}
+
+// Subdivide a pointer jump into small steps so a fast drag can't skip past
+// a node — or past leaving the line it should be following — unnoticed.
+function stepsBetween(p0, p1){
+  const d = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+  const steps = Math.max(1, Math.ceil(d / 6));
+  const pts = [];
+  for (let s = 1; s <= steps; s++){
+    pts.push({ x: p0.x + (p1.x - p0.x) * s / steps, y: p0.y + (p1.y - p0.y) * s / steps });
+  }
+  return pts;
+}
+
 function render(){
   while (svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
 
@@ -628,21 +705,72 @@ function render(){
     svgEl.appendChild(line);
   });
 
+  // Live "pen" line — follows the pointer from the last node reached, so
+  // there's always visible feedback the instant a drag starts, not just the
+  // moment it lands on another node. Solid + thicker while it's actually
+  // tracking a real edge; thin and faint while it's off in open space.
+  if (strokeActive && currentPos !== null && liveTip){
+    const A = puzzle.nodes[currentPos];
+    const live = document.createElementNS(SVG_NS, 'line');
+    live.setAttribute('x1', A.x); live.setAttribute('y1', A.y);
+    live.setAttribute('x2', liveTip.x); live.setAttribute('y2', liveTip.y);
+    live.setAttribute('stroke', '#5B4FE0');
+    live.setAttribute('stroke-linecap', 'round');
+    if (activeFollow){
+      live.setAttribute('stroke-width', 5);
+      live.setAttribute('opacity', '0.9');
+    } else {
+      live.setAttribute('stroke-width', 3);
+      live.setAttribute('stroke-dasharray', '2 6');
+      live.setAttribute('opacity', '0.45');
+    }
+    svgEl.appendChild(live);
+  }
+
+  const pathEnd = pathEndNode();
+  const labels = computeNodeLabels();
+
   for (let i = 0; i < NODE_COUNT; i++){
     const n = puzzle.nodes[i];
+    const isPen = strokeActive && currentPos === i;
+    // Even while your finger's up between strokes, the node the path
+    // currently ends at stays highlighted — that's the only place a new
+    // stroke is allowed to begin.
+    const isEndpoint = !strokeActive && status === 'playing' && pathEnd === i;
+    const highlight = isPen || isEndpoint;
+
     const circle = document.createElementNS(SVG_NS, 'circle');
     circle.setAttribute('cx', n.x);
     circle.setAttribute('cy', n.y);
-    const isPen = strokeActive && currentPos === i;
-    circle.setAttribute('r', isPen ? NODE_R * 1.35 : NODE_R);
-    circle.setAttribute('fill', isPen ? '#5B4FE0' : '#FFFEFA');
+    circle.setAttribute('r', isPen ? NODE_R * 1.35 : (isEndpoint ? NODE_R * 1.15 : NODE_R));
+    circle.setAttribute('fill', highlight ? '#5B4FE0' : '#FFFEFA');
     circle.setAttribute('stroke', '#5B4FE0');
     circle.setAttribute('stroke-width', 3.5);
     svgEl.appendChild(circle);
+
+    if (labels[i] !== null){
+      const text = document.createElementNS(SVG_NS, 'text');
+      text.setAttribute('x', n.x);
+      text.setAttribute('y', n.y);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'central');
+      text.setAttribute('font-family', 'IBM Plex Mono, ui-monospace, monospace');
+      text.setAttribute('font-size', highlight ? '12.5' : '11');
+      text.setAttribute('font-weight', '700');
+      text.setAttribute('fill', highlight ? '#FFFFFF' : '#5B4FE0');
+      text.setAttribute('pointer-events', 'none');
+      text.textContent = String(labels[i]);
+      svgEl.appendChild(text);
+    }
   }
 
   document.getElementById('strokesDisplay').textContent = strokeCount() + (strokeCount() === 1 ? ' stroke' : ' strokes');
-  document.getElementById('progressLabel').textContent = tracedCount() + ' / ' + TOTAL_EDGES + ' connections traced';
+  let hint = '';
+  if (status === 'playing' && pathEnd !== null && labels[pathEnd] !== null){
+    hint = ' · continue from the filled-in node (' + labels[pathEnd] + ')';
+  }
+  document.getElementById('progressLabel').textContent =
+    tracedCount() + ' / ' + TOTAL_EDGES + ' connections traced' + hint;
   document.getElementById('undoBtn').disabled = traceLog.length === 0 || status !== 'playing';
 }
 
@@ -659,14 +787,116 @@ function findUntracedEdgeBetween(a, b){
   return -1;
 }
 
+// Since a stroke can now only ever continue from wherever it last left off
+// (no restarting elsewhere), a careless move can strand other untraced
+// edges on the far side of a "bridge" — the one connection back to them —
+// making the puzzle impossible to finish without hitting Undo. This checks
+// whether taking `edgeIdx` (from -> to) would cut off every other untraced
+// edge from wherever the pen ends up. Same idea as Fleury's algorithm's
+// bridge test for drawing an Eulerian trail by hand.
+function wouldStrandEdges(fromNode, edgeIdx, toNode){
+  // Everything else still untraced, once this edge is used up.
+  const remaining = [];
+  puzzle.edges.forEach(([a, b], idx) => {
+    if (idx !== edgeIdx && !traced[idx]) remaining.push([a, b]);
+  });
+  if (remaining.length === 0) return false; // this was the last edge — nothing to strand
+
+  const radj = Array.from({ length: NODE_COUNT }, () => []);
+  remaining.forEach(([a, b]) => { radj[a].push(b); radj[b].push(a); });
+  const seen = new Array(NODE_COUNT).fill(false);
+  const stack = [toNode]; seen[toNode] = true;
+  while (stack.length){
+    const cur = stack.pop();
+    for (const n of radj[cur]) if (!seen[n]){ seen[n] = true; stack.push(n); }
+  }
+  // If any remaining edge has neither endpoint reachable from the new
+  // position, it's now stranded.
+  return remaining.some(([a, b]) => !seen[a] && !seen[b]);
+}
+
+// A move is allowed unless it would strand other edges AND a safer
+// alternative (one that wouldn't) is available right now. When every
+// option from here is equally bad (or this is the only edge left), it's
+// forced, so it's always allowed — that's exactly how a real Eulerian
+// trail has to behave too: any actual solution only ever crosses a bridge
+// once there's nothing left on the near side.
+function isSafeMove(fromNode, edgeIdx, toNode){
+  const options = adj[fromNode].filter((e) => !traced[e.edgeIdx]);
+  if (options.length <= 1) return true;
+  if (!wouldStrandEdges(fromNode, edgeIdx, toNode)) return true;
+  const saferAltExists = options.some((o) =>
+    o.edgeIdx !== edgeIdx && !wouldStrandEdges(fromNode, o.edgeIdx, o.to));
+  return !saferAltExists;
+}
+
+// The one place an edge actually gets marked traced. Graph-based (does no
+// screen geometry itself) — the pointer handling below decides *when* it's
+// legitimate to call this, by requiring the drag to have actually followed
+// that edge's line, and this itself refuses a move that would needlessly
+// strand the rest of the board.
 function traceStep(toNode){
   if (currentPos === null) return;
   const edgeIdx = findUntracedEdgeBetween(currentPos, toNode);
   if (edgeIdx === -1) return;
+  if (!isSafeMove(currentPos, edgeIdx, toNode)) return;
   traced[edgeIdx] = true;
-  traceLog.push({ edgeIdx, newStroke: pendingNewStroke });
+  traceLog.push({ edgeIdx, from: currentPos, to: toNode, newStroke: pendingNewStroke });
   pendingNewStroke = false;
   currentPos = toNode;
+}
+
+// Processes one (interpolated) pointer sample. Returns true if it caused an
+// edge to be traced. Tracks a single "active" edge candidate at a time —
+// the untraced edge out of currentPos that the pointer is currently riding
+// close to — so a drag has to stay near that specific line, all the way to
+// its far node, rather than being able to cut straight across the board to
+// any other node that merely happens to share an edge with currentPos.
+function processSample(pt){
+  if (currentPos === null) return false;
+
+  if (activeFollow){
+    const { to, edgeIdx } = activeFollow;
+    if (traced[edgeIdx]){
+      activeFollow = null;
+    } else {
+      const A = puzzle.nodes[currentPos], B = puzzle.nodes[to];
+      const { dist, t } = segPointDist(pt.x, pt.y, A.x, A.y, B.x, B.y);
+      if (dist > SNAP_DIST){
+        activeFollow = null; // drifted away from the line — drop the lock
+      } else if (t >= 0.88 || Math.hypot(pt.x - B.x, pt.y - B.y) <= HIT_R){
+        const before = currentPos;
+        traceStep(to);
+        activeFollow = null;
+        return currentPos !== before;
+      } else {
+        return false; // still en route along this edge
+      }
+    }
+  }
+
+  // No active edge (or just lost it) — see if the pointer is currently
+  // close enough to any untraced, non-stranding edge leaving currentPos to
+  // pick it up. Edges that would needlessly strand the rest of the board
+  // are left out of consideration entirely, unless taking them is forced.
+  let best = null, bestDist = Infinity;
+  for (const { to, edgeIdx } of adj[currentPos]){
+    if (traced[edgeIdx]) continue;
+    if (!isSafeMove(currentPos, edgeIdx, to)) continue;
+    const A = puzzle.nodes[currentPos], B = puzzle.nodes[to];
+    const { dist, t } = segPointDist(pt.x, pt.y, A.x, A.y, B.x, B.y);
+    if (dist < bestDist){ bestDist = dist; best = { to, edgeIdx, dist, t }; }
+  }
+  if (!best || best.dist > SNAP_DIST) return false;
+
+  activeFollow = { to: best.to, edgeIdx: best.edgeIdx };
+  if (best.t >= 0.88 || Math.hypot(pt.x - puzzle.nodes[best.to].x, pt.y - puzzle.nodes[best.to].y) <= HIT_R){
+    const before = currentPos;
+    traceStep(best.to);
+    activeFollow = null;
+    return currentPos !== before;
+  }
+  return false;
 }
 
 function onPointerDown(evt){
@@ -674,28 +904,45 @@ function onPointerDown(evt){
   const pt = svgPointFromClient(evt.clientX, evt.clientY);
   const hit = nodeAt(pt);
   if (hit === -1) return;
+  // The board is one continuous path: once it has a start, every new stroke
+  // has to pick up exactly where the last one left off — but the very first
+  // press is the player's own choice to make, wrong or right. Picking a
+  // node that can't actually lead to a full solve is part of the puzzle;
+  // they'll find out the hard way and can Undo back out and try again.
+  const requiredStart = pathEndNode();
+  if (requiredStart !== null && hit !== requiredStart){
+    rejectShake();
+    return;
+  }
   evt.preventDefault();
   strokeActive = true;
   currentPos = hit;
   pendingNewStroke = true;
+  activeFollow = null;
+  lastPt = pt;
+  liveTip = pt;
   boardEl.setPointerCapture(evt.pointerId);
   startTimer();
   render();
 }
 
 function onPointerMove(evt){
-  if (!strokeActive) return;
+  if (!strokeActive || currentPos === null) return;
   evt.preventDefault();
   const pt = svgPointFromClient(evt.clientX, evt.clientY);
-  const hit = nodeAt(pt);
-  if (hit !== -1 && hit !== currentPos){
-    const before = tracedCount();
-    traceStep(hit);
-    if (tracedCount() !== before){
-      saveState();
-      render();
-      checkWin();
-    }
+  const samples = stepsBetween(lastPt || pt, pt);
+  lastPt = pt;
+  liveTip = pt;
+
+  const before = tracedCount();
+  for (const s of samples){
+    if (currentPos === null) break;
+    processSample(s);
+  }
+  render();
+  if (tracedCount() !== before){
+    saveState();
+    checkWin();
   }
 }
 
@@ -703,6 +950,9 @@ function onPointerUp(){
   if (!strokeActive) return;
   strokeActive = false;
   currentPos = null;
+  activeFollow = null;
+  liveTip = null;
+  lastPt = null;
   saveState();
   render();
 }
@@ -722,6 +972,9 @@ document.getElementById('undoBtn').addEventListener('click', () => {
   strokeActive = false;
   currentPos = null;
   pendingNewStroke = true;
+  activeFollow = null;
+  liveTip = null;
+  lastPt = null;
   saveState();
   render();
 });
@@ -756,6 +1009,9 @@ function finishGame(){
   status = 'won';
   strokeActive = false;
   currentPos = null;
+  activeFollow = null;
+  liveTip = null;
+  lastPt = null;
   stopTimer();
   document.getElementById('timerDisplay').classList.add('won');
   saveState();
@@ -812,6 +1068,9 @@ function resetBoard(){
   currentPos = null;
   strokeActive = false;
   pendingNewStroke = true;
+  activeFollow = null;
+  liveTip = null;
+  lastPt = null;
   secondsElapsed = 0;
   status = 'playing';
   document.getElementById('timerDisplay').textContent = fmt(0);
@@ -860,13 +1119,18 @@ function saveState(){
 function replaySavedState(saved){
   traced = new Array(TOTAL_EDGES).fill(false);
   traceLog = (saved.traceLog || []).filter((e) =>
-    Number.isInteger(e.edgeIdx) && e.edgeIdx >= 0 && e.edgeIdx < TOTAL_EDGES);
+    Number.isInteger(e.edgeIdx) && e.edgeIdx >= 0 && e.edgeIdx < TOTAL_EDGES &&
+    Number.isInteger(e.from) && e.from >= 0 && e.from < NODE_COUNT &&
+    Number.isInteger(e.to) && e.to >= 0 && e.to < NODE_COUNT);
   traceLog.forEach((e) => { traced[e.edgeIdx] = true; });
   secondsElapsed = saved.secondsElapsed || 0;
   status = saved.status || 'playing';
   currentPos = null;
   strokeActive = false;
   pendingNewStroke = true;
+  activeFollow = null;
+  liveTip = null;
+  lastPt = null;
   document.getElementById('timerDisplay').textContent = fmt(secondsElapsed);
   render();
   if (status === 'won'){
