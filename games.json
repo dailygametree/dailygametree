@@ -229,4 +229,17 @@
     "tags": ["puzzle", "logic", "daily"],
     "hiddenTags": ["memory game", "matching game", "match game", "matchdle", "match-dle", "pairs game", "concentration", "flip cards", "card matching", "memory match", "memory puzzle", "shape matching", "wordle", "tile matching"]
   }
+  {
+    "id": "node-dle",
+    "folder": "node-dle",
+    "title": "Node-dle",
+    "tagline": "Trace every line. Never lift twice.",
+    "description": "A daily one-line tracing puzzle. Every board is a fixed network of nodes with grey connections already drawn between them — drag across each one to trace it, without ever retracing the same line twice. It's always possible to trace the whole board in a single unbroken stroke; the fewer times you lift and restart, the better your score.",
+    "banner": "node-dle/banner.png",
+    "favicon": "node-dle/favicon.png",
+    "accent": "#5B4FE0",
+    "dateAdded": "2026-08-28",
+    "tags": ["puzzle", "logic", "daily"],
+    "hiddenTags": ["node", "nodes", "node game", "nodedle", "node-dle", "one line puzzle", "one stroke puzzle", "eulerian trail", "trace the lines", "draw without lifting", "graph puzzle", "wordle", "fewest strokes"]
+  }
 ]
