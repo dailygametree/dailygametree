@@ -228,7 +228,7 @@
     "dateAdded": "2026-08-28",
     "tags": ["puzzle", "logic", "daily"],
     "hiddenTags": ["memory game", "matching game", "match game", "matchdle", "match-dle", "pairs game", "concentration", "flip cards", "card matching", "memory match", "memory puzzle", "shape matching", "wordle", "tile matching"]
-  }
+  },
   {
     "id": "node-dle",
     "folder": "node-dle",
