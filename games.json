@@ -202,5 +202,18 @@
       "geometric sequence",
       "fibonacci"
     ]
+  },
+  {
+    "id": "flow-dle",
+    "folder": "flow-dle",
+    "title": "Flow-dle",
+    "tagline": "Connect the dots, don't cross the lines",
+    "description": "A daily pipe-connecting logic puzzle — link every pair of matching coloured dots on an 8×8 grid without crossing a line, filling every cell to solve it.",
+    "banner": "flow-dle/banner.png",
+    "favicon": "flow-dle/favicon.png",
+    "accent": "#2F6FE4",
+    "dateAdded": "2026-08-28",
+    "tags": ["puzzle", "logic", "daily"],
+    "hiddenTags": ["flow", "flow free", "flow game", "flowdle", "flow-dle", "connect the dots", "pipe puzzle", "pipes", "connect dots", "line puzzle", "numberlink", "color connect", "colour connect", "wordle", "grid puzzle", "non-crossing paths"]
   }
 ]
