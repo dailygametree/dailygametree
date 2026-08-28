@@ -215,5 +215,18 @@
     "dateAdded": "2026-08-28",
     "tags": ["puzzle", "logic", "daily"],
     "hiddenTags": ["flow", "flow free", "flow game", "flowdle", "flow-dle", "connect the dots", "pipe puzzle", "pipes", "connect dots", "line puzzle", "numberlink", "color connect", "colour connect", "wordle", "grid puzzle", "non-crossing paths"]
+  },
+  {
+    "id": "match-dle",
+    "folder": "match-dle",
+    "title": "Match-dle",
+    "tagline": "Flip two, find the pair",
+    "description": "A daily memory-matching puzzle — flip two tiles at a time and clear the board by finding all eight matching shape pairs on a 4×4 grid.",
+    "banner": "match-dle/banner.png",
+    "favicon": "match-dle/favicon.png",
+    "accent": "#C2478A",
+    "dateAdded": "2026-08-28",
+    "tags": ["puzzle", "logic", "daily"],
+    "hiddenTags": ["memory game", "matching game", "match game", "matchdle", "match-dle", "pairs game", "concentration", "flip cards", "card matching", "memory match", "memory puzzle", "shape matching", "wordle", "tile matching"]
   }
 ]
