@@ -241,5 +241,18 @@
     "dateAdded": "2026-08-28",
     "tags": ["puzzle", "logic", "daily"],
     "hiddenTags": ["node", "nodes", "node game", "nodedle", "node-dle", "one line puzzle", "one stroke puzzle", "eulerian trail", "trace the lines", "draw without lifting", "graph puzzle", "wordle", "fewest strokes"]
+  },
+  {
+    "id": "stop-the-clock",
+    "folder": "stop-the-clock",
+    "title": "Stop the Clock",
+    "tagline": "Feel the seconds. Stop on the dot.",
+    "description": "A daily timing game. Today's number is a random whole number of seconds from 1 to 30 — hit Start, then hit Stop the instant you think that many seconds have passed. There's no visible clock while it's running, just your own sense of time. Try as many times as you like; your closest attempt is your best for the day.",
+    "banner": "stop-the-clock/banner.png",
+    "favicon": "stop-the-clock/favicon.png",
+    "accent": "#E0562C",
+    "dateAdded": "2026-08-29",
+    "tags": ["reaction", "timing", "daily"],
+    "hiddenTags": ["stopwatch game", "stop watch", "timing game", "reaction game", "reflex game", "guess the time", "internal clock", "time perception", "count the seconds", "stop the clock", "stop-the-clock", "precision timer", "wordle", "daily challenge", "time estimation game", "beat the clock"]
   }
 ]
