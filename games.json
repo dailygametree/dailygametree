@@ -254,5 +254,18 @@
     "dateAdded": "2026-08-29",
     "tags": ["reaction", "timing", "daily"],
     "hiddenTags": ["stopwatch game", "stop watch", "timing game", "reaction game", "reflex game", "guess the time", "internal clock", "time perception", "count the seconds", "stop the clock", "stop-the-clock", "precision timer", "wordle", "daily challenge", "time estimation game", "beat the clock"]
+  },
+  {
+    "id": "blackjack-dle",
+    "folder": "blackjack-dle",
+    "title": "Blackjack-dle",
+    "tagline": "One hand a day, dealer included",
+    "description": "A daily blackjack puzzle — one hand against the dealer, dealt from the same shuffle as everyone else. Hit, stand or double down, then come back tomorrow for a new shoe.",
+    "banner": "blackjack-dle/banner.png",
+    "favicon": "blackjack-dle/favicon.png",
+    "accent": "#1E7145",
+    "dateAdded": "2026-08-30",
+    "tags": ["logic", "cards", "daily"],
+    "hiddenTags": ["blackjack", "black jack", "21", "twenty-one", "twenty one", "vingt-et-un", "card game", "casino game", "daily blackjack", "blackjack-dle", "blackjackdle", "hit or stand", "dealer game", "free blackjack", "blackjack online", "one hand a day", "wordle"]
   }
 ]
