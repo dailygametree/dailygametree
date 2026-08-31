@@ -365,7 +365,10 @@ footer {
   background:var(--bg-card);
   border:1px solid var(--line);
   border-radius:12px;
-  padding:16px 18px;
+  /* Extra bottom padding vs. the other sides — the "you" label under the
+     number line sits right at the bottom of this card, so it needs more
+     breathing room below it than the panel needs anywhere else. */
+  padding:16px 18px 30px;
 }
 .result-panel.on{ display:block; }
 .result-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -757,22 +760,53 @@ function renderResult(elapsedSeconds, diff){
 
   // Number line: scale so both target and actual comfortably fit.
   const maxScale = Math.max(TARGET * 1.3, elapsedSeconds * 1.15, 5);
-  const targetPct = Math.min(97, (TARGET / maxScale) * 100);
+  const targetPct = Math.min(97, Math.max(3, (TARGET / maxScale) * 100));
   const actualPct = Math.min(97, Math.max(3, (elapsedSeconds / maxScale) * 100));
   const bandHalfPct = (0.4 / maxScale) * 100;
 
   document.getElementById('nlMarkerTarget').style.left = targetPct + '%';
-  document.getElementById('nlTagTarget').style.left = targetPct + '%';
-  document.getElementById('nlTagTarget').textContent = 'target · ' + TARGET + 's';
   document.getElementById('nlMarkerActual').style.left = actualPct + '%';
-  const tagActual = document.getElementById('nlTagActual');
-  tagActual.style.left = actualPct + '%';
-  tagActual.textContent = 'you · ' + fmtS(elapsedSeconds);
   const band = document.getElementById('nlBand');
   band.style.left = Math.max(0, targetPct - bandHalfPct) + '%';
   band.style.width = (bandHalfPct * 2) + '%';
 
+  const tagTarget = document.getElementById('nlTagTarget');
+  const tagActual = document.getElementById('nlTagActual');
+  tagTarget.textContent = 'target · ' + TARGET + 's';
+  tagActual.textContent = 'you · ' + fmtS(elapsedSeconds);
+
+  // The dots above sit at their exact percentage along the track, which is
+  // correct — but the text labels are much wider than the dots, and
+  // centering a wide label on a point near either end of the track (via
+  // the CSS translateX(-50%)) runs half the label straight past the
+  // track's edge. A percentage clamp alone can't fix this: how much room a
+  // label needs depends on its own pixel width (which varies — "you ·
+  // 1.00s" vs "you · 12.34s"), not on where the dot sits. So the tags are
+  // shown first (resultPanel has to be visible, i.e. laid out, for
+  // getBoundingClientRect() below to return real sizes rather than 0), then
+  // each label's own rendered width is measured and its centre position is
+  // clamped in actual pixels, with a small margin so it never rides right
+  // up against the container edge either.
   document.getElementById('resultPanel').classList.add('on');
+
+  function positionTag(tagEl, pct, trackEl){
+    const trackW = trackEl.getBoundingClientRect().width;
+    const tagW = tagEl.getBoundingClientRect().width;
+    const margin = 6;
+    const half = tagW / 2;
+    const rawPx = (pct / 100) * trackW;
+    let clampedPx;
+    if (half + margin > trackW - half - margin) {
+      clampedPx = trackW / 2; // track narrower than the label — just centre it
+    } else {
+      clampedPx = Math.min(trackW - half - margin, Math.max(half + margin, rawPx));
+    }
+    tagEl.style.left = clampedPx + 'px';
+  }
+
+  const trackEl = document.getElementById('nlTrack');
+  positionTag(tagTarget, targetPct, trackEl);
+  positionTag(tagActual, actualPct, trackEl);
 }
 
 function renderHistory(){
