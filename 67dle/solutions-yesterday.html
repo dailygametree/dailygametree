@@ -19,13 +19,11 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4051899080057429"
      crossorigin="anonymous"></script>
 <!-- DGT:ADS-ANALYTICS:END -->
-<title>The 67 Number Game — Yesterday's Solutions — dailygametree</title>
+<title>67dle — Yesterday's Solutions — dailygametree</title>
 <meta name="description" content="Use four numbers and maths to make 67. A new puzzle every day.">
 <link rel="icon" href="favicon.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
@@ -90,7 +88,7 @@ a{ color:inherit; }
 
 .layout {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
 }
 
@@ -99,6 +97,12 @@ a{ color:inherit; }
   margin: 0 10px;
   position: sticky;
   top: 78px;
+  align-self: stretch;
+  display: flex;
+  /* Sticky elements are bounded by their own box. With align-items:stretch
+     on .layout, this rail's height now matches the tallest column
+     (main-content), instead of a fixed px value — so the ad fills all the
+     way down to the footer with no gap, and grows/shrinks with the page. */
 }
 
 .ad-slot {
@@ -114,9 +118,9 @@ a{ color:inherit; }
   justify-content: center;
   text-align: center;
   line-height: 1.6;
+  flex: 1 1 auto;
+  width: 100%;
 }
-
-.ad-rail .ad-slot { height: 600px; }
 
 .main-content {
   flex: 1;
@@ -132,21 +136,22 @@ a{ color:inherit; }
 }
 
 @media (max-width: 900px) {
-  .layout { flex-direction: column; }
+  html, body { height: 100dvh; overflow: hidden; }
+  body { display: flex; flex-direction: column; }
+  .site-header { display: none; }
+  .layout { flex: 1 1 auto; min-height: 0; flex-direction: column; align-items: stretch; overflow: hidden; }
   /* width: calc(...) instead of width: 100% — with a 100% width AND side
      margins, the margins add on top of the full container width and the
      rail overflows the viewport by 28px, which pushes the whole page into
      unwanted horizontal scroll. calc() keeps the outer (margin) box
      exactly at 100%. */
-  .ad-rail { position: static; flex: none; width: calc(100% - 20px); margin: 6px 10px; }
+  .ad-rail { position: static; flex: 0 0 auto; width: calc(100% - 20px); margin: 6px 10px; align-self: auto; }
   .ad-rail.left { order: -1; }
-  .main-content { order: 0; }
+  .main-content { order: 0; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
   .ad-rail.right { order: 1; }
-  .ad-rail .ad-slot { height: 40px; width: auto; font-size: 8px; }
-  .main-inner { padding: 0 14px; }
+  .ad-rail .ad-slot { height: 32px; width: auto; font-size: 8px; letter-spacing: .04em; }
+  .main-inner { padding: 0 12px; height: 100%; }
 
-  .site-header { display: none; }
-  .game-top-row { margin: 10px 4px 0; }
   footer { display: none; }
 }
 
@@ -229,48 +234,243 @@ footer {
   outline-offset: 2px;
 }
 
+/* =====================================================================
+   GAME CONTENT — palette scoped to .game-wrap so it can't clash with
+   the site-wide variables above. Redesigned as a bold, clean, NYT
+   Games / Wordle-style board: crisp white cards, confident type, and
+   a signature green/red duo lifted straight from the 67dle logo (the
+   "6" and the "7"). --card and --black are kept as variable NAMES
+   (re-pointed to the new palette) because the hint popup's JS builds
+   inline styles referencing var(--card)/var(--black) directly.
+   ===================================================================== */
 
 .game-wrap{
-  --card:#ddd8ce;
-  --black:#1a1a1a;
-  --red:#c0392b;
-  --white:#ffffff;
-  --grey:#888;
-  --amber:#c8711a;
-  --amber-light:#e8d5b0;
-  --font-t:'Special Elite',cursive;
-  --font-b:'Courier Prime',monospace;
-  --bg:#f5f0e8;
+  --ink:#171E13;
+  --paper:#fffdf8;
+  --board:#F7EFDE;
+  --line:#EAD9B4;
+  --muted:#8A7C5C;
+  --six:#2F9254;
+  --six-soft:#DFF2E2;
+  --seven:#D1402A;
+  --seven-soft:#FBE1DA;
+  --amber:#C97A1B;
+  --amber-deep:#9C5E14;
+  --amber-soft:#F6E4C1;
 
-  background:var(--bg);
+  /* compatibility aliases — referenced directly by the hint-popup JS */
+  --card:var(--paper);
+  --black:var(--ink);
+
+  --font-display:'Fraunces', serif;
+  --font-num:'IBM Plex Mono', ui-monospace, monospace;
+  --font-b:'Public Sans', ui-sans-serif, sans-serif;
+  --font-mono:'IBM Plex Mono', ui-monospace, monospace;
+
+  background-color:transparent;
+  position:relative;
+  overflow:hidden;
   font-family:var(--font-b);
-  color:var(--black);
-  border-radius:var(--radius);
-  margin-top:14px;
-  padding:32px 24px 48px;
+  color:var(--ink);
+  margin-top:10px;
 }
 
-@media(max-width:960px){.game-wrap{padding:20px 12px 32px}}
+/* Dense "6/7" watermark, upright (no rotation). Sits behind everything via
+   z-index:0; .page below is lifted to z-index:1 to sit on top of it. */
+.game-wrap::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background-repeat:repeat;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='440'%20height='240'%3E%3Ctext%20x='10'%20y='190'%20font-family='IBM%20Plex%20Mono,monospace'%20font-weight='700'%20font-size='112'%20fill='%232F9254'%20fill-opacity='0.11'%3E6%3C/text%3E%3Ctext%20x='70'%20y='150'%20font-family='IBM%20Plex%20Mono,monospace'%20font-weight='700'%20font-size='156'%20fill='%23D1402A'%20fill-opacity='0.09'%3E7%3C/text%3E%3Ctext%20x='175'%20y='205'%20font-family='IBM%20Plex%20Mono,monospace'%20font-weight='700'%20font-size='76'%20fill='%232F9254'%20fill-opacity='0.1'%3E6%3C/text%3E%3Ctext%20x='230'%20y='110'%20font-family='IBM%20Plex%20Mono,monospace'%20font-weight='700'%20font-size='127'%20fill='%23D1402A'%20fill-opacity='0.08'%3E7%3C/text%3E%3Ctext%20x='320'%20y='195'%20font-family='IBM%20Plex%20Mono,monospace'%20font-weight='700'%20font-size='66'%20fill='%232F9254'%20fill-opacity='0.09'%3E6%3C/text%3E%3Ctext%20x='370'%20y='225'%20font-family='IBM%20Plex%20Mono,monospace'%20font-weight='700'%20font-size='90'%20fill='%23D1402A'%20fill-opacity='0.07'%3E7%3C/text%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+}
 
-.title{font-family:var(--font-t);font-size:clamp(20px,4vw,34px);letter-spacing:.5px;line-height:1.2}
-.divider{border:none;height:2px;background:linear-gradient(to right,var(--amber),#e8c07a,var(--amber));margin:12px 0 20px;border-radius:2px;opacity:.7}
-.subtitle{font-size:14px;color:var(--grey);margin-bottom:28px;font-family:var(--font-b)}
-.nums-display{display:flex;gap:14px;justify-content:center;margin-bottom:32px}
-.num-tile{width:72px;height:72px;background:var(--card);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;box-shadow:0 3px 10px rgba(0,0,0,.12)}
+.page{position:relative;z-index:1}
+
+.page{display:flex;justify-content:center;padding:0 24px}
+.game-col{flex:0 0 600px;max-width:600px;padding:28px 24px 60px}
+
+@media(max-width:960px){
+  .page{padding:0 6px;height:100%}
+  .game-col{flex:0 0 auto;max-width:100%;width:100%;height:100%;padding:10px 10px 10px;display:flex;flex-direction:column;justify-content:space-between}
+  .main-inner{height:100%}
+  .main-inner > main{height:100%;display:flex;flex-direction:column;min-height:0}
+  .game-wrap{height:100%;display:flex;flex-direction:column;min-height:0}
+}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ── Hero / logo lockup — replaces the old text title ── */
+.hero-block{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:14px 0 20px}
+.hero-logo-frame{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:14px 26px;
+}
+.hero-logo{width:250px;max-width:100%;height:auto;display:block}
+.hero-tagline{font-family:var(--font-mono);font-size:12.5px;font-weight:600;letter-spacing:.02em;color:var(--muted)}
+.hero-tagline b{color:var(--amber-deep);font-weight:700}
+
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:24px;flex-wrap:nowrap}
+.toolbar-left{display:flex;align-items:center;gap:8px;min-width:0}
+.toolbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.mode-toggle{display:flex;background:var(--board);border-radius:999px;padding:3px;gap:2px;flex-shrink:0}
+.mode-btn{font-family:var(--font-mono);font-size:12.5px;font-weight:700;background:transparent;border:none;padding:7px 15px;border-radius:999px;cursor:pointer;color:var(--muted);transition:background .18s,color .18s;letter-spacing:.03em}
+.mode-btn.active{background:var(--ink);color:#fff}
+.mode-btn.active[data-mode="hard"]{background:var(--seven)}
+.mode-btn:not(.active):hover{color:var(--ink)}
+.icon-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:var(--paper);color:var(--muted);font-family:var(--font-b);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s,border-color .15s;flex-shrink:0;padding:0;line-height:1}
+.icon-btn:hover{border-color:var(--amber);color:var(--amber-deep);background:var(--amber-soft)}
+
+.timer{font-family:var(--font-num);font-size:12.5px;font-weight:600;letter-spacing:.02em;min-width:auto;text-align:right;color:var(--muted);background:var(--board);padding:8px 12px;border-radius:999px;flex-shrink:0}
+
+.history-links{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.history-link{display:block;padding:14px 16px;background:var(--board);border-radius:14px;font-family:var(--font-b);font-weight:700;font-size:14px;color:var(--ink);text-decoration:none;border:1.5px solid transparent;transition:.15s}
+.history-link:hover{border-color:var(--amber);background:var(--amber-soft)}
+
+/* ── Number tiles ── */
+.nums-row{display:flex;gap:14px;justify-content:center;margin-bottom:22px}
+.num-tile{flex:1;max-width:118px;aspect-ratio:1;background:var(--paper);border-radius:18px;display:flex;align-items:center;justify-content:center;font-family:var(--font-num);font-size:clamp(24px,4.4vw,40px);font-weight:700;cursor:pointer;border:2px solid var(--ink);transition:background .18s,color .18s,border-color .18s,transform .15s,box-shadow .18s;user-select:none;box-shadow:0 3px 0 var(--ink)}
+.num-tile:hover:not(.used){transform:translateY(-2px);box-shadow:0 6px 0 var(--ink)}
+.num-tile:active:not(.used){transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}
+.num-tile.used{background:var(--six);color:#fff;border-color:var(--ink);box-shadow:0 4px 0 var(--ink);transform:none;cursor:default}
+
+/* ── Operator tiles ── */
+.ops-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.op-tile{width:58px;height:58px;background:var(--amber);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-num);font-size:22px;line-height:1;font-weight:700;cursor:pointer;border:2px solid var(--ink);transition:background .15s,color .15s,transform .15s,border-color .15s,box-shadow .15s;user-select:none;color:#fff;box-shadow:0 3px 0 var(--ink)}
+.op-tile:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--ink)}
+.op-tile.flash{animation:flashAnim .3s ease forwards}
+@keyframes flashAnim{0%{background:var(--six);transform:scale(1.14)}100%{background:var(--amber);transform:scale(1)}}
+
+/* ── Expression area — a raised "scoreboard" card ── */
+.expr-area{margin-bottom:6px}
+.equation-card{background:var(--board);border-radius:20px;padding:16px 18px}
+.expr-row{display:flex;align-items:center;gap:12px;margin-bottom:2px}
+.expr-box{flex:1;background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:14px 18px;font-size:21px;font-family:var(--font-num);font-weight:700;min-height:56px;letter-spacing:.02em;overflow-x:auto;white-space:nowrap;transition:border-color .18s,background .18s;cursor:default;color:var(--ink)}
+.expr-box.err{border-color:var(--seven)!important;background:var(--seven-soft)}
+.expr-box.ok{border-color:var(--six);background:var(--six-soft)}
+.eq-sign{font-family:var(--font-num);font-size:24px;font-weight:700;flex-shrink:0;color:var(--amber-deep)}
+.result-group{display:flex;align-items:baseline;gap:5px;min-width:74px}
+.result{font-size:26px;font-weight:700;text-align:left;font-family:var(--font-num);color:var(--ink)}
+.result.err{color:var(--seven)}
+.result.win{color:var(--six)}
+.target-note{font-family:var(--font-num);font-size:14px;font-weight:600;color:var(--muted);white-space:nowrap}
+
+.error-msg{color:var(--seven);font-size:12.5px;font-weight:700;min-height:18px;font-family:var(--font-b);padding:8px 2px 0}
+
+.action-row{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+.action-btn{font-family:var(--font-b);font-weight:700;font-size:13px;padding:9px 18px;background:var(--paper);border:1.5px solid var(--line);border-radius:999px;cursor:pointer;transition:border-color .15s,background .15s,color .15s;color:var(--ink)}
+.action-btn:hover{border-color:var(--ink)}
+#clearBtn{color:var(--seven)}
+#clearBtn:hover{border-color:var(--seven);background:var(--seven-soft)}
+
+/* Dedicated mobile-only parenthesis buttons, anchored to the left of the
+   Back/Clear row. Hidden on desktop, where ( and ) stay inline in .ops-row. */
+.paren-group{display:none;gap:6px}
+.paren-tile{display:flex;align-items:center;justify-content:center;padding:0}
+
+.day-info{font-size:11.5px;color:var(--muted);text-align:center;margin-top:20px;font-family:var(--font-mono);letter-spacing:.02em}
+
+/* =====================================================================
+   MOBILE — placed AFTER the base rules above on purpose: an earlier
+   media query with the same selectors (equal specificity) sitting
+   before these base rules would lose the cascade and never apply.
+   ===================================================================== */
+@media(max-width:960px){
+  .hero-block{flex-direction:row;justify-content:center;height:56px;padding:2px 0;gap:10px}
+  .hero-logo-frame{padding:6px 10px}
+  .hero-logo{width:auto;height:34px;max-width:150px}
+  .hero-tagline{display:none}
+  .toolbar{margin-bottom:10px}
+  .icon-btn{width:28px;height:28px;font-size:13px}
+  .mode-btn{padding:5px 11px;font-size:11px}
+  .timer{font-size:11.5px;padding:6px 10px}
+  .nums-row{flex:0 0 auto;align-items:center;gap:8px;margin-bottom:0}
+  .num-tile{max-width:clamp(64px,22vh,96px);font-size:clamp(18px,6.5vw,28px);border-radius:14px}
+
+  /* Operator row: ( and ) move down to the action row (see .paren-group),
+     which frees this row up to fit the rest on one line in Normal mode
+     (4 symbols) and two rows of three in Hard mode (6 symbols). */
+  .ops-row{display:grid;grid-template-columns:repeat(4,max-content);justify-content:center;flex:0 0 auto;gap:10px;margin-bottom:0}
+  .ops-row.ops-hard{grid-template-columns:repeat(3,max-content)}
+  .op-tile{width:clamp(42px,12vh,54px);height:clamp(42px,12vh,54px);font-size:clamp(16px,5vw,20px)}
+  .op-tile-paren{display:none}
+
+  .expr-area{flex:0 0 auto;margin-bottom:0}
+  .equation-card{padding:12px 14px;border-radius:16px}
+  .expr-box{padding:10px 14px;font-size:16px;min-height:46px}
+  .result{font-size:18px}
+  .result-group{min-width:52px}
+  .target-note{font-size:11px}
+
+  .action-row{margin-top:8px;align-items:center}
+  .action-btn{padding:7px 14px;font-size:12px}
+  .paren-group{display:flex;margin-right:auto}
+  .paren-tile{width:30px;height:30px;font-size:15px;border-radius:50%}
+
+  .day-info{margin-top:0;font-size:9.5px}
+}
+
+/* ── Popups ──
+   The four overlay elements below live at the end of <body>, as
+   siblings of .game-wrap rather than descendants of it — so the
+   palette custom properties defined on .game-wrap (--paper, --ink,
+   --card, --black, etc.) don't cascade down to them. Re-declaring
+   the ones actually used in/under a popup directly on the overlay
+   elements makes them inherit correctly, including inside the hint
+   popup's JS-generated markup, which references var(--card)/
+   var(--black) directly. */
+#helpOverlay,#historyOverlay,#hintOverlay,#winOverlay{
+  --ink:#171E13;
+  --paper:#fffdf8;
+  --board:#F7EFDE;
+  --muted:#8A7C5C;
+  --six:#2F9254;
+  --seven:#D1402A;
+  --amber:#C97A1B;
+  --amber-deep:#9C5E14;
+  --amber-soft:#F6E4C1;
+  --card:var(--paper);
+  --black:var(--ink);
+  --font-display:'Fraunces', serif;
+  --font-num:'IBM Plex Mono', ui-monospace, monospace;
+  --font-b:'Public Sans', ui-sans-serif, sans-serif;
+  --font-mono:'IBM Plex Mono', ui-monospace, monospace;
+}
+.overlay{display:none;position:fixed;inset:0;background:rgba(20,24,16,.55);z-index:200;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
+.overlay.on{display:flex}
+.popup{background:var(--paper);border-radius:24px;padding:30px 28px 26px;max-width:420px;width:100%;position:relative;box-shadow:0 20px 50px rgba(23,30,19,.25);font-family:var(--font-b);color:var(--ink)}
+.popup h2{font-family:var(--font-display);font-weight:700;font-size:22px;margin-bottom:14px;letter-spacing:-.01em}
+.popup p,.popup li{font-size:13.5px;line-height:1.65}
+.popup ul{padding-left:18px;margin-top:8px}
+.popup ul li{margin-bottom:4px}
+.popup-close{position:absolute;top:14px;right:16px;width:30px;height:30px;border-radius:50%;background:var(--board);border:none;font-size:14px;cursor:pointer;color:var(--ink);line-height:1;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+.popup-close:hover{background:var(--ink);color:#fff}
+.popup code{background:var(--amber-soft);color:var(--amber-deep);border-radius:5px;padding:2px 6px;font-family:var(--font-mono);font-size:12px;font-weight:700}
+
+.rule-box{background:var(--board);border-radius:14px;padding:12px 14px}
+.rule-head{font-family:var(--font-mono);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--amber-deep);margin-bottom:6px}
+
+.win-popup h2{color:var(--six);font-size:28px;text-align:center;font-family:var(--font-display)}
+.win-popup .win-expr{font-size:13px;text-align:center;margin-top:8px;color:var(--amber-deep);font-style:italic;word-break:break-all;font-family:var(--font-mono);font-weight:600}
+.win-popup .win-time-val{font-size:26px;font-weight:700;display:block;text-align:center;margin-top:10px;font-family:var(--font-num);color:var(--ink)}
+.win-popup .win-sub{font-size:12.5px;color:var(--muted);text-align:center;margin-top:12px}
+
+
+/* ── Yesterday's Solutions — extra components not used on the main
+   puzzle page. Reuses the shared palette/typography variables scoped
+   on .game-wrap above. ── */
+.solutions-subtitle{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--muted);text-align:center;margin-bottom:22px}
+.nums-display{display:flex;gap:14px;justify-content:center;margin-bottom:32px;flex-wrap:wrap}
 .solutions-grid{display:grid;gap:10px}
-.sol-card{background:var(--white);border:1.5px solid #ccc;border-radius:10px;padding:14px 18px;font-family:var(--font-b);font-size:16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.sol-expr{flex:1;word-break:break-all;letter-spacing:.3px}
-.sol-eq{color:#4a9e5c;font-weight:700;font-size:14px;white-space:nowrap}
-.loading{text-align:center;padding:40px;color:var(--grey);font-size:15px}
-.count-info{font-size:13px;color:var(--grey);text-align:center;margin-bottom:20px}
+.sol-card{background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:14px 18px;font-family:var(--font-num);font-size:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;transition:border-color .15s,background .15s}
+.sol-card:hover{border-color:var(--amber);background:var(--amber-soft)}
+.sol-expr{flex:1;word-break:break-all;letter-spacing:.02em;color:var(--ink);font-weight:600}
+.sol-eq{color:var(--six);font-weight:700;font-size:14px;white-space:nowrap;font-family:var(--font-mono)}
+.loading{text-align:center;padding:40px;color:var(--muted);font-size:15px;font-family:var(--font-mono)}
+.count-info{font-size:13px;color:var(--muted);text-align:center;margin-bottom:20px;font-family:var(--font-mono);font-weight:600}
 @media(max-width:600px){.sol-card{font-size:14px;padding:10px 14px}}
-
-.mode-row{display:flex;align-items:center;gap:10px;margin-bottom:22px;flex-wrap:wrap}
-.mode-label{font-size:12px;color:#888;letter-spacing:.5px}
-.mode-toggle{display:flex;border:2px solid var(--black);border-radius:999px;overflow:hidden}
-.mode-btn{font-family:var(--font-b);font-size:13px;font-weight:700;background:transparent;border:none;padding:6px 16px;cursor:pointer;color:var(--black);transition:background .15s,color .15s;letter-spacing:.5px}
-.mode-btn.active{background:var(--black);color:var(--bg)}
-.mode-btn:not(.active):hover{background:var(--amber-light)}
 </style>
 </head>
 <body data-game="67dle">
@@ -302,24 +502,32 @@ footer {
           </div>
 
           <div class="game-wrap">
-            <h1 class="title">Yesterday's Solutions</h1>
-            <hr class="divider">
+            <div class="page">
+              <div class="game-col">
+                <div class="hero-block">
+                  <h1 class="sr-only">67dle — Yesterday's Solutions</h1>
+                  <div class="hero-logo-frame">
+                    <img class="hero-logo" src="67dle-logo.png" alt="67dle" width="1495" height="645" />
+                  </div>
+                  <p class="hero-tagline">Every way to reach exactly <b>67</b> — yesterday's puzzle</p>
+                </div>
 
-            <div class="mode-row">
-              <span class="mode-label">MODE:</span>
-              <div class="mode-toggle">
-                <button class="mode-btn" id="modeNormalBtn" data-mode="normal">Normal</button>
-                <button class="mode-btn" id="modeHardBtn" data-mode="hard">Hard</button>
+                <div style="display:flex;justify-content:center;margin-bottom:26px">
+                  <div class="mode-toggle">
+                    <button class="mode-btn" id="modeNormalBtn" data-mode="normal">Normal</button>
+                    <button class="mode-btn" id="modeHardBtn" data-mode="hard">Hard</button>
+                  </div>
+                </div>
+
+                <p class="solutions-subtitle" id="puzzleLabel">Loading puzzle&hellip;</p>
+
+                <div class="nums-display" id="numsDisplay"></div>
+
+                <div class="loading" id="loadingMsg">Finding all solutions&hellip; <span id="progress"></span></div>
+                <div class="count-info" id="countInfo" style="display:none"></div>
+                <div class="solutions-grid" id="solutionsGrid"></div>
               </div>
             </div>
-
-            <p class="subtitle" id="puzzleLabel">Loading puzzle&hellip;</p>
-
-            <div class="nums-display" id="numsDisplay"></div>
-
-            <div class="loading" id="loadingMsg">Finding all solutions&hellip; <span id="progress"></span></div>
-            <div class="count-info" id="countInfo" style="display:none"></div>
-            <div class="solutions-grid" id="solutionsGrid"></div>
           </div>
 
         </main>
