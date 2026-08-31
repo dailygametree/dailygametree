@@ -4,20 +4,11 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <!-- DGT:ADS-ANALYTICS:START -->
-<!-- Consent Mode v2 defaults. This must load before any Google tag.
-     Nothing is granted until our consent tool (Google's Privacy &
-     messaging, once configured) says otherwise. -->
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){ dataLayer.push(arguments); }
-  gtag('consent', 'default', {
-    ad_storage: 'denied',
-    analytics_storage: 'denied',
-    ad_user_data: 'denied',
-    ad_personalization: 'denied',
-    wait_for_update: 500
-  });
-</script>
+<!-- Consent Mode defaults — shared, see /tags.js. The two Google script
+     tags below are kept static per page (not loaded from tags.js) per
+     Google's own guidance against dynamically-injected ad/analytics
+     scripts, which can delay or block ads loading. -->
+<script src="/tags.js"></script>
 <!-- Google tag (gtag.js) — Google Analytics 4 -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F97XZGEJ9B"></script>
 <script>
@@ -648,6 +639,7 @@ footer {
       <a href="terms.html">Terms and Conditions</a>
       <a href="about.html">About Us</a>
       <a href="contact.html">Contact</a>
+      <a href="javascript:void(0)" onclick="googlefc.callbackQueue.push(googlefc.showRevocationMessage)" id="cookieSettingsLink">Cookie Settings</a>
     </nav>
     <p>&copy; <span id="year"></span> dailygametree.com</p>
   </footer>
