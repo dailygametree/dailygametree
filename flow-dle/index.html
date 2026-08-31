@@ -816,12 +816,33 @@ function clearColorPath(c){
   completed[c] = false;
 }
 
+// True only for cells one orthogonal step apart (never diagonal, never a
+// multi-cell jump).
+function isAdjacent(a, b){
+  const ra = Math.floor(a / COLS), ca = a % COLS;
+  const rb = Math.floor(b / COLS), cb = b % COLS;
+  return Math.abs(ra - rb) + Math.abs(ca - cb) === 1;
+}
+
 function tryStep(newIdx){
   const c = activeColor;
   const path = paths[c];
   const last = path[path.length - 1];
   if (newIdx === last) return;
   if (completed[c]) return;
+
+  // stepsBetween() normally only ever hands us cells one step away from
+  // wherever the pipe currently ends. But when one interpolated step in a
+  // batch gets rejected below (it's blocked by another colour's pipe or
+  // dot), the pipe's tail doesn't move — yet the loop in onPointerMove()
+  // keeps feeding it the REST of that batch regardless, which are cells
+  // meant to follow the rejected one, not `last`. Without this check,
+  // accepting one of those non-adjacent cells anyway draws a pipe segment
+  // that jumps clean over the cell that blocked it (visually either a
+  // diagonal line, or a straight line passing straight through another
+  // colour's dot) instead of just stopping at the obstacle like a real
+  // drag would.
+  if (!isAdjacent(newIdx, last)) return;
 
   // Stepping back onto the immediately preceding cell erases the tip
   // of the pipe (lets the player redraw without lifting their finger).
