@@ -761,6 +761,21 @@ function render(){
   const filled = owner.filter((v) => v !== -1).length;
   document.getElementById('pairsLeft').textContent =
     completed.filter(Boolean).length + '/' + pairsCount + ' · ' + filled + '/' + N;
+
+  // Safety net: checkWin() used to be called ONLY from onPointerUp, on the
+  // assumption that "did the board just become fully solved" only ever
+  // needs checking right when a drag ends. In practice pointerup/pointercancel
+  // can be dropped by the browser in all sorts of ordinary situations —
+  // trackpad gestures, a mid-drag focus change, fast touch input, the
+  // pointer leaving the window — and when that happens the very last move
+  // that actually completes the board never gets checked at all: the state
+  // is genuinely fully solved (every pair connected, every cell filled),
+  // but nothing ever looks again. render() runs after every single state
+  // change in this file (pointerdown, pointermove, pointerup, reset,
+  // restoring saved progress), so checking here catches a true win the
+  // instant it happens no matter which of those code paths produced it,
+  // instead of depending on one specific event firing.
+  checkWin();
 }
 
 // ═══════════════════════════════════════════════
@@ -918,6 +933,7 @@ function stopTimer(){
 //  WIN / SHARE / COUNTDOWN
 // ═══════════════════════════════════════════════
 function checkWin(){
+  if (status !== 'playing') return; // already won (or not started) — don't re-trigger finishGame()
   if (completed.every(Boolean) && owner.every((v) => v !== -1)) finishGame();
 }
 
