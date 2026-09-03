@@ -267,5 +267,18 @@
     "dateAdded": "2026-08-30",
     "tags": ["logic", "cards", "daily"],
     "hiddenTags": ["blackjack", "black jack", "21", "twenty-one", "twenty one", "vingt-et-un", "card game", "casino game", "daily blackjack", "blackjack-dle", "blackjackdle", "hit or stand", "dealer game", "free blackjack", "blackjack online", "one hand a day", "wordle"]
+  },
+  {
+    "id": "connectly",
+    "folder": "connectly",
+    "title": "Connectly",
+    "tagline": "One path, every cell, in order",
+    "description": "A daily grid-tracing puzzle — connect the numbered dots in order with a single path that fills every cell on the 6×6 grid, without crossing or lifting.",
+    "banner": "connectly/banner.png",
+    "favicon": "connectly/favicon.png",
+    "accent": "#159895",
+    "dateAdded": "2026-09-02",
+    "tags": ["puzzle", "logic", "daily"],
+    "hiddenTags": ["zip", "zip game", "linkedin zip", "connect the dots", "connectly", "connect-ly", "number path", "dot to dot", "dot-to-dot", "path puzzle", "fill the grid", "hamiltonian path", "trace puzzle", "wordle", "grid puzzle", "logic puzzle", "one line puzzle"]
   }
 ]
