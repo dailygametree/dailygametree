@@ -280,5 +280,18 @@
     "dateAdded": "2026-09-02",
     "tags": ["puzzle", "logic", "daily"],
     "hiddenTags": ["zip", "zip game", "linkedin zip", "connect the dots", "connectly", "connect-ly", "number path", "dot to dot", "dot-to-dot", "path puzzle", "fill the grid", "hamiltonian path", "trace puzzle", "wordle", "grid puzzle", "logic puzzle", "one line puzzle"]
-  }
+  },
+  {
+  "id": "guess-the-word",
+  "folder": "guess-the-word",
+  "title": "Guess the Word",
+  "tagline": "Five letters, six guesses, one word a day",
+  "description": "A daily five-letter word puzzle — guess the secret word in six tries, with every guess coloring in how close each letter was.",
+  "banner": "guess-the-word/banner.png",
+  "favicon": "guess-the-word/favicon.png",
+  "accent": "#7A2E3B",
+  "dateAdded": "2026-09-04",
+  "tags": ["word", "puzzle", "daily"],
+  "hiddenTags": ["wordle", "wordle clone", "wordle alternative", "word game", "5 letter word game", "five letter word", "guess the word", "guess a word", "daily word game", "word of the day", "word puzzle", "letter game", "guess word game"]
+}
 ]
