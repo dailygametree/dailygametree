@@ -1,0 +1,384 @@
+:root {
+  --ink: #f5f5f5;
+  --bg-deep: #000000;
+  --bg-panel: #0a0a0a;
+  --panel-border: #ffffff;
+  --accent: #ffffff;
+  --accent-shadow: #8a8a8a;
+  --gold: #e9e9e9;
+  --scrim: rgba(0, 0, 0, 0.85);
+  --muted-text: #8a8a8a;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-deep);
+  font-family: "Nunito", "Segoe UI", sans-serif;
+  touch-action: none;
+  user-select: none;
+}
+
+#game-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at 50% 20%, #161616 0%, #000 70%);
+}
+
+#gameCanvas {
+  display: block;
+  background: #000;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.25), 0 12px 40px rgba(0, 0, 0, 0.8);
+  border-radius: 6px;
+}
+
+/* CRT overlay — scanlines + a soft vignette, sitting over the canvas
+   area only (below the HUD and menu overlays, which carry their own
+   scrim) so the game view reads like an old monochrome monitor. */
+.crt-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.crt-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 700px 650px at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ---------------------------------------------------------------- */
+/* HUD                                                                */
+/* ---------------------------------------------------------------- */
+#hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  color: var(--ink);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+  pointer-events: none;
+  z-index: 5;
+}
+
+#hud.hidden {
+  display: none;
+}
+
+.hud-label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--muted-text);
+  font-weight: 700;
+}
+
+.hud-left, .hud-mid, .hud-right {
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+#score { color: var(--gold); }
+#hud-level { color: var(--panel-border); }
+
+#lives-dots {
+  display: inline-flex;
+  gap: 4px;
+  vertical-align: middle;
+}
+
+.life-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+/* ---------------------------------------------------------------- */
+/* Overlay scrim + panel                                             */
+/* ---------------------------------------------------------------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--scrim);
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  color: var(--ink);
+  background: var(--bg-panel);
+  border: 3px solid var(--panel-border);
+  border-radius: 18px;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.12), 0 10px 30px rgba(0, 0, 0, 0.6);
+  padding: 26px 26px 24px;
+  width: 100%;
+  max-width: 340px;
+  margin: auto;
+  animation: panelIn 0.4s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.mascot {
+  width: 60px;
+  height: 60px;
+  margin-bottom: -4px;
+}
+
+h1 {
+  font-family: "Baloo 2", sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.03em;
+  margin: 4px 0 0;
+  color: var(--panel-border);
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+h2, h3 {
+  font-family: "Baloo 2", sans-serif;
+  margin: 4px 0 0;
+  color: var(--ink);
+}
+
+.hint {
+  font-size: 14px;
+  color: var(--muted-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.hint em {
+  color: var(--gold);
+  font-style: normal;
+}
+
+.controls-hint {
+  font-size: 12px;
+  color: var(--muted-text);
+  margin: 2px 0 0;
+}
+
+.btn {
+  font-family: "Baloo 2", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #06070f;
+  background: var(--accent);
+  border: none;
+  border-radius: 14px;
+  padding: 12px 30px;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--accent-shadow);
+  transition: transform 0.08s;
+}
+
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--accent-shadow);
+}
+
+.btn.pulse {
+  animation: pulseBtn 1.6s ease-in-out infinite;
+}
+
+@keyframes pulseBtn {
+  0%, 100% { box-shadow: 0 5px 0 var(--accent-shadow), 0 0 0 0 rgba(255, 255, 255, 0.5); }
+  50% { box-shadow: 0 5px 0 var(--accent-shadow), 0 0 0 10px rgba(255, 255, 255, 0); }
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.btn-sm {
+  font-family: "Nunito", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.btn-sm.primary {
+  border-color: var(--panel-border);
+  color: var(--panel-border);
+}
+
+.score-line {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.score-line.best {
+  color: var(--gold);
+}
+
+.name-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  align-items: flex-start;
+  margin-bottom: 4px;
+}
+
+.name-field label {
+  font-size: 11px;
+  color: var(--muted-text);
+}
+
+.name-field input {
+  width: 100%;
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--ink);
+  font-family: "Nunito", sans-serif;
+}
+
+.lb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lb-row {
+  display: grid;
+  grid-template-columns: 30px 1fr 55px;
+  gap: 6px;
+  align-items: center;
+  font-size: 13px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lb-row.me {
+  background: rgba(255, 255, 255, 0.15);
+  outline: 1px solid var(--accent);
+}
+
+.lb-rank { color: var(--muted-text); font-weight: 700; }
+.lb-name { text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-score { text-align: right; color: var(--gold); font-weight: 700; }
+
+.lb-note {
+  font-size: 12px;
+  color: var(--muted-text);
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* Touch pad — rotate counter-clockwise / clockwise, side by side     */
+/* below the ring                                                    */
+/* ---------------------------------------------------------------- */
+#dpad {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 60px;
+  z-index: 6;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+#dpad.hidden { display: none; }
+
+.dpad-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: var(--ink);
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dpad-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ---------------------------------------------------------------- */
+/* Mute button                                                       */
+/* ---------------------------------------------------------------- */
+.icon-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+}
+
+.touch-only { display: none; }
+@media (pointer: coarse) {
+  .desktop-only { display: none; }
+  .touch-only { display: inline; }
+}

@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METEOR MADNESS - Endless Runner Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Major+Mono+Display&display=swap" rel="stylesheet">
+    <!-- Audio elements for sound effects -->
+    <audio id="hitSound" preload="auto"></audio>
+    <audio id="scoreSound" preload="auto"></audio>
+    <audio id="powerUpSound" preload="auto"></audio>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: #000000;
+            color: #ffffff;
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: block;
+        }
+
+        /* ── Game area (fills the entire embed frame) ── */
+        #page-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #gameCanvas {
+            display: block;
+            background: #000000;
+            width: 100%;
+            height: 100%;
+        }
+
+        #menuContainer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(0, 20, 40, 0.95), rgba(20, 0, 40, 0.95));
+            border: 3px solid #00d4ff;
+            border-radius: 20px;
+            padding: clamp(20px, 5vmin, 60px);
+            text-align: center;
+            z-index: 100;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            max-width: 92vw;
+            max-height: 92vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        #menuContainer h1 {
+            font-family: 'Major Mono Display', monospace;
+            font-size: clamp(28px, 8vmin, 72px);
+            font-weight: 400;
+            letter-spacing: clamp(2px, 1vmin, 8px);
+            margin-bottom: 20px;
+            color: #ffffff;
+            text-shadow: 0 0 30px #00d4ff, 0 0 60px #00d4ff;
+        }
+
+        #highScoreDisplay {
+            font-size: clamp(14px, 3vmin, 20px);
+            color: #ffdd00;
+            margin-bottom: clamp(16px, 4vmin, 40px);
+            text-shadow: 0 0 15px #ffdd00;
+            letter-spacing: 2px;
+        }
+
+        .menu-button {
+            display: block;
+            width: min(280px, 70vw);
+            height: clamp(48px, 10vmin, 70px);
+            margin: clamp(10px, 2vmin, 20px) auto;
+            background: linear-gradient(135deg, #001a33, #002d4d);
+            border: 2px solid #00d4ff;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: clamp(15px, 3vmin, 24px);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+            letter-spacing: 2px;
+        }
+
+        .menu-button:hover {
+            border-color: #00ff88;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.6), inset 0 0 20px rgba(0, 212, 255, 0.2);
+            background: linear-gradient(135deg, #001a33, #003d66);
+            transform: scale(1.05);
+        }
+
+        .menu-button:active {
+            transform: scale(0.98);
+        }
+
+        #scoreHUD {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4));
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 15px;
+            gap: 10px;
+            z-index: 50;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+        }
+
+        #scoreHUDTitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: #00d4ff;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px #00d4ff;
+            font-weight: 700;
+        }
+
+        #scoreContainer {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .player-score {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .player-indicator {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .player-out {
+            color: #ff3333;
+        }
+    </style>
+</head>
+<body>
+
+        <!-- Game wrapper -->
+        <div id="page-wrapper">
+            <div id="menuContainer">
+                <h1>METEOR MADNESS</h1>
+                <div id="highScoreDisplay">HIGH SCORE: 0</div>
+                <div id="playerSelectionButtons">
+                    <button class="menu-button" onclick="startGame(1)" data-testid="button-start-1player">1 PLAYER</button>
+                    <button class="menu-button" onclick="startGame(2)" data-testid="button-start-2players">2 PLAYERS</button>
+                    <button class="menu-button" onclick="startGame(3)" data-testid="button-start-3players">3 PLAYERS</button>
+                    <button class="menu-button" onclick="startGame(4)" data-testid="button-start-4players">4 PLAYERS</button>
+                </div>
+                <div id="gameOverButtons" style="display: none;">
+                    <button class="menu-button" onclick="restartGame()" data-testid="button-restart">PLAY AGAIN</button>
+                    <button class="menu-button" onclick="returnToMenu()" data-testid="button-menu">MAIN MENU</button>
+                </div>
+            </div>
+
+            <div id="scoreHUD">
+                <div id="scoreHUDTitle">◇ SCORES ◇</div>
+                <div id="scoreContainer"></div>
+            </div>
+            <canvas id="gameCanvas"></canvas>
+
+            <script>
+                const canvas = document.getElementById('gameCanvas');
+                const ctx = canvas.getContext('2d');
+                const menuContainer = document.getElementById('menuContainer');
+                const scoreHUD = document.getElementById('scoreHUD');
+                const scoreContainer = document.getElementById('scoreContainer');
+                const highScoreDisplay = document.getElementById('highScoreDisplay');
+                const playerSelectionButtons = document.getElementById('playerSelectionButtons');
+                const gameOverButtons = document.getElementById('gameOverButtons');
+
+                let backgroundMusic = new Audio('abandoned-space-station-305773.mp3');
+
+                let lastPlayerCount = 1;
+                
+                // Game state - sound first
+                let soundEnabled = true;
+                
+                // Menu music using HTML Audio element
+                let bgMusic = new Audio('abandoned-space-station-305773.mp3');
+                bgMusic.loop = true;
+                bgMusic.volume = 0.3;
+                let gameMusicPlaying = false;
+
+                let menuMusic = new Audio('space-drama-theme-163019.mp3')
+                menuMusic.loop = true;
+                menuMusic.volume = 0.3;
+                let menuMusicPlaying = false;
+
+                let musicPlaying = false;
+                
+                function playMenuMusic() {
+                    if (!menuMusicPlaying) {
+                        menuMusic.play().catch(err => console.log("Menu music play error:", err));
+                        menuMusicPlaying = true;
+                    }
+                }
+                
+                function stopMenuMusic() {
+                    if (menuMusicPlaying) {
+                        menuMusic.pause();
+                        menuMusic.currentTime = 0;
+                        menuMusicPlaying = false;
+                    }
+                }
+                
+                // Start menu music only after the user's first interaction:
+                function unlockAudio() {
+                    if (menuContainer.style.display !== "none") {
+                        playMenuMusic();
+                    }
+                    document.removeEventListener("click", unlockAudio);
+                    document.removeEventListener("keydown", unlockAudio);
+                }
+
+                document.addEventListener("click", unlockAudio);
+                document.addEventListener("keydown", unlockAudio);
+                
+                // High score management
+                let highScore = 0;
+                try {
+                    highScore = parseInt(localStorage.getItem('spaceRunnerHighScore') || '0', 10);
+                } catch (e) { /* storage may be unavailable in some embeds */ }
+                
+                function updateHighScoreDisplay() {
+                    highScoreDisplay.textContent = `HIGH SCORE: ${Math.floor(highScore)}`;
+                }
+                
+                function updateHighScore(scores) {
+                    const maxScore = Math.max(...scores);
+                    if (maxScore > highScore) {
+                        highScore = maxScore;
+                        try {
+                            localStorage.setItem('spaceRunnerHighScore', Math.floor(highScore).toString());
+                        } catch (e) { /* storage may be unavailable in some embeds */ }
+                        updateHighScoreDisplay();
+                    }
+                }
+                
+                updateHighScoreDisplay();
+
+                // Canvas setup
+                function resizeCanvas() {
+                    const wrapper = document.getElementById('page-wrapper');
+                    canvas.width = wrapper.clientWidth;
+                    canvas.height = wrapper.clientHeight;
+                }
+                resizeCanvas();
+                window.addEventListener('resize', resizeCanvas);
+
+                // dailygametree.com: ?mode=party shows the 2-4 player options,
+                // anything else is the 1 player game.
+                const PAGE_MODE = new URLSearchParams(location.search).get('mode') === 'party' ? 'party' : 'solo';
+                document.querySelectorAll('#playerSelectionButtons .menu-button').forEach((btn) => {
+                    const isSolo = btn.dataset.testid === 'button-start-1player';
+                    if ((PAGE_MODE === 'party') === isSolo) btn.remove();
+                });
+
+                // Player accent colors
+                const PLAYER_COLORS = ['#00d4ff', '#00ff88', '#ff3366', '#ffdd00'];
+
+                // Game state
+                let gameRunning = false;
+                let numPlayers = 0;
+                let players = [];
+                let meteors = [];
+                let stars = [];
+                let explosions = [];
+                let rocketTrails = [];
+                let powerUps = [];
+                let slowMotionActive = false;
+                let slowMotionTimer = 0;
+                let gameTime = 0;
+                let difficultyMultiplier = 1;
+                
+                // Sound effect generators
+                function playExplosionSound() {
+                    if (!soundEnabled) return;
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Create complex explosion sound with multiple layers
+                    // Low-frequency boom
+                    const osc1 = audioContext.createOscillator();
+                    const gain1 = audioContext.createGain();
+                    osc1.type = 'sine';
+                    osc1.frequency.setValueAtTime(150, audioContext.currentTime);
+                    osc1.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.4);
+                    gain1.gain.setValueAtTime(0.4, audioContext.currentTime);
+                    gain1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                    osc1.connect(gain1);
+                    gain1.connect(audioContext.destination);
+                    osc1.start(audioContext.currentTime);
+                    osc1.stop(audioContext.currentTime + 0.4);
+                    
+                    // Mid-range crackle
+                    const osc2 = audioContext.createOscillator();
+                    const gain2 = audioContext.createGain();
+                    osc2.type = 'triangle';
+                    osc2.frequency.setValueAtTime(400, audioContext.currentTime);
+                    osc2.frequency.exponentialRampToValueAtTime(150, audioContext.currentTime + 0.3);
+                    gain2.gain.setValueAtTime(0.25, audioContext.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                    osc2.connect(gain2);
+                    gain2.connect(audioContext.destination);
+                    osc2.start(audioContext.currentTime);
+                    osc2.stop(audioContext.currentTime + 0.3);
+                    
+                    // High-frequency noise burst
+                    const osc3 = audioContext.createOscillator();
+                    const gain3 = audioContext.createGain();
+                    osc3.type = 'square';
+                    osc3.frequency.setValueAtTime(800, audioContext.currentTime);
+                    osc3.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.2);
+                    gain3.gain.setValueAtTime(0.15, audioContext.currentTime);
+                    gain3.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                    osc3.connect(gain3);
+                    gain3.connect(audioContext.destination);
+                    osc3.start(audioContext.currentTime);
+                    osc3.stop(audioContext.currentTime + 0.2);
+                }
+                
+                function playScoreSound() {
+                    if (!soundEnabled) return;
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.frequency.setValueAtTime(800, audioContext.currentTime);
+                    osc.frequency.setValueAtTime(1000, audioContext.currentTime + 0.05);
+                    gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                    osc.start(audioContext.currentTime);
+                    osc.stop(audioContext.currentTime + 0.15);
+                }
+                
+                function playPowerUpSound(type) {
+                    if (!soundEnabled) return;
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    if (type === 'shield') {
+                        // Shield charging sound - rising pitch with harmonic buildup
+                        const osc1 = audioContext.createOscillator();
+                        const osc2 = audioContext.createOscillator();
+                        const gain1 = audioContext.createGain();
+                        const gain2 = audioContext.createGain();
+                        
+                        osc1.type = 'sine';
+                        osc2.type = 'sine';
+                        osc1.connect(gain1);
+                        osc2.connect(gain2);
+                        gain1.connect(audioContext.destination);
+                        gain2.connect(audioContext.destination);
+                        
+                        // Fundamental rising from 300 to 600 (lowered and longer)
+                        osc1.frequency.setValueAtTime(300, audioContext.currentTime);
+                        osc1.frequency.linearRampToValueAtTime(600, audioContext.currentTime + 0.5);
+                        gain1.gain.setValueAtTime(0.25, audioContext.currentTime);
+                        gain1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                        
+                        // Harmonic rising from 400 to 900 (lowered and longer)
+                        osc2.frequency.setValueAtTime(400, audioContext.currentTime);
+                        osc2.frequency.linearRampToValueAtTime(900, audioContext.currentTime + 0.5);
+                        gain2.gain.setValueAtTime(0.15, audioContext.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                        
+                        osc1.start(audioContext.currentTime);
+                        osc2.start(audioContext.currentTime);
+                        osc1.stop(audioContext.currentTime + 0.5);
+                        osc2.stop(audioContext.currentTime + 0.5);
+                        
+                    } else if (type === 'slowmo') {
+                        // Time warp sound - downward frequency sweep with reverb effect
+                        const osc = audioContext.createOscillator();
+                        const gain = audioContext.createGain();
+                        osc.type = 'sine';
+                        osc.connect(gain);
+                        gain.connect(audioContext.destination);
+                        
+                        // Dramatic downward sweep (warping time effect) - longer duration
+                        osc.frequency.setValueAtTime(1000, audioContext.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(80, audioContext.currentTime + 1.0);
+                        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);
+                        
+                        osc.start(audioContext.currentTime);
+                        osc.stop(audioContext.currentTime + 1.0);
+                        
+                    } else if (type === 'multiplier') {
+                        // Triumphant "ba dah!" - two rising notes (higher pitch)
+                        const osc1 = audioContext.createOscillator();
+                        const osc2 = audioContext.createOscillator();
+                        const gain1 = audioContext.createGain();
+                        const gain2 = audioContext.createGain();
+                        
+                        osc1.type = 'sine';
+                        osc2.type = 'sine';
+                        osc1.connect(gain1);
+                        osc2.connect(gain2);
+                        gain1.connect(audioContext.destination);
+                        gain2.connect(audioContext.destination);
+                        
+                        // First note "ba" - lower note, quick (higher pitch)
+                        osc1.frequency.setValueAtTime(500, audioContext.currentTime);
+                        gain1.gain.setValueAtTime(0.3, audioContext.currentTime);
+                        gain1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                        osc1.start(audioContext.currentTime);
+                        osc1.stop(audioContext.currentTime + 0.2);
+                        
+                        // Second note "dah!" - higher note, longer and triumphant (higher pitch)
+                        osc2.frequency.setValueAtTime(750, audioContext.currentTime + 0.15);
+                        osc2.frequency.linearRampToValueAtTime(850, audioContext.currentTime + 0.5);
+                        gain2.gain.setValueAtTime(0.35, audioContext.currentTime + 0.15);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                        osc2.start(audioContext.currentTime + 0.15);
+                        osc2.stop(audioContext.currentTime + 0.5);
+                    }
+                }
+                
+                function playShieldBreakSound() {
+                    if (!soundEnabled) return;
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Reverse shield sound - descending frequencies (shield collapsing)
+                    const osc1 = audioContext.createOscillator();
+                    const osc2 = audioContext.createOscillator();
+                    const gain1 = audioContext.createGain();
+                    const gain2 = audioContext.createGain();
+                    
+                    osc1.type = 'sine';
+                    osc2.type = 'sine';
+                    osc1.connect(gain1);
+                    osc2.connect(gain2);
+                    gain1.connect(audioContext.destination);
+                    gain2.connect(audioContext.destination);
+                    
+                    // Fundamental falling from 600 to 300
+                    osc1.frequency.setValueAtTime(600, audioContext.currentTime);
+                    osc1.frequency.linearRampToValueAtTime(300, audioContext.currentTime + 0.5);
+                    gain1.gain.setValueAtTime(0.25, audioContext.currentTime);
+                    gain1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    // Harmonic falling from 900 to 400
+                    osc2.frequency.setValueAtTime(900, audioContext.currentTime);
+                    osc2.frequency.linearRampToValueAtTime(400, audioContext.currentTime + 0.5);
+                    gain2.gain.setValueAtTime(0.15, audioContext.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    
+                    osc1.start(audioContext.currentTime);
+                    osc2.start(audioContext.currentTime);
+                    osc1.stop(audioContext.currentTime + 0.5);
+                    osc2.stop(audioContext.currentTime + 0.5);
+                }
+                
+                function playTimeWarpEndSound() {
+                    if (!soundEnabled) return;
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Reverse time warp sound - upward frequency sweep (time returning to normal)
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.type = 'sine';
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    // Upward sweep as time returns to normal
+                    osc.frequency.setValueAtTime(80, audioContext.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(1000, audioContext.currentTime + 1.0);
+                    gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);
+                    
+                    osc.start(audioContext.currentTime);
+                    osc.stop(audioContext.currentTime + 1.0);
+                }
+                
+                let backgroundMusicOscillators = [];
+                let musicContext = null;
+                let musicRunning = false;
+                let musicScheduler = null;
+                
+                function playBackgroundMusic() {
+                    if (!gameMusicPlaying) {
+                        bgMusic.play().catch(err => console.log("Game music play error:", err));
+                        gameMusicPlaying = true;
+                    }
+                }
+                
+                function stopBackgroundMusic() {
+                    if (gameMusicPlaying) {
+                        bgMusic.pause();
+                        bgMusic.currentTime = 0;
+                        gameMusicPlaying = false;
+                    }
+                }
+
+                // Input state
+                const keys = {};
+                let mouseX = canvas.width / 2;
+                let mouseY = canvas.height / 2;
+
+                // Star field for background
+                function createStars() {
+                    stars = [];
+                    for (let i = 0; i < 200; i++) {
+                        // Random angle from center (0-2π)
+                        const angle = Math.random() * Math.PI * 2;
+                        // Random distance from center (starting far away)
+                        const distance = Math.random() * 800 + 200;
+                        const x = canvas.width / 2 + Math.cos(angle) * distance;
+                        const y = canvas.height / 2 + Math.sin(angle) * distance;
+                        const depth = Math.random() * 0.9 + 0.1; // 0.1 to 1.0
+                        
+                        stars.push({
+                            x: x,
+                            y: y,
+                            startX: x,
+                            startY: y,
+                            angle: angle,
+                            depth: depth,
+                            maxDistance: 1000,
+                            speed: (2 - depth) * 0.3 // Slower movement
+                        });
+                    }
+                }
+
+                // Player class
+                class Player {
+                    constructor(index) {
+                        this.index = index;
+                        this.color = PLAYER_COLORS[index];
+                        this.x = canvas.width / 2 + (index - 1.5) * 100;
+                        this.y = canvas.height - 150;
+                        this.width = 30;
+                        this.height = 40;
+                        this.speed = 5;
+                        this.alive = true;
+                        this.score = 0;
+                        this.rotation = 0;
+                        
+                        // Physics velocity for collisions
+                        this.vx = 0;
+                        this.vy = 0;
+                        this.friction = 0.92;
+                        
+                        // Power-up states
+                        this.hasShield = false;
+                        this.pointMultiplier = 1;
+                        this.multiplierTimer = 0;
+                        
+                        // Control schemes
+                        this.controls = [
+                            { up: 'w', down: 's', left: 'a', right: 'd' },  // Player 1: WASD
+                            { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' },  // Player 2: Arrows
+                            { up: 'u', down: 'j', left: 'h', right: 'k' },  // Player 3: UHJK
+                            { mouse: true }  // Player 4: Mouse
+                        ][index];
+                    }
+
+                    update(deltaTime) {
+                        if (!this.alive) return;
+
+                        // Score increases while alive (with multiplier) - normalized to time
+                        // 0.1 points per frame at 60fps = 6 points per second
+                        const oldScore = Math.floor(this.score);
+                        this.score += (6 * (deltaTime / 1000)) * difficultyMultiplier * this.pointMultiplier;
+                        const newScore = Math.floor(this.score);
+                        if (newScore > oldScore && newScore % 100 === 0) {
+                            playScoreSound();
+                        }
+                        
+                        // Update multiplier timer (using actual elapsed time)
+                        if (this.multiplierTimer > 0) {
+                            this.multiplierTimer -= deltaTime;
+                            if (this.multiplierTimer <= 0) {
+                                this.pointMultiplier = 1;
+                                this.multiplierTimer = 0;
+                            }
+                        }
+
+                        // Apply velocity (physics from collisions)
+                        this.x += this.vx;
+                        this.y += this.vy;
+                        this.vx *= this.friction;
+                        this.vy *= this.friction;
+
+                        // Movement based on control scheme
+                        if (this.controls.mouse) {
+                            // Mouse control - smooth movement
+                            const dx = mouseX - this.x;
+                            const dy = mouseY - this.y;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            
+                            if (distance > 5) {
+                                this.x += (dx / distance) * Math.min(this.speed, distance);
+                                this.y += (dy / distance) * Math.min(this.speed, distance);
+                            }
+                        } else {
+                            // Keyboard controls
+                            let dx = 0;
+                            let dy = 0;
+
+                            if (keys[this.controls.up]) dy -= 1;
+                            if (keys[this.controls.down]) dy += 1;
+                            if (keys[this.controls.left]) dx -= 1;
+                            if (keys[this.controls.right]) dx += 1;
+
+                            // Normalize diagonal movement
+                            if (dx !== 0 && dy !== 0) {
+                                dx *= 0.707;
+                                dy *= 0.707;
+                            }
+
+                            this.x += dx * this.speed;
+                            this.y += dy * this.speed;
+
+                            // Banking rotation based on horizontal movement
+                            this.rotation = dx * 5 * Math.PI / 180;
+                        }
+
+                        // Keep player in bounds
+                        this.x = Math.max(this.width, Math.min(canvas.width - this.width, this.x));
+                        this.y = Math.max(this.height, Math.min(canvas.height - this.height - 50, this.y));
+
+                        // Create rocket trail particles (time-based emission)
+                        // At 60fps, 0.5 probability = 30 particles/second
+                        // So we spawn particles based on deltaTime probability
+                        const particlesPerSecond = 30;
+                        const spawnProbability = (particlesPerSecond * deltaTime) / 1000;
+                        
+                        if (Math.random() < spawnProbability) {
+                            rocketTrails.push({
+                                x: this.x,
+                                y: this.y + this.height / 3,
+                                size: Math.random() * 3 + 2,
+                                life: 0.8,
+                                maxLife: 0.8,
+                                color: this.color,
+                                vx: (Math.random() - 0.5) * 1,
+                                vy: Math.random() * 2 + 1
+                            });
+                        }
+                    }
+
+                    draw() {
+                        if (!this.alive) return;
+
+                        ctx.save();
+                        ctx.translate(this.x, this.y);
+                        ctx.rotate(this.rotation);
+                        
+                        // 3D Shadow effect (depth)
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                        ctx.beginPath();
+                        ctx.ellipse(0, this.height * 0.55, this.width * 0.3, this.height * 0.15, 0, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Draw shield if active
+                        if (this.hasShield) {
+                            ctx.beginPath();
+                            ctx.arc(0, 0, this.width * 1.2, 0, Math.PI * 2);
+                            ctx.strokeStyle = '#00ffff';
+                            ctx.lineWidth = 3;
+                            ctx.globalAlpha = 0.5 + Math.sin(Date.now() / 200) * 0.3;
+                            ctx.stroke();
+                            ctx.globalAlpha = 1;
+                        }
+
+                        // Draw realistic 3D rocket ship with rotation effect
+                        // Back section (darker for 3D effect)
+                        ctx.fillStyle = '#a0a0a0';
+                        ctx.beginPath();
+                        ctx.moveTo(-this.width * 0.22, this.height * 0.25);
+                        ctx.lineTo(this.width * 0.22, this.height * 0.25);
+                        ctx.lineTo(this.width * 0.18, this.height * 0.4);
+                        ctx.lineTo(-this.width * 0.18, this.height * 0.4);
+                        ctx.closePath();
+                        ctx.fill();
+                        
+                        // Mid back section
+                        ctx.fillStyle = '#c0c0c0';
+                        ctx.beginPath();
+                        ctx.moveTo(-this.width * 0.21, this.height * 0.1);
+                        ctx.lineTo(this.width * 0.21, this.height * 0.1);
+                        ctx.lineTo(this.width * 0.22, this.height * 0.25);
+                        ctx.lineTo(-this.width * 0.22, this.height * 0.25);
+                        ctx.closePath();
+                        ctx.fill();
+                        
+                        // Main body front section
+                        const bodyGradient = ctx.createLinearGradient(-this.width * 0.2, -this.height * 0.4, this.width * 0.2, -this.height * 0.4);
+                        bodyGradient.addColorStop(0, '#d0d0d0');
+                        bodyGradient.addColorStop(0.5, '#ffffff');
+                        bodyGradient.addColorStop(1, '#d0d0d0');
+                        ctx.fillStyle = bodyGradient;
+                        ctx.fillRect(-this.width * 0.2, -this.height * 0.4, this.width * 0.4, this.height * 0.5);
+                        
+                        // 3D edge bevels on main body
+                        ctx.fillStyle = '#c0c0c0';
+                        ctx.fillRect(-this.width * 0.22, -this.height * 0.4, this.width * 0.02, this.height * 0.5);
+                        ctx.fillStyle = '#e0e0e0';
+                        ctx.fillRect(this.width * 0.2, -this.height * 0.4, this.width * 0.02, this.height * 0.5);
+                        
+                        // Nose cone (top point)
+                        ctx.beginPath();
+                        ctx.moveTo(0, -this.height * 0.52);
+                        ctx.lineTo(-this.width * 0.18, -this.height * 0.33);
+                        ctx.lineTo(this.width * 0.18, -this.height * 0.33);
+                        ctx.closePath();
+                        const noseGradient = ctx.createLinearGradient(-this.width * 0.18, -this.height * 0.4, this.width * 0.18, -this.height * 0.4);
+                        noseGradient.addColorStop(0, '#ff8800');
+                        noseGradient.addColorStop(0.5, '#ffbb00');
+                        noseGradient.addColorStop(1, '#ff8800');
+                        ctx.fillStyle = noseGradient;
+                        ctx.fill();
+                        ctx.strokeStyle = '#cc5500';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        
+                        // Left fin - full 3D
+                        ctx.beginPath();
+                        ctx.moveTo(-this.width * 0.2, -0.05);
+                        ctx.lineTo(-this.width * 0.5, this.height * 0.1);
+                        ctx.lineTo(-this.width * 0.2, this.height * 0.38);
+                        ctx.closePath();
+                        ctx.fillStyle = this.color;
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.moveTo(-this.width * 0.2, -0.05);
+                        ctx.lineTo(-this.width * 0.52, this.height * 0.08);
+                        ctx.lineTo(-this.width * 0.5, this.height * 0.1);
+                        ctx.closePath();
+                        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                        ctx.fill();
+                        
+                        // Right fin - full 3D
+                        ctx.beginPath();
+                        ctx.moveTo(this.width * 0.2, -0.05);
+                        ctx.lineTo(this.width * 0.5, this.height * 0.1);
+                        ctx.lineTo(this.width * 0.2, this.height * 0.38);
+                        ctx.closePath();
+                        ctx.fillStyle = this.color;
+                        ctx.fill();
+                        ctx.beginPath();
+                        ctx.moveTo(this.width * 0.2, -0.05);
+                        ctx.lineTo(this.width * 0.52, this.height * 0.08);
+                        ctx.lineTo(this.width * 0.5, this.height * 0.1);
+                        ctx.closePath();
+                        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                        ctx.fill();
+                        
+                        // Engine nozzle - 3D
+                        ctx.beginPath();
+                        ctx.moveTo(-this.width * 0.12, this.height * 0.38);
+                        ctx.lineTo(this.width * 0.12, this.height * 0.38);
+                        ctx.lineTo(this.width * 0.1, this.height * 0.55);
+                        ctx.lineTo(-this.width * 0.1, this.height * 0.55);
+                        ctx.closePath();
+                        ctx.fillStyle = '#ff5500';
+                        ctx.fill();
+                        ctx.strokeStyle = '#cc3300';
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                        
+                        // Engine flames
+                        const flame1 = ctx.createLinearGradient(-this.width * 0.06, this.height * 0.55, -this.width * 0.06, this.height * 0.7);
+                        flame1.addColorStop(0, '#ff6600');
+                        flame1.addColorStop(1, 'rgba(255,100,0,0)');
+                        ctx.fillStyle = flame1;
+                        ctx.beginPath();
+                        ctx.moveTo(-this.width * 0.08, this.height * 0.55);
+                        ctx.lineTo(-this.width * 0.04, this.height * 0.7);
+                        ctx.lineTo(-this.width * 0.12, this.height * 0.68);
+                        ctx.closePath();
+                        ctx.fill();
+                        
+                        const flame2 = ctx.createLinearGradient(this.width * 0.06, this.height * 0.55, this.width * 0.06, this.height * 0.7);
+                        flame2.addColorStop(0, '#ff6600');
+                        flame2.addColorStop(1, 'rgba(255,100,0,0)');
+                        ctx.fillStyle = flame2;
+                        ctx.beginPath();
+                        ctx.moveTo(this.width * 0.08, this.height * 0.55);
+                        ctx.lineTo(this.width * 0.04, this.height * 0.7);
+                        ctx.lineTo(this.width * 0.12, this.height * 0.68);
+                        ctx.closePath();
+                        ctx.fill();
+                        
+                        // Window/cockpit - 3D
+                        ctx.beginPath();
+                        ctx.arc(0, -this.height * 0.15, this.width * 0.12, 0, Math.PI * 2);
+                        ctx.fillStyle = '#0088ff';
+                        ctx.fill();
+                        ctx.strokeStyle = '#0055aa';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                        ctx.beginPath();
+                        ctx.arc(-this.width * 0.04, -this.height * 0.2, this.width * 0.06, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Accent stripes on body
+                        ctx.strokeStyle = this.color;
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(-this.width * 0.2, -this.height * 0.1);
+                        ctx.lineTo(this.width * 0.2, -this.height * 0.1);
+                        ctx.stroke();
+
+                        ctx.restore();
+                    }
+
+                    checkCollision(meteor) {
+                        if (!this.alive) return false;
+
+                        const dx = this.x - meteor.x;
+                        const dy = this.y - meteor.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        return distance < (this.width / 2 + meteor.size);
+                    }
+
+                    explode() {
+                        this.alive = false;
+                        playExplosionSound();
+                        
+                        // Create enhanced explosion particles - multiple layers
+                        // Outer ring - large particles
+                        for (let i = 0; i < 16; i++) {
+                            const angle = (Math.PI * 2 * i) / 16;
+                            const speed = Math.random() * 6 + 4;
+                            explosions.push({
+                                x: this.x,
+                                y: this.y,
+                                vx: Math.cos(angle) * speed,
+                                vy: Math.sin(angle) * speed,
+                                size: Math.random() * 6 + 5,
+                                life: 1.0,
+                                maxLife: 1.0,
+                                color: Math.random() > 0.5 ? '#ff6600' : '#ff4400'
+                            });
+                        }
+                        
+                        // Inner ring - medium particles
+                        for (let i = 0; i < 12; i++) {
+                            const angle = Math.random() * Math.PI * 2;
+                            const speed = Math.random() * 4 + 2;
+                            explosions.push({
+                                x: this.x,
+                                y: this.y,
+                                vx: Math.cos(angle) * speed,
+                                vy: Math.sin(angle) * speed,
+                                size: Math.random() * 4 + 3,
+                                life: 0.8,
+                                maxLife: 0.8,
+                                color: '#ffaa00'
+                            });
+                        }
+                        
+                        // Core - small bright particles
+                        for (let i = 0; i < 8; i++) {
+                            const angle = Math.random() * Math.PI * 2;
+                            const speed = Math.random() * 3 + 1;
+                            explosions.push({
+                                x: this.x,
+                                y: this.y,
+                                vx: Math.cos(angle) * speed,
+                                vy: Math.sin(angle) * speed,
+                                size: Math.random() * 3 + 2,
+                                life: 0.6,
+                                maxLife: 0.6,
+                                color: '#ffdd00'
+                            });
+                        }
+                        
+                        // Add player-colored accent particles
+                        for (let i = 0; i < 6; i++) {
+                            const angle = Math.random() * Math.PI * 2;
+                            const speed = Math.random() * 5 + 2;
+                            explosions.push({
+                                x: this.x,
+                                y: this.y,
+                                vx: Math.cos(angle) * speed,
+                                vy: Math.sin(angle) * speed,
+                                size: Math.random() * 4 + 3,
+                                life: 0.7,
+                                maxLife: 0.7,
+                                color: this.color
+                            });
+                        }
+                    }
+                }
+
+                // Meteor class
+                class Meteor {
+                    constructor() {
+                        // Start from horizontal line in center of screen (anywhere along it)
+                        const centerY = canvas.height / 2;
+                        const spread = 50;
+                        
+                        // Spawn from anywhere along the horizontal center line
+                        this.startX = Math.random() * canvas.width;
+                        this.startY = centerY + (Math.random() - 0.5) * spread;
+                        
+                        // Target is a random position on screen
+                        this.targetX = Math.random() * canvas.width;
+                        this.targetY = Math.random() * canvas.height;
+                        
+                        this.x = this.startX;
+                        this.y = this.startY;
+                        
+                        // Calculate direction vector
+                        const dx = this.targetX - this.startX;
+                        const dy = this.targetY - this.startY;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        this.vx = (dx / dist) * (2 + Math.random() * 2) * difficultyMultiplier;
+                        this.vy = (dy / dist) * (2 + Math.random() * 2) * difficultyMultiplier;
+                        
+                        // Size and visual properties
+                        this.maxSize = 30 + Math.random() * 30;
+                        this.size = 0;  // Start small (far away)
+                        this.progress = 0;  // 0 to 1, representing depth
+                        
+                        // Irregular shape (5-8 sided polygon)
+                        this.sides = Math.floor(Math.random() * 4) + 5;
+                        this.irregularity = [];
+                        for (let i = 0; i < this.sides; i++) {
+                            this.irregularity.push(0.7 + Math.random() * 0.6);
+                        }
+                        
+                        this.rotation = Math.random() * Math.PI * 2;
+                        this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+                        
+                        // Color variations for rocky texture
+                        this.colors = ['#6b5447', '#8b7d77', '#5a4a3a'];
+                        
+                        // Generate static crater positions (not animated)
+                        this.craters = [];
+                        for (let i = 0; i < 6; i++) {
+                            this.craters.push({
+                                angle: (Math.PI * 2 * i) / 6,
+                                dist: 0.3 + Math.random() * 0.35,
+                                size: 0.15 + Math.random() * 0.2
+                            });
+                        }
+                    }
+
+                    update() {
+                        // Apply slow-motion if active (affects both movement and rotation)
+                        const speedMult = slowMotionActive ? 0.3 : 1.0;
+                        this.x += this.vx * speedMult;
+                        this.y += this.vy * speedMult;
+                        this.rotation += this.rotationSpeed * speedMult;
+                        
+                        // Calculate progress based on distance traveled
+                        const dx = this.x - this.startX;
+                        const dy = this.y - this.startY;
+                        const totalDx = this.targetX - this.startX;
+                        const totalDy = this.targetY - this.startY;
+                        const traveled = Math.sqrt(dx * dx + dy * dy);
+                        const total = Math.sqrt(totalDx * totalDx + totalDy * totalDy);
+                        
+                        this.progress = Math.min(traveled / total, 1);
+                        
+                        // Size grows as meteor approaches (3D perspective), then stays at max
+                        this.size = this.maxSize * (0.1 + this.progress * 0.9);
+                        
+                        // Only remove if off screen - keep going until completely off-screen
+                        return this.x < -this.maxSize || this.x > canvas.width + this.maxSize ||
+                            this.y < -this.maxSize || this.y > canvas.height + this.maxSize;
+                    }
+
+                    draw() {
+                        ctx.save();
+                        ctx.translate(this.x, this.y);
+                        ctx.rotate(this.rotation);
+                        
+                        // Opacity increases as meteor approaches
+                        const opacity = 0.5 + this.progress * 0.5;
+                        
+                        // 3D Shadow effect (odd offset)
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                        ctx.beginPath();
+                        ctx.ellipse(this.size * 0.4 - this.size * 0.1, this.size * 0.35 + this.size * 0.15, this.size * 1.3, this.size * 0.7, 0.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Draw irregular boulder shape
+                        ctx.beginPath();
+                        for (let i = 0; i < this.sides; i++) {
+                            const angle = (Math.PI * 2 * i) / this.sides;
+                            const radius = this.size * this.irregularity[i];
+                            const x = Math.cos(angle) * radius;
+                            const y = Math.sin(angle) * radius;
+                            
+                            if (i === 0) {
+                                ctx.moveTo(x, y);
+                            } else {
+                                ctx.lineTo(x, y);
+                            }
+                        }
+                        ctx.closePath();
+                        
+                        // Rocky 3D gradient - irregular light source
+                        const boulderGradient = ctx.createRadialGradient(-this.size * 0.35, -this.size * 0.4, 0, this.size * 0.1, this.size * 0.2, this.size * 1.2);
+                        boulderGradient.addColorStop(0, '#9d8566');
+                        boulderGradient.addColorStop(0.3, '#6b5447');
+                        boulderGradient.addColorStop(0.6, '#4a3a28');
+                        boulderGradient.addColorStop(1, '#1a0a00');
+                        
+                        ctx.fillStyle = boulderGradient;
+                        ctx.globalAlpha = opacity;
+                        ctx.fill();
+                        
+                        // Hard irregular outline
+                        ctx.strokeStyle = '#0a0500';
+                        ctx.lineWidth = 2.5;
+                        ctx.stroke();
+                        
+                        ctx.globalAlpha = 1;
+                        ctx.restore();
+                    }
+                }
+
+                // PowerUp class
+                class PowerUp {
+                    constructor(type) {
+                        this.type = type; // 'shield', 'slowmo', 'multiplier'
+                        this.x = Math.random() * (canvas.width - 100) + 50;
+                        this.y = -50;
+                        this.size = 20;
+                        this.speed = 2;
+                        this.rotation = 0;
+                        this.rotationSpeed = 0.05;
+                        
+                        // Type-specific properties
+                        if (type === 'shield') {
+                            this.color = '#00ffff';
+                            this.symbol = '◈';
+                        } else if (type === 'slowmo') {
+                            this.color = '#aa00ff';
+                            this.symbol = '⧗';
+                        } else { // multiplier
+                            this.color = '#ffff00';
+                            this.symbol = '×2';
+                        }
+                    }
+
+                    update() {
+                        this.y += this.speed;
+                        this.rotation += this.rotationSpeed;
+                        
+                        // Remove if off screen
+                        return this.y > canvas.height + this.size;
+                    }
+
+                    draw() {
+                        ctx.save();
+                        ctx.translate(this.x, this.y);
+                        ctx.rotate(this.rotation);
+                        
+                        // Outer pulsing glow effect
+                        const pulse = Math.sin(this.rotation * 2) * 0.3 + 0.7;
+                        const glowGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size * 2);
+                        glowGradient.addColorStop(0, this.color);
+                        glowGradient.addColorStop(0.5, 'rgba(' + (this.type === 'shield' ? '0,255,255' : this.type === 'slowmo' ? '170,0,255' : '255,255,0') + ',' + (pulse * 0.4) + ')');
+                        glowGradient.addColorStop(1, 'rgba(0,0,0,0)');
+                        ctx.fillStyle = glowGradient;
+                        ctx.beginPath();
+                        ctx.arc(0, 0, this.size * 2, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        if (this.type === 'shield') {
+                            // Shield: Geometric hexagon shape
+                            ctx.fillStyle = this.color;
+                            ctx.globalAlpha = 0.9;
+                            ctx.beginPath();
+                            for (let i = 0; i < 6; i++) {
+                                const angle = (i * Math.PI / 3) - Math.PI / 2;
+                                const px = Math.cos(angle) * this.size;
+                                const py = Math.sin(angle) * this.size;
+                                if (i === 0) ctx.moveTo(px, py);
+                                else ctx.lineTo(px, py);
+                            }
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.globalAlpha = 1;
+                            
+                            // Shield border glow
+                            ctx.strokeStyle = '#00ffff';
+                            ctx.lineWidth = 3;
+                            ctx.globalAlpha = 0.8;
+                            ctx.stroke();
+                            ctx.globalAlpha = 1;
+                            
+                            // Inner circle detail
+                            ctx.fillStyle = '#ffffff';
+                            ctx.globalAlpha = 0.4;
+                            ctx.beginPath();
+                            ctx.arc(0, 0, this.size * 0.4, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.globalAlpha = 1;
+                            
+                        } else if (this.type === 'slowmo') {
+                            // Slow-motion: Rotating hourglass-like shape
+                            const glassGradient = ctx.createLinearGradient(-this.size, -this.size, this.size, this.size);
+                            glassGradient.addColorStop(0, '#dd00ff');
+                            glassGradient.addColorStop(1, '#6600cc');
+                            ctx.fillStyle = glassGradient;
+                            ctx.globalAlpha = 0.95;
+                            
+                            // Top part
+                            ctx.beginPath();
+                            ctx.moveTo(-this.size * 0.6, -this.size * 0.6);
+                            ctx.lineTo(this.size * 0.6, -this.size * 0.6);
+                            ctx.lineTo(0, 0);
+                            ctx.closePath();
+                            ctx.fill();
+                            
+                            // Bottom part
+                            ctx.beginPath();
+                            ctx.moveTo(-this.size * 0.6, this.size * 0.6);
+                            ctx.lineTo(this.size * 0.6, this.size * 0.6);
+                            ctx.lineTo(0, 0);
+                            ctx.closePath();
+                            ctx.fill();
+                            ctx.globalAlpha = 1;
+                            
+                            // Border glow
+                            ctx.strokeStyle = '#aa00ff';
+                            ctx.lineWidth = 2.5;
+                            ctx.globalAlpha = 0.8;
+                            ctx.beginPath();
+                            ctx.moveTo(-this.size * 0.6, -this.size * 0.6);
+                            ctx.lineTo(this.size * 0.6, -this.size * 0.6);
+                            ctx.lineTo(0, 0);
+                            ctx.closePath();
+                            ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(-this.size * 0.6, this.size * 0.6);
+                            ctx.lineTo(this.size * 0.6, this.size * 0.6);
+                            ctx.lineTo(0, 0);
+                            ctx.closePath();
+                            ctx.stroke();
+                            ctx.globalAlpha = 1;
+                            
+                        } else {
+                            // Multiplier: 4-pointed star with rotating rays
+                            ctx.fillStyle = '#ffff00';
+                            ctx.globalAlpha = 0.95;
+                            
+                            for (let i = 0; i < 4; i++) {
+                                ctx.save();
+                                ctx.rotate((i * Math.PI / 2) + this.rotation);
+                                ctx.beginPath();
+                                ctx.moveTo(0, -this.size * 1.2);
+                                ctx.lineTo(this.size * 0.3, -this.size * 0.4);
+                                ctx.lineTo(this.size * 0.5, 0);
+                                ctx.lineTo(this.size * 0.3, this.size * 0.4);
+                                ctx.lineTo(0, this.size * 0.6);
+                                ctx.lineTo(-this.size * 0.3, this.size * 0.4);
+                                ctx.lineTo(-this.size * 0.5, 0);
+                                ctx.lineTo(-this.size * 0.3, -this.size * 0.4);
+                                ctx.closePath();
+                                ctx.fill();
+                                ctx.restore();
+                            }
+                            ctx.globalAlpha = 1;
+                            
+                            // Center core glow
+                            const coreGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, this.size * 0.6);
+                            coreGradient.addColorStop(0, '#ffffff');
+                            coreGradient.addColorStop(1, '#ffff00');
+                            ctx.fillStyle = coreGradient;
+                            ctx.globalAlpha = 0.8;
+                            ctx.beginPath();
+                            ctx.arc(0, 0, this.size * 0.6, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.globalAlpha = 1;
+                            
+                            // Outer star border
+                            ctx.strokeStyle = '#ffff88';
+                            ctx.lineWidth = 2;
+                            ctx.globalAlpha = 0.7;
+                            for (let i = 0; i < 4; i++) {
+                                ctx.save();
+                                ctx.rotate((i * Math.PI / 2) + this.rotation);
+                                ctx.beginPath();
+                                ctx.moveTo(0, -this.size * 1.2);
+                                ctx.lineTo(this.size * 0.3, -this.size * 0.4);
+                                ctx.lineTo(this.size * 0.5, 0);
+                                ctx.lineTo(this.size * 0.3, this.size * 0.4);
+                                ctx.lineTo(0, this.size * 0.6);
+                                ctx.lineTo(-this.size * 0.3, this.size * 0.4);
+                                ctx.lineTo(-this.size * 0.5, 0);
+                                ctx.lineTo(-this.size * 0.3, -this.size * 0.4);
+                                ctx.closePath();
+                                ctx.stroke();
+                                ctx.restore();
+                            }
+                            ctx.globalAlpha = 1;
+                        }
+                        
+                        ctx.restore();
+                    }
+
+                    checkCollision(player) {
+                        const dx = this.x - player.x;
+                        const dy = this.y - player.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        return distance < (this.size + player.width / 2);
+                    }
+                }
+
+                // Rocket trail particle update
+                function updateRocketTrails(deltaTime) {
+                    for (let i = rocketTrails.length - 1; i >= 0; i--) {
+                        const particle = rocketTrails[i];
+                        
+                        particle.x += particle.vx;
+                        particle.y += particle.vy;
+                        particle.life -= deltaTime / 1000;  // Convert ms to seconds
+                        
+                        if (particle.life <= 0) {
+                            rocketTrails.splice(i, 1);
+                        } else {
+                            // Draw trail particle with glow effect
+                            const alpha = particle.life / particle.maxLife;
+                            
+                            // Glow
+                            const gradient = ctx.createRadialGradient(
+                                particle.x, particle.y, 0,
+                                particle.x, particle.y, particle.size * 2
+                            );
+                            gradient.addColorStop(0, particle.color);
+                            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                            
+                            ctx.fillStyle = gradient;
+                            ctx.globalAlpha = alpha * 0.6;
+                            ctx.beginPath();
+                            ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
+                            ctx.fill();
+                            
+                            // Core particle
+                            ctx.fillStyle = particle.color;
+                            ctx.globalAlpha = alpha;
+                            ctx.beginPath();
+                            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.globalAlpha = 1;
+                        }
+                    }
+                }
+
+                // Explosion particle update
+                function updateExplosions(deltaTime) {
+                    for (let i = explosions.length - 1; i >= 0; i--) {
+                        const particle = explosions[i];
+                        
+                        particle.x += particle.vx;
+                        particle.y += particle.vy;
+                        particle.life -= deltaTime / 1000;  // Convert ms to seconds
+                        
+                        if (particle.life <= 0) {
+                            explosions.splice(i, 1);
+                        } else {
+                            // Draw explosion particle with glow
+                            const alpha = particle.life / particle.maxLife;
+                            
+                            // Glow effect
+                            const gradient = ctx.createRadialGradient(
+                                particle.x, particle.y, 0,
+                                particle.x, particle.y, particle.size * 2
+                            );
+                            gradient.addColorStop(0, particle.color);
+                            gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                            
+                            ctx.fillStyle = gradient;
+                            ctx.globalAlpha = alpha * 0.5;
+                            ctx.beginPath();
+                            ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
+                            ctx.fill();
+                            
+                            // Core particle
+                            ctx.fillStyle = particle.color;
+                            ctx.globalAlpha = alpha;
+                            ctx.beginPath();
+                            ctx.arc(particle.x, particle.y, particle.size * alpha, 0, Math.PI * 2);
+                            ctx.fill();
+                            ctx.globalAlpha = 1;
+                        }
+                    }
+                }
+
+                // Spawn meteors
+                function spawnMeteor() {
+                    let meteor;
+                    let safeToSpawn = false;
+                    let attempts = 0;
+                    
+                    // Keep trying to spawn away from players
+                    while (!safeToSpawn && attempts < 10) {
+                        meteor = new Meteor();
+                        safeToSpawn = true;
+                        
+                        // Check if spawn position is too close to any player
+                        for (const player of players) {
+                            if (!player.alive) continue;
+                            const dx = meteor.startX - player.x;
+                            const dy = meteor.startY - player.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            
+                            // Keep at least 50 pixels away from players at spawn
+                            if (dist < 50) {
+                                safeToSpawn = false;
+                                break;
+                            }
+                        }
+                        attempts++;
+                    }
+                    
+                    meteors.push(meteor);
+                }
+
+                // Update HUD
+                function updateHUD() {
+                    scoreContainer.innerHTML = '';
+                    for (let i = 0; i < numPlayers; i++) {
+                        const player = players[i];
+                        const scoreDiv = document.createElement('div');
+                        scoreDiv.className = 'player-score';
+                        scoreDiv.setAttribute('data-testid', `score-player-${i + 1}`);
+                        
+                        const indicator = document.createElement('div');
+                        indicator.className = 'player-indicator';
+                        indicator.style.backgroundColor = player.color;
+                        if (!player.alive) {
+                            indicator.style.opacity = '0.5';
+                        }
+                        
+                        const text = document.createElement('span');
+                        text.textContent = `P${i + 1} ${Math.floor(player.score)}`;
+                        if (!player.alive) {
+                            text.style.opacity = '0.5';
+                        }
+                        
+                        scoreDiv.appendChild(indicator);
+                        scoreDiv.appendChild(text);
+                        scoreContainer.appendChild(scoreDiv);
+                    }
+                }
+                
+                // Show winner popup
+                function showWinnerPopup() {
+                    // Find highest score
+                    let winner = players[0];
+                    for (const player of players) {
+                        if (player.score > winner.score) {
+                            winner = player;
+                        }
+                    }
+                    
+                    // Create container for popup and text
+                    const container = document.createElement('div');
+                    container.id = 'winner-popup-container';
+                    container.style.position = 'fixed';
+                    container.style.top = '50%';
+                    container.style.left = '50%';
+                    container.style.transform = 'translate(-50%, -50%)';
+                    container.style.zIndex = '10000';
+                    container.style.display = 'flex';
+                    container.style.flexDirection = 'column';
+                    container.style.alignItems = 'center';
+                    
+                    // Create and show popup
+                    const popup = document.createElement('div');
+                    popup.id = 'winner-popup';
+                    popup.style.cssText = `
+                        background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.3) 0%, rgba(0, 0, 0, 0.8) 100%);
+                        border: 3px solid ${winner.color};
+                        border-radius: 20px;
+                        padding: 40px;
+                        text-align: center;
+                        animation: winnerPop 0.6s ease-out forwards;
+                        box-shadow: 0 0 40px ${winner.color}, inset 0 0 40px rgba(255,255,255,0.1);
+                        width: min(400px, 90vw);
+                        max-height: 90vh;
+                        overflow-y: auto;
+                        box-sizing: border-box;
+                    `;
+                    
+                    let titleContent = '';
+                    if (numPlayers === 1) {
+                        titleContent = `
+                            <div style="font-size: clamp(22px, 6vmin, 36px); color: #00ff88; text-shadow: 0 0 15px #00ff88;">
+                                GAME OVER
+                            </div>
+                        `;
+                    } else {
+                        titleContent = `
+                            <div style="font-size: clamp(26px, 7vmin, 48px); font-weight: bold; color: ${winner.color}; text-shadow: 0 0 20px ${winner.color}; margin-bottom: 20px; letter-spacing: 3px;">
+                                PLAYER ${winner.index + 1} WINS!
+                            </div>
+                        `;
+                    }
+                    
+                    popup.innerHTML = `
+                        ${titleContent}
+                        <div style="font-size: clamp(22px, 6vmin, 36px); color: #00ff88; text-shadow: 0 0 15px #00ff88; margin-bottom: 40px;">
+                            ${Math.floor(winner.score)} POINTS
+                        </div>
+                        <button class="menu-button" onclick="closeWinnerPopupAndReturnMenu()" data-testid="button-popup-menu" style="width: min(200px, 60vw);">MAIN MENU</button>
+                    `;
+                    
+                    // Create flashing text
+                    const flashText = document.createElement('div');
+                    flashText.id = 'winner-flash-text';
+                    flashText.style.cssText = `
+                        font-size: clamp(12px, 3vmin, 18px);
+                        color: #ffffff;
+                        text-shadow: 0 0 10px #ffffff;
+                        margin-top: 30px;
+                        text-align: center;
+                        padding: 0 10px;
+                        animation: textFlash 1.5s ease-in-out infinite;
+                    `;
+                    flashText.textContent = 'Press Space Bar to Play Again';
+                    
+                    container.appendChild(popup);
+                    container.appendChild(flashText);
+                    document.body.appendChild(container);
+                    
+                    // Add animation keyframes
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        @keyframes winnerPop {
+                            0% { transform: scale(0.3); opacity: 0; }
+                            60% { transform: scale(1.1); }
+                            100% { transform: scale(1); opacity: 1; }
+                        }
+                        @keyframes textFlash {
+                            0% { opacity: 1; }
+                            50% { opacity: 0.2; }
+                            100% { opacity: 1; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    // Add Space Bar listener for restart
+                    const handleSpaceBar = (e) => {
+                        if (e.code === 'Space') {
+                            e.preventDefault();
+                            document.removeEventListener('keydown', handleSpaceBar);
+                            const containerEl = document.getElementById('winner-popup-container');
+                            if (containerEl) containerEl.remove();
+                            restartGame();
+                        }
+                    };
+                    document.addEventListener('keydown', handleSpaceBar);
+                }
+                
+                // Close winner popup and return to menu
+                function closeWinnerPopupAndReturnMenu() {
+                    const containerEl = document.getElementById('winner-popup-container');
+                    if (containerEl) containerEl.remove();
+                    returnToMenu();
+                }
+
+                // Game loop
+                let lastTime = 0;
+                let meteorSpawnTimer = 0;
+                let powerUpSpawnTimer = 0;
+                const baseSpawnRate = 1000;  // 1 second
+                const powerUpSpawnRate = 8000;  // 8 seconds
+
+                function gameLoop(timestamp) {
+                    if (!gameRunning) return;
+
+                    const deltaTime = timestamp - lastTime;
+                    lastTime = timestamp;
+                    gameTime += deltaTime;
+
+                    // Increase difficulty over time
+                    difficultyMultiplier = 1 + (gameTime / 60000);  // +1 difficulty per minute
+                    
+                    // Clear canvas
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw stars moving toward camera
+                    for (let i = 0; i < stars.length; i++) {
+                        const star = stars[i];
+                        
+                        // Move star toward center (camera)
+                        const centerX = canvas.width / 2;
+                        const centerY = canvas.height / 2;
+                        const dx = centerX - star.x;
+                        const dy = centerY - star.y;
+                        const distToCenter = Math.sqrt(dx * dx + dy * dy);
+                        
+                        // Move away from center (ship moving forward through space)
+                        if (distToCenter < 1200) {
+                            star.x -= (dx / distToCenter) * star.speed;
+                            star.y -= (dy / distToCenter) * star.speed;
+                        }
+                        
+                        // Calculate size based on distance to center (closer = larger)
+                        const size = (1 - distToCenter / 1000) * 1.5;
+                        const opacity = Math.max(0.1, 1 - distToCenter / 800);
+                        
+                        // Reset star if it gets too far away
+                        if (distToCenter > 1000) {
+                            const angle = Math.random() * Math.PI * 2;
+                            const distance = Math.random() * 200 + 250;
+                            star.x = centerX + Math.cos(angle) * distance;
+                            star.y = centerY + Math.sin(angle) * distance;
+                        }
+                        
+                        // Draw star
+                        ctx.fillStyle = '#ffffff';
+                        ctx.globalAlpha = opacity;
+                        ctx.fillRect(star.x, star.y, Math.max(0.5, size), Math.max(0.5, size));
+                        ctx.globalAlpha = 1;
+                    }
+
+                    // Spawn meteors (affected by slow-motion)
+                    const spawnTimeMult = slowMotionActive ? 0.3 : 1.0;
+                    meteorSpawnTimer += deltaTime * spawnTimeMult;
+                    const spawnRate = baseSpawnRate / difficultyMultiplier;
+                    if (meteorSpawnTimer > spawnRate) {
+                        spawnMeteor();
+                        meteorSpawnTimer = 0;
+                    }
+
+                    // Spawn power-ups (not affected by slow-motion)
+                    powerUpSpawnTimer += deltaTime;
+                    if (powerUpSpawnTimer > powerUpSpawnRate) {
+                        const types = ['shield', 'slowmo', 'multiplier'];
+                        const randomType = types[Math.floor(Math.random() * types.length)];
+                        powerUps.push(new PowerUp(randomType));
+                        powerUpSpawnTimer = 0;
+                    }
+                    
+                    // Update slow-motion
+                    if (slowMotionActive) {
+                        slowMotionTimer -= deltaTime;
+                        if (slowMotionTimer <= 0) {
+                            slowMotionActive = false;
+                            playTimeWarpEndSound();
+                        }
+                    }
+
+                    // Update and draw power-ups
+                    for (let i = powerUps.length - 1; i >= 0; i--) {
+                        const powerUp = powerUps[i];
+                        
+                        if (powerUp.update()) {
+                            powerUps.splice(i, 1);
+                            continue;
+                        }
+                        
+                        powerUp.draw();
+                        
+                        // Check collisions with players
+                        for (const player of players) {
+                            if (!player.alive) continue;
+                            
+                            if (powerUp.checkCollision(player)) {
+                                // Apply power-up effect
+                                if (powerUp.type === 'shield') {
+                                    player.hasShield = true;
+                                } else if (powerUp.type === 'slowmo') {
+                                    slowMotionActive = true;
+                                    slowMotionTimer = 5000; // 5 seconds
+                                } else if (powerUp.type === 'multiplier') {
+                                    player.pointMultiplier = 2;
+                                    player.multiplierTimer = 10000; // 10 seconds in milliseconds
+                                }
+                                
+                                playPowerUpSound(powerUp.type);
+                                powerUps.splice(i, 1);
+                                break;
+                            }
+                        }
+                    }
+
+                    // Update and draw meteors
+                    for (let i = meteors.length - 1; i >= 0; i--) {
+                        const meteor = meteors[i];
+                        
+                        if (meteor.update()) {
+                            meteors.splice(i, 1);
+                            continue;
+                        }
+                        
+                        meteor.draw();
+                        
+                        // Check collisions with players
+                        for (const player of players) {
+                            if (player.checkCollision(meteor)) {
+                                if (player.hasShield) {
+                                    // Shield absorbs the hit
+                                    player.hasShield = false;
+                                    playShieldBreakSound();
+                                    meteors.splice(i, 1);
+                                } else {
+                                    player.explode();
+                                    meteors.splice(i, 1);
+                                }
+                                break;
+                            }
+                        }
+                    }
+
+                    // Update and draw rocket trails (before players so they appear behind)
+                    updateRocketTrails(deltaTime);
+
+                    // Check player-to-player collisions in multiplayer
+                    if (numPlayers > 1) {
+                        for (let i = 0; i < players.length; i++) {
+                            for (let j = i + 1; j < players.length; j++) {
+                                const p1 = players[i];
+                                const p2 = players[j];
+                                
+                                if (p1.alive && p2.alive) {
+                                    const dx = p2.x - p1.x;
+                                    const dy = p2.y - p1.y;
+                                    const distance = Math.sqrt(dx * dx + dy * dy);
+                                    const minDistance = (p1.width + p2.width) / 2;
+                                    
+                                    if (distance < minDistance) {
+                                        // Collision detected - apply physics impulse
+                                        const angle = Math.atan2(dy, dx);
+                                        const push = minDistance - distance + 2;
+                                        const impulsePower = 8;
+                                        
+                                        // Apply velocity impulse to both players
+                                        p1.vx -= Math.cos(angle) * impulsePower;
+                                        p1.vy -= Math.sin(angle) * impulsePower;
+                                        p2.vx += Math.cos(angle) * impulsePower;
+                                        p2.vy += Math.sin(angle) * impulsePower;
+                                        
+                                        // Separate positions to prevent overlap
+                                        p1.x -= Math.cos(angle) * push / 2;
+                                        p1.y -= Math.sin(angle) * push / 2;
+                                        p2.x += Math.cos(angle) * push / 2;
+                                        p2.y += Math.sin(angle) * push / 2;
+                                        
+                                        // Keep in bounds
+                                        p1.x = Math.max(p1.width, Math.min(canvas.width - p1.width, p1.x));
+                                        p1.y = Math.max(p1.height, Math.min(canvas.height - p1.height - 50, p1.y));
+                                        p2.x = Math.max(p2.width, Math.min(canvas.width - p2.width, p2.x));
+                                        p2.y = Math.max(p2.height, Math.min(canvas.height - p2.height - 50, p2.y));
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Update and draw players
+                    for (const player of players) {
+                        player.update(deltaTime);
+                        player.draw();
+                    }
+
+                    // Update and draw explosions
+                    updateExplosions(deltaTime);
+
+                    // Update HUD
+                    updateHUD();
+
+                    // Check if all players are dead
+                    const allDead = players.every(p => !p.alive);
+                    if (allDead) {
+                        gameRunning = false;
+                        stopBackgroundMusic();
+                        // Update high score
+                        const finalScores = players.map(p => p.score);
+                        updateHighScore(finalScores);
+                        // Show winner popup in multiplayer
+                        showWinnerPopup();
+                        // Pause score update but continue animation for 1 second
+                        scoreHUD.style.display = 'none';
+                        gameOverButtons.style.display = 'none';
+                        setTimeout(() => {
+                            playMenuMusic();
+                        }, 1000);
+                        return;
+                    }
+
+                    requestAnimationFrame(gameLoop);
+                }
+
+                // Restart game with same player count
+                function restartGame() {
+                    startGame(lastPlayerCount);
+                }
+                
+                // Return to main menu
+                function returnToMenu() {
+                    gameRunning = false;
+                    stopBackgroundMusic();
+                    menuContainer.style.display = 'block';
+                    scoreHUD.style.display = 'none';
+                    playerSelectionButtons.style.display = 'flex';
+                    playerSelectionButtons.style.flexDirection = 'column';
+                    gameOverButtons.style.display = 'none';
+                    playMenuMusic();
+                }
+                
+                // Start game
+                function startGame(playerCount) {
+                    lastPlayerCount = playerCount;
+                    numPlayers = playerCount;
+                    gameRunning = true;
+                    gameTime = 0;
+                    difficultyMultiplier = 1;
+                    
+                    // Initialize players
+                    players = [];
+                    for (let i = 0; i < numPlayers; i++) {
+                        players.push(new Player(i));
+                    }
+                    
+                    // Initialize game state
+                    meteors = [];
+                    explosions = [];
+                    rocketTrails = [];
+                    powerUps = [];
+                    slowMotionActive = false;
+                    slowMotionTimer = 0;
+                    meteorSpawnTimer = 0;
+                    powerUpSpawnTimer = 0;
+                    createStars();
+                    
+                    // Stop menu music, show HUD, hide menu
+                    stopMenuMusic();
+                    menuContainer.style.display = 'none';
+                    scoreHUD.style.display = 'flex';
+                    
+                    // Start background music
+                    playBackgroundMusic();
+                    
+                    // Start game loop
+                    lastTime = performance.now();
+                    requestAnimationFrame(gameLoop);
+                }
+
+                // Input handlers
+                window.addEventListener('keydown', (e) => {
+                    keys[e.key] = true;
+                });
+
+                window.addEventListener('keyup', (e) => {
+                    keys[e.key] = false;
+                });
+
+                window.addEventListener('mousemove', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    mouseX = e.clientX - rect.left;
+                    mouseY = e.clientY - rect.top;
+                });
+
+                // Prevent context menu on right click
+                canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+            </script>
+            
+        </div><!-- /#page-wrapper -->
+
+</body>
+</html>

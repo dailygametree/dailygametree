@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Snake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Roboto:wght@400;500;700;900&display=swap" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="game-wrap">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div id="score-badge" class="badge"><span id="score">0</span></div>
+      <div id="best-badge" class="badge best"><span class="best-label">BEST</span><span id="best-live">0</span></div>
+    </div>
+
+    <!-- Start screen -->
+    <div id="start-screen" class="overlay">
+      <div class="panel">
+        <h1 class="title">
+          <span class="l l-1">S</span><span class="l l-2">n</span><span class="l l-3">a</span><span class="l l-4">k</span><span class="l l-5">e</span>
+        </h1>
+        <p class="hint">Eat the dots. Don't hit the walls or yourself.</p>
+        <button id="start-btn" class="btn primary">Play</button>
+        <p class="controls-hint">
+          <span class="desktop-only">Arrow keys or WASD to steer</span>
+          <span class="touch-only">Tap the left/right side of the screen to turn</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Game over screen -->
+    <div id="gameover-screen" class="overlay hidden">
+      <div class="panel">
+        <h2 class="title-sm">Game Over</h2>
+        <p id="final-score" class="score-line">Score: 0</p>
+        <p id="best-score" class="score-line best">Best: 0</p>
+        <button id="restart-btn" class="btn primary">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Sound toggle — always reachable, above every screen -->
+    <button id="mute-btn" class="icon-btn" type="button" aria-pressed="false" aria-label="Mute sound">
+      <svg width="20" height="20" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+        <path d="M3 8 H6.5 L11 4.5 V17.5 L6.5 14 H3 Z" fill="#3c4043" />
+        <g class="mute-waves">
+          <path d="M14.5 7.5 Q17 11 14.5 14.5" fill="none" stroke="#3c4043" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M16.8 5 Q20.5 11 16.8 17" fill="none" stroke="#3c4043" stroke-width="1.8" stroke-linecap="round" />
+        </g>
+        <path class="mute-slash" d="M14 6 L20 16" stroke="#3c4043" stroke-width="2.2" stroke-linecap="round" style="display:none" />
+      </svg>
+    </button>
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>

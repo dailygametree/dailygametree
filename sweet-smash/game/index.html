@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Sweet Smash</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-root">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD shown during play -->
+    <div id="hud">
+      <div class="hud-badge">
+        <span class="hud-label">SCORE</span>
+        <span id="score-display">0</span>
+      </div>
+      <div class="hud-badge" id="timer-badge">
+        <span class="hud-label">SURVIVED</span>
+        <span id="timer-display">0:00</span>
+      </div>
+    </div>
+
+    <!-- Title screen -->
+    <div id="screen-title" class="screen">
+      <div class="panel">
+        <h1 class="title">SWEET<span>SMASH</span></h1>
+        <p class="subtitle">Match 3 or more. Chain combos. Play until you're stuck!</p>
+        <button id="btn-play" class="btn btn-primary">Play</button>
+        <p class="best-score" id="best-score-label"></p>
+      </div>
+    </div>
+
+    <!-- Game over screen -->
+    <div id="screen-gameover" class="screen hidden">
+      <div class="panel">
+        <h2 class="title small">OUT OF MOVES!</h2>
+        <p class="final-score">Score: <span id="final-score">0</span></p>
+        <p class="best-score" id="final-best-label"></p>
+        <button id="btn-retry" class="btn btn-primary">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Countdown overlay -->
+    <div id="countdown" class="hidden">3</div>
+
+    <!-- Sound toggle — always reachable, above every screen -->
+    <button id="btn-mute" type="button" aria-pressed="false" aria-label="Mute sound">🔊</button>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

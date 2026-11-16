@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Up You Go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="game-wrap">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Start screen -->
+    <div id="start-screen" class="overlay">
+      <div class="panel">
+        <svg class="mascot" viewBox="0 0 64 68" aria-hidden="true" focusable="false">
+          <ellipse cx="22" cy="58" rx="7" ry="5" fill="#c23a26" />
+          <ellipse cx="42" cy="58" rx="7" ry="5" fill="#c23a26" />
+          <circle cx="32" cy="36" r="20" fill="#ff6b57" stroke="#c23a26" stroke-width="2.5" />
+          <path d="M32 16 Q39 9 37 4" fill="none" stroke="#c23a26" stroke-width="2.5" stroke-linecap="round" />
+          <circle cx="37" cy="4" r="3" fill="#ffd166" />
+          <ellipse cx="24" cy="31" rx="3.6" ry="4.6" fill="#2b2140" />
+          <ellipse cx="40" cy="31" rx="3.6" ry="4.6" fill="#2b2140" />
+          <circle cx="22.6" cy="28.6" r="1.2" fill="#fff" />
+          <circle cx="38.6" cy="28.6" r="1.2" fill="#fff" />
+          <path d="M25 41 Q32 47 39 41" fill="none" stroke="#2b2140" stroke-width="2.4" stroke-linecap="round" />
+        </svg>
+        <h1>UP YOU GO</h1>
+        <p class="hint">Bounce as high as you can.<br />Don't fall!</p>
+        <p class="world-tag" id="start-world-tag">Playing in Cloud Kingdom</p>
+        <button id="start-btn" class="btn pulse">Play</button>
+        <p class="controls-hint">
+          <span class="desktop-only">Arrow keys or A / D to move</span>
+          <span class="touch-only">Touch left / right side of the screen to move</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Game over screen -->
+    <div id="gameover-screen" class="overlay hidden">
+      <div class="panel">
+        <h2>Game Over</h2>
+        <p id="final-score" class="score-line">Score: 0</p>
+        <p id="best-score" class="score-line best">Best: 0</p>
+        <button id="restart-btn" class="btn pulse">Play Again</button>
+      </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div id="score">0</div>
+      <div id="hud-world"></div>
+    </div>
+
+    <!-- Sound toggle — always reachable, above every screen -->
+    <button id="mute-btn" class="icon-btn" type="button" aria-pressed="false" aria-label="Mute sound">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+        <path d="M3 8 H6.5 L11 4.5 V17.5 L6.5 14 H3 Z" fill="#2b2140" />
+        <g class="mute-waves">
+          <path d="M14.5 7.5 Q17 11 14.5 14.5" fill="none" stroke="#2b2140" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M16.8 5 Q20.5 11 16.8 17" fill="none" stroke="#2b2140" stroke-width="1.8" stroke-linecap="round" />
+        </g>
+        <path class="mute-slash" d="M14 6 L20 16" stroke="#2b2140" stroke-width="2.2" stroke-linecap="round" style="display:none" />
+      </svg>
+    </button>
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>

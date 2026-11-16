@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Minesweeper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="game-wrap">
+
+    <!-- Top bar -->
+    <div id="titlebar">
+      <span id="titlebar-label">Minesweeper</span>
+      <div id="titlebar-btns">
+        <button id="pause-btn" class="tb-btn hidden" type="button" aria-label="Pause">&#10073;&#10073;</button>
+        <button id="mute-btn" class="tb-btn" type="button" aria-pressed="false" aria-label="Mute sound">&#128266;</button>
+      </div>
+    </div>
+
+    <!-- Board panel -->
+    <div id="stage">
+      <div id="board-frame" class="hidden">
+        <div id="control-row" class="bevel-in">
+          <div id="mine-counter" class="led">010</div>
+          <button id="smiley-btn" class="bevel-out" type="button" aria-label="New game">
+            <span id="smiley-face">&#128578;</span>
+          </button>
+          <div id="timer" class="led">000</div>
+        </div>
+
+        <div id="status-line" class="hidden">
+          <span id="status-text"></span>
+        </div>
+
+        <div id="board-scroll" class="bevel-in">
+          <div id="board" role="grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Touch controls: flag-mode toggle -->
+    <div id="touch-controls" class="touch-only">
+      <button id="flag-mode-btn" class="tc-btn bevel-out" type="button" aria-pressed="false">
+        &#128681; Flag mode: <span id="flag-mode-state">Off</span>
+      </button>
+    </div>
+
+    <!-- Start screen -->
+    <div id="start-screen" class="overlay">
+      <div class="panel">
+        <div class="brand-badge">&#128163;</div>
+        <h1 class="title">MINESWEEPER</h1>
+        <p class="hint">Clear the board without hitting a mine.</p>
+        <div class="diff-row">
+          <button class="diff-btn" data-diff="beginner">
+            <span class="diff-icon">&#9634;</span>
+            <span class="diff-copy"><span class="diff-name">Beginner</span><span class="diff-sub">9&times;9 &middot; 10 mines</span></span>
+          </button>
+          <button class="diff-btn" data-diff="intermediate">
+            <span class="diff-icon">&#9634;</span>
+            <span class="diff-copy"><span class="diff-name">Intermediate</span><span class="diff-sub">16&times;16 &middot; 40 mines</span></span>
+          </button>
+          <button class="diff-btn" data-diff="expert">
+            <span class="diff-icon">&#9634;</span>
+            <span class="diff-copy"><span class="diff-name">Expert</span><span class="diff-sub">30&times;16 &middot; 99 mines</span></span>
+          </button>
+        </div>
+        <p class="controls-hint">
+          <span class="desktop-only">Left-click to reveal &middot; right-click to flag &middot; double-click a number to chord</span>
+          <span class="touch-only">Tap to reveal &middot; hold or use Flag mode to flag &middot; double-tap a number to chord</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Pause screen -->
+    <div id="pause-screen" class="overlay hidden">
+      <div class="panel">
+        <h2 class="title-sm">Paused</h2>
+        <button id="resume-btn" class="btn primary">Resume</button>
+        <button id="quit-btn" class="btn text">Quit to menu</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>

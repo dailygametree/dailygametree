@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Rise</title>
+<meta name="description" content="Rise - keep your balloon aloft, dodge the sky, chase your best." />
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <canvas id="game" aria-label="Rise game canvas"></canvas>
+
+    <!-- HUD shown during gameplay -->
+    <div id="hud" class="hidden">
+      <div id="altitude">0 m</div>
+      <div id="shieldChip" class="hidden">shield up</div>
+      <button id="pauseBtn" aria-label="Pause">II</button>
+    </div>
+
+    <div id="toast" class="hidden"></div>
+
+    <!-- Always-visible music toggle. -->
+    <button id="muteBtn" aria-label="Toggle music">
+      <svg viewBox="0 0 24 24" class="muteIconOn"><path d="M4 9v6h4l5 5V4L8 9H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M19 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" opacity="0.6"/></svg>
+      <svg viewBox="0 0 24 24" class="muteIconOff hidden"><path d="M4 9v6h4l5 5V4L8 9H4z" fill="currentColor"/><path d="M16 9l5 6M21 9l-5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+
+    <!-- MENU SCREEN -->
+    <section id="menuScreen" class="screen">
+      <div class="hero" aria-hidden="true">
+        <svg viewBox="0 0 320 220" class="heroSvg">
+          <defs>
+            <linearGradient id="heroSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffd9a8"/>
+              <stop offset="100%" stop-color="#ff8fa3"/>
+            </linearGradient>
+            <linearGradient id="heroBalloon" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#ffd569"/>
+              <stop offset="100%" stop-color="#ff5d73"/>
+            </linearGradient>
+          </defs>
+          <rect x="0" y="0" width="320" height="220" rx="28" fill="url(#heroSky)"/>
+          <path d="M-10 90 C 30 70, 55 100, 90 82 S 150 60, 190 85 S 260 70, 300 88 L300 30 C 250 10, 210 25, 170 12 S 90 8, 40 22 S -10 15, -10 40 Z" fill="#fff" opacity="0.35"/>
+          <path d="M-10 205 C 20 175, 60 210, 100 178 S 170 165, 210 190 S 280 170, 330 195 L330 230 L-10 230 Z" fill="#3a2f52" opacity="0.28"/>
+          <path stroke="#fff" stroke-opacity="0.5" stroke-width="2" stroke-dasharray="2 8" stroke-linecap="round" fill="none" d="M40 205 C 90 150, 60 110, 120 95 S 190 60, 168 40"/>
+          <g transform="translate(168,58)">
+            <ellipse cx="0" cy="34" rx="3" ry="14" fill="rgba(255,255,255,.5)"/>
+            <path d="M-6 40 L6 40 L0 50 Z" fill="#ff5d73"/>
+            <ellipse cx="0" cy="0" rx="30" ry="34" fill="url(#heroBalloon)"/>
+            <ellipse cx="-10" cy="-12" rx="7" ry="11" fill="#fff" opacity="0.4" transform="rotate(-18 -10 -12)"/>
+          </g>
+          <circle cx="55" cy="45" r="5" fill="#fff" opacity="0.7"/>
+          <circle cx="80" cy="30" r="3" fill="#fff" opacity="0.5"/>
+        </svg>
+      </div>
+      <h1>Rise</h1>
+      <p class="tagline">One balloon. One life. See how high you get.</p>
+      <button class="primaryBtn" id="playBtn">Play</button>
+      <button class="secondaryBtn" id="howToBtn">How to Play</button>
+    </section>
+
+    <!-- HOW TO PLAY -->
+    <section id="howToScreen" class="screen hidden">
+      <div class="card">
+        <h2>How to Play</h2>
+        <ul class="howList">
+          <li><strong>Steer</strong> — drag anywhere, or use ← → / A D</li>
+          <li><strong>Climb</strong> — the balloon rises on its own, and the sky moves faster the higher you get</li>
+          <li><strong>One hit pops it</strong> — so give hazards room</li>
+          <li><strong>Helium canister</strong> — grab one for a few seconds of shield</li>
+          <li><strong>Close calls</strong> — graze a hazard without touching it for bonus altitude</li>
+        </ul>
+        <button class="primaryBtn" id="backFromHow">Back</button>
+      </div>
+    </section>
+
+    <!-- PAUSE OVERLAY -->
+    <section id="pauseScreen" class="screen hidden">
+      <div class="card">
+        <h2>Paused</h2>
+        <button class="primaryBtn" id="resumeBtn">Resume</button>
+        <button class="secondaryBtn" id="quitBtn">Quit to Menu</button>
+      </div>
+    </section>
+
+    <!-- GAME OVER -->
+    <section id="gameOverScreen" class="screen hidden">
+      <div class="card">
+        <svg class="popIcon" viewBox="0 0 60 60" aria-hidden="true">
+          <polygon points="30,2 36,22 56,16 40,30 54,44 34,38 30,58 26,38 6,44 20,30 4,16 24,22" fill="#ff5d73"/>
+          <polygon points="30,12 34,26 46,22 36,31 45,41 32,37 30,50 28,37 15,41 24,31 14,22 26,26" fill="#ffd569"/>
+        </svg>
+        <h2>Popped!</h2>
+        <div class="finalAltitude" id="finalAltitude">0 m</div>
+        <div id="newBest" class="hidden">New Best!</div>
+        <div id="submitStatus" class="submitStatus"></div>
+        <button class="primaryBtn" id="retryBtn">Play Again</button>
+        <button class="secondaryBtn" id="backToMenuBtn">Menu</button>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

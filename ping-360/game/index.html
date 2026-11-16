@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Ping 360</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="game-wrap">
+    <canvas id="gameCanvas"></canvas>
+    <div class="crt-scanlines" aria-hidden="true"></div>
+    <div class="crt-vignette" aria-hidden="true"></div>
+
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+      <div class="hud-left">
+        <span class="hud-label">SCORE</span>
+        <span id="score">0</span>
+      </div>
+      <div class="hud-mid">
+        <span class="hud-label">LEVEL</span>
+        <span id="hud-level">1</span>
+      </div>
+      <div class="hud-right">
+        <span class="hud-label">LIVES</span>
+        <span id="lives-dots"></span>
+      </div>
+    </div>
+
+    <!-- Start screen -->
+    <div id="start-screen" class="overlay">
+      <div class="panel">
+        <svg class="mascot" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <circle cx="32" cy="32" r="25" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="3" stroke-dasharray="3 6" />
+          <path d="M 15 15 A 25 25 0 0 1 42 9.5" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" />
+          <rect x="27.5" y="27.5" width="9" height="9" fill="#ffffff" />
+        </svg>
+        <h1>PING 360</h1>
+        <p class="hint">Slide your paddle around the ring.<br />Keep the ball alive at the center&hellip; it only gets faster.</p>
+        <button id="start-btn" class="btn pulse">Play</button>
+        <p class="controls-hint">
+          <span class="desktop-only">Arrow keys or A / D to rotate counterclockwise / clockwise</span>
+          <span class="touch-only">Drag around the ring, or use the pad</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Game over screen -->
+    <div id="gameover-screen" class="overlay hidden">
+      <div class="panel">
+        <h2 id="gameover-title">Game Over</h2>
+        <p id="final-score" class="score-line">Score: 0</p>
+        <p id="best-score" class="score-line best">Best: 0</p>
+        <button id="restart-btn" class="btn pulse">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Touch pad: rotate left / rotate right -->
+    <div id="dpad" class="hidden" aria-hidden="true">
+      <button class="dpad-btn dpad-left" data-dir="left">&#8634;</button>
+      <button class="dpad-btn dpad-right" data-dir="right">&#8635;</button>
+    </div>
+
+    <!-- Sound toggle — always reachable, above every screen -->
+    <button id="mute-btn" class="icon-btn" type="button" aria-pressed="false" aria-label="Mute sound">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+        <path d="M3 8 H6.5 L11 4.5 V17.5 L6.5 14 H3 Z" fill="#ffffff" />
+        <g class="mute-waves">
+          <path d="M14.5 7.5 Q17 11 14.5 14.5" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M16.8 5 Q20.5 11 16.8 17" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" />
+        </g>
+        <path class="mute-slash" d="M14 6 L20 16" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" style="display:none" />
+      </svg>
+    </button>
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>
