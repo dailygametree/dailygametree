@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Chop Shop Chef</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="game-root">
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD shown during play -->
+    <div id="hud">
+      <div id="score-display">0</div>
+      <div id="lives-display">
+        <span class="life" data-i="0">🥕</span>
+        <span class="life" data-i="1">🥕</span>
+        <span class="life" data-i="2">🥕</span>
+      </div>
+    </div>
+
+    <!-- Title screen -->
+    <div id="screen-title" class="screen">
+      <div class="panel">
+        <h1 class="title">CHOP SHOP<span>CHEF</span></h1>
+        <p class="subtitle">Swipe to slice. Dodge the bombs.</p>
+        <button id="btn-play" class="btn btn-primary">Play</button>
+        <p class="best-score" id="best-score-label"></p>
+      </div>
+    </div>
+
+    <!-- Game over screen -->
+    <div id="screen-gameover" class="screen hidden">
+      <div class="panel">
+        <h2 class="title small">SLICED!</h2>
+        <p class="final-score">Score: <span id="final-score">0</span></p>
+        <p class="best-score" id="final-best-label"></p>
+        <button id="btn-retry" class="btn btn-primary">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Countdown overlay -->
+    <div id="countdown" class="hidden">3</div>
+
+    <!-- Sound toggle — always reachable, above every screen -->
+    <button id="btn-mute" type="button" aria-pressed="false" aria-label="Mute sound">🔊</button>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

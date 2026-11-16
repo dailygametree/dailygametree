@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Tetromino</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:wght@400;500;700;800&display=swap" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="game-wrap">
+
+    <!-- Top HUD: skip · score/level/lines · next -->
+    <div id="hud" class="hidden">
+      <button id="skip-box" class="mini-box" type="button" aria-label="Skip piece (30 second cooldown)">
+        <canvas id="skip-canvas" width="88" height="88"></canvas>
+        <span class="mini-label">SKIP</span>
+      </button>
+
+      <div id="stats">
+        <div class="stat"><span class="stat-label">Score</span><span id="score" class="stat-value">0</span></div>
+        <div class="stat-row">
+          <div class="stat small"><span class="stat-label">Level</span><span id="level" class="stat-value">1</span></div>
+          <div class="stat small"><span class="stat-label">Lines</span><span id="lines" class="stat-value">0</span></div>
+        </div>
+      </div>
+
+      <div id="next-box" class="mini-box">
+        <canvas id="next-canvas" width="88" height="220"></canvas>
+        <span class="mini-label">NEXT</span>
+      </div>
+    </div>
+
+    <!-- Pause / mute, always reachable -->
+    <button id="pause-btn" class="icon-btn hidden" type="button" aria-label="Pause">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true" focusable="false">
+        <rect x="4" y="3" width="3.4" height="12" rx="1" fill="#e8eaed" />
+        <rect x="10.6" y="3" width="3.4" height="12" rx="1" fill="#e8eaed" />
+      </svg>
+    </button>
+    <button id="mute-btn" class="icon-btn" type="button" aria-pressed="false" aria-label="Mute sound">
+      <svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+        <path d="M3 8 H6.5 L11 4.5 V17.5 L6.5 14 H3 Z" fill="#e8eaed" />
+        <g class="mute-waves">
+          <path d="M14.5 7.5 Q17 11 14.5 14.5" fill="none" stroke="#e8eaed" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M16.8 5 Q20.5 11 16.8 17" fill="none" stroke="#e8eaed" stroke-width="1.8" stroke-linecap="round" />
+        </g>
+        <path class="mute-slash" d="M14 6 L20 16" stroke="#e8eaed" stroke-width="2.2" stroke-linecap="round" style="display:none" />
+      </svg>
+    </button>
+
+    <canvas id="board-canvas"></canvas>
+
+    <!-- Touch controls -->
+    <div id="touch-controls" class="touch-only">
+      <div class="tc-cluster tc-left">
+        <button class="tc-btn" data-action="left" type="button" aria-label="Move left">&#9664;</button>
+        <button class="tc-btn" data-action="softdrop" type="button" aria-label="Soft drop">&#9660;</button>
+        <button class="tc-btn" data-action="right" type="button" aria-label="Move right">&#9654;</button>
+      </div>
+      <div class="tc-cluster tc-right">
+        <button class="tc-btn tc-sm" data-action="skip" type="button" aria-label="Skip piece">SKIP</button>
+        <button class="tc-btn tc-rotate" data-action="rotate" type="button" aria-label="Rotate">&#8635;</button>
+        <button class="tc-btn tc-sm" data-action="harddrop" type="button" aria-label="Hard drop">&#8595;&#8595;</button>
+      </div>
+    </div>
+
+    <!-- Start screen -->
+    <div id="start-screen" class="overlay">
+      <div class="panel accent-i">
+        <div class="panel-corner tl"></div><div class="panel-corner tr"></div>
+        <div class="panel-corner bl"></div><div class="panel-corner br"></div>
+        <h1 class="title">
+          <span style="color:var(--t)">T</span><span style="color:var(--i)">E</span><span style="color:var(--o)">T</span><span style="color:var(--l)">R</span><span style="color:var(--s)">O</span><span style="color:var(--j)">M</span><span style="color:var(--z)">I</span><span style="color:var(--i)">N</span><span style="color:var(--o)">O</span>
+        </h1>
+        <p class="hint">Clear lines. Don't top out.</p>
+        <button id="start-btn" class="btn primary blink-label">Play</button>
+        <p class="controls-hint">
+          <span class="desktop-only">Arrows/WASD to move &middot; Up/X rotate &middot; Space hard drop &middot; C skip (30s cooldown)</span>
+          <span class="touch-only">Use the on-screen controls below the board</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Pause screen -->
+    <div id="pause-screen" class="overlay hidden">
+      <div class="panel accent-o">
+        <div class="panel-corner tl"></div><div class="panel-corner tr"></div>
+        <div class="panel-corner bl"></div><div class="panel-corner br"></div>
+        <h2 class="title-sm">PAUSED</h2>
+        <button id="resume-btn" class="btn primary">Resume</button>
+        <button id="quit-btn" class="btn text">&#9654; Quit to menu</button>
+      </div>
+    </div>
+
+    <!-- Game over screen -->
+    <div id="gameover-screen" class="overlay hidden">
+      <div class="panel accent-z">
+        <div class="panel-corner tl"></div><div class="panel-corner tr"></div>
+        <div class="panel-corner bl"></div><div class="panel-corner br"></div>
+        <h2 class="title-sm">TOPPED OUT</h2>
+        <p id="final-score" class="score-line">Score: 0</p>
+        <p id="best-score" class="score-line best">Best: 0</p>
+        <button id="restart-btn" class="btn primary">Play Again</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="./game.js"></script>
+</body>
+</html>

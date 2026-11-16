@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Tanks</title>
+<style>
+  :root{
+    /* A stenciled, field-manual feel for headings/labels/buttons; body copy
+       stays on the plain sans stack below so long text stays easy to read. */
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "Courier New", Courier, monospace;
+  }
+  :root{
+    /* Rustic army palette: khaki, olive drab, brass and rust -- this game
+       gets its own identity. */
+    --bg: #2c2a1f;
+    --surface: #d9cca3;
+    --surface-2: #cbbd88;
+    --border: #8a7a4e;
+    --ink: #2a2416;
+    --dim: #6b6142;
+    --dim-inverse: #c3b585;
+    --accent: #55642f;
+    --accent-ink: #f1e9cf;
+    --accent-soft: #e2d6ac;
+    --danger: #9c3b2e;
+    --success: #5c7a3a;
+    --warn: #c9902b;
+    --shadow-sm: 0 1px 2px rgba(20,17,8,0.22), 0 1px 1px rgba(20,17,8,0.14);
+    --shadow-md: 0 6px 16px rgba(20,17,8,0.28), 0 2px 4px rgba(20,17,8,0.16);
+    --shadow-lg: 0 20px 50px rgba(20,17,8,0.4), 0 4px 14px rgba(20,17,8,0.22);
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg);
+    overflow:hidden;
+    font-family: var(--font);
+    color:var(--ink);
+    user-select:none;
+    touch-action:none;
+  }
+  #viewport{
+    position:fixed; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(ellipse 1100px 680px at 50% -6%, rgba(85,100,47,0.28) 0%, rgba(85,100,47,0) 60%),
+      var(--bg);
+  }
+  #stage{
+    width:1280px; height:720px;
+    flex: none;
+    position:relative;
+    transform-origin: center center;
+    overflow:hidden;
+    background: var(--surface);
+    border-radius: 28px;
+    box-shadow: var(--shadow-lg), 0 0 0 1px var(--border);
+  }
+  #game{
+    position:absolute; left:0; top:0;
+    width:1280px; height:720px;
+    display:block;
+    cursor:crosshair;
+  }
+
+  /* ---------- HUD ---------- */
+  #hud{
+    position:absolute; left:0; top:0; width:1280px; height:720px;
+    pointer-events:none;
+    opacity:0; transition: opacity .25s ease;
+  }
+  #hud.show{ opacity:1; }
+  #hudTop{
+    position:absolute; left:0; top:0; width:100%;
+    display:flex; align-items:flex-start; justify-content:space-between;
+    padding: 26px 26px 0 26px;
+  }
+  #livesWrap{ display:flex; gap:8px; }
+  .lifeIcon{
+    width:14px; height:14px; border-radius:50%;
+    background: var(--danger);
+    transition: opacity .15s ease, background .15s ease;
+  }
+  .lifeIcon.lost{ background: var(--border); }
+  #mineRow{ display:flex; gap:8px; margin-top:10px; }
+  .mineIcon{
+    width:12px; height:12px; border-radius:50%;
+    background: var(--accent);
+    transition: background .15s ease;
+  }
+  .mineIcon.empty{ background: var(--border); }
+  #mineLabel{ font-family: var(--font-mono); font-size:10px; font-weight:700; letter-spacing:1.2px; color:#f1ecd8; text-shadow: 0 1px 3px rgba(20,17,8,0.6); margin-top:4px; text-transform:uppercase; }
+  #scoreWrap{ text-align:right; }
+  #scoreLabel{ font-family: var(--font-mono); font-size:11px; font-weight:700; letter-spacing:1.5px; color:#f1ecd8; text-shadow: 0 1px 3px rgba(20,17,8,0.6); }
+  #scoreValue{ font-family: var(--font-mono); font-size:26px; font-weight:800; line-height:1.4; margin-top:2px; color:#f1ecd8; text-shadow: 0 1px 3px rgba(20,17,8,0.6); }
+  #levelLabel{
+    position:absolute; left:50%; top:28px; transform:translateX(-50%);
+    font-family: var(--font-mono);
+    font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent-ink);
+    background: var(--accent);
+    border: 1px solid rgba(0,0,0,0.25);
+    padding: 6px 14px;
+    border-radius: 999px;
+    white-space:nowrap;
+  }
+
+  #topButtons{
+    position:absolute; right:22px; top:128px;
+    display:flex; flex-direction:column; gap:10px;
+    pointer-events:auto;
+  }
+  .iconBtn{
+    width:40px; height:40px; border-radius:12px;
+    background: var(--surface);
+    border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow: var(--shadow-sm);
+    pointer-events:auto;
+    transition: transform .1s ease, box-shadow .1s ease;
+  }
+  .iconBtn:active{ transform: scale(.92); }
+  .iconBtn svg{ width:18px; height:18px; fill:var(--ink); opacity:0.75; }
+
+  #mineBtn{
+    position:absolute; right:26px; bottom:120px;
+    width:64px; height:64px; border-radius:50%;
+    background: var(--surface);
+    border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: var(--shadow-md);
+    pointer-events:auto;
+    transition: transform .1s ease;
+  }
+  #mineBtn:active{ transform: scale(.92); }
+  #mineBtn svg{ width:26px; height:26px; fill:var(--ink); opacity:0.8; }
+  #mineBtn .mbCount{
+    position:absolute; right:-4px; top:-4px;
+    min-width:20px; height:20px; padding:0 5px; border-radius:999px;
+    background: var(--accent); color:#fff;
+    font-size:11px; font-weight:800;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  #hint{
+    position:absolute; left:0; top:684px; width:100%;
+    text-align:center;
+    font-size:13px; font-weight:600; color:#f1ecd8;
+    text-shadow: 0 1px 3px rgba(20,17,8,0.6);
+    transition: opacity .5s ease;
+  }
+
+  #levelBanner{
+    position:absolute; left:0; top:0; width:1280px; height:720px;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+    opacity:0;
+    transition: opacity .3s ease;
+    z-index: 18;
+  }
+  #levelBanner.show{ opacity:1; }
+  #levelBanner .lbCard{
+    background: rgba(217,204,163,0.95);
+    border:1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 40px;
+    box-shadow: var(--shadow-lg);
+    font-family: var(--font-mono); font-size:28px; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--ink);
+  }
+
+  /* ---------- Virtual joysticks (touch only) ---------- */
+  .stick{
+    position:absolute; width:120px; height:120px;
+    border-radius:50%;
+    border:2px solid rgba(28,31,42,0.14);
+    background: rgba(28,31,42,0.05);
+    transform: translate(-50%,-50%);
+    pointer-events:none;
+    opacity:0;
+    z-index:16;
+  }
+  .stick.show{ opacity:1; }
+  .stickKnob{
+    position:absolute; left:50%; top:50%; width:52px; height:52px;
+    border-radius:50%;
+    background: var(--accent);
+    opacity:0.55;
+    transform: translate(-50%,-50%);
+  }
+
+  /* ---------- Buttons ---------- */
+  button.primary, button.secondary{ cursor:pointer; font-family: var(--font-mono); text-transform:uppercase; }
+  button.primary{
+    appearance:none;
+    font-size:15px; font-weight:700; letter-spacing:1px;
+    color: var(--accent-ink);
+    padding: 15px 26px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(0,0,0,0.25);
+    background: var(--accent);
+    box-shadow: var(--shadow-md);
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  button.primary:active{ transform: translateY(2px) scale(.98); box-shadow: var(--shadow-sm); }
+  button.secondary{
+    appearance:none;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--ink); font-size:14px; font-weight:700; letter-spacing:0.6px;
+    padding:13px 22px; border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    transition: transform .12s ease;
+  }
+  button.secondary:active{ transform: translateY(1px) scale(.98); }
+  .linkBtn{
+    appearance:none; cursor:pointer;
+    font-family: var(--font-mono); font-size:13px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase;
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 9px 16px;
+    transition: transform .12s ease;
+  }
+  .linkBtn:active{ transform: scale(.96); }
+
+  /* ---------- Full-screen modal screens ---------- */
+  .screen{
+    position:absolute; left:0; top:0; width:1280px; height:720px;
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center;
+    padding: 0 60px;
+    transition: opacity .3s ease;
+    pointer-events:auto;
+    z-index: 20;
+    background: rgba(44,42,31,0.90);
+    backdrop-filter: blur(4px);
+    color: var(--surface);
+  }
+  .screen.hidden{ opacity:0; pointer-events:none; }
+
+  #screen-start{ justify-content:center; gap:16px; }
+  #screen-gameover{ justify-content:center; gap:0; }
+
+  .badge{
+    font-family: var(--font-mono);
+    font-size:12px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+    color: var(--warn);
+  }
+  h1.title{
+    font-family: var(--font-mono);
+    font-size:48px; margin:2px 0 0; letter-spacing:1px; line-height:1.1;
+    text-transform:uppercase;
+    font-weight:800;
+    color: var(--surface);
+  }
+  .subtitle{ font-family: var(--font); color:var(--dim-inverse); font-size:16px; font-weight:500; line-height:1.45; max-width:460px; }
+
+  .bestRow{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+  .statChip{
+    background:var(--surface); border:1px solid var(--border);
+    border-radius: var(--radius-sm); padding:10px 22px;
+    box-shadow: var(--shadow-sm);
+  }
+  .statChip .n{ font-size:18px; font-weight:800; color:var(--ink); }
+  .statChip .l{ font-size:11px; font-weight:700; letter-spacing:1.5px; color:var(--dim); margin-top:3px; text-transform:uppercase; }
+
+  .modeRow{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:6px; }
+  .footerLinks{ display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; margin-top:18px; }
+  .userTag{ font-family: var(--font); font-size:13px; color:var(--dim-inverse); margin-top:10px; }
+  .userTag b{ color:var(--warn); }
+
+  /* Leaderboard / Achievements */
+  #screen-leaderboard, #screen-achievements{ justify-content:flex-start; padding-top:120px; gap:18px; }
+  #lbList, #achList{
+    width:100%; max-width:520px;
+    display:flex; flex-direction:column; gap:10px;
+    max-height:800px; overflow-y:auto;
+  }
+  .lbRow{
+    display:flex; align-items:center; gap:14px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius: var(--radius-sm); padding:14px 18px;
+    text-align:left;
+    box-shadow: var(--shadow-sm);
+  }
+  .lbRow .rank{ width:32px; color:var(--dim); font-size:14px; font-weight:700; }
+  .lbRow .name{ flex:1; font-size:15px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lbRow .val{ font-size:14px; font-weight:800; color:var(--accent); }
+  .lbRow.me{ border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  #lbNote{ font-family: var(--font); font-size:13px; font-weight:500; color:var(--dim-inverse); margin-top:-6px; }
+  #lbEmpty{ font-family: var(--font); color:var(--dim-inverse); font-size:15px; padding: 30px 0; }
+  .spinner{
+    width:26px; height:26px; border-radius:50%;
+    border:3px solid var(--border); border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  .achRow{
+    display:flex; align-items:center; gap:14px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius: var(--radius-sm); padding:14px 18px;
+    text-align:left;
+    opacity:0.55;
+    box-shadow: var(--shadow-sm);
+  }
+  .achRow.unlocked{ opacity:1; border-color: var(--warn); }
+  .achRow .achIcon{
+    width:34px; height:34px; flex:none; border-radius: 10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:16px;
+    background: var(--surface-2); border:1px solid var(--border);
+  }
+  .achRow.unlocked .achIcon{ background: #fff6e0; border-color:#ffe6a8; }
+  .achRow .achText{ flex:1; min-width:0; }
+  .achRow .achTitle{ font-size:14px; font-weight:700; color:var(--ink); }
+  .achRow .achDesc{ font-family: var(--font); font-size:13px; font-weight:500; color:var(--dim); margin-top:3px; }
+  .achRow.unlocked .achDesc{ color: var(--dim); opacity:0.9; }
+
+  #achToastWrap{
+    position:absolute; left:0; top:0; width:1280px;
+    display:flex; flex-direction:column; align-items:center;
+    padding-top: 40px;
+    pointer-events:none;
+    z-index: 30;
+  }
+  .achToast{
+    display:flex; align-items:center; gap:14px;
+    background: var(--surface); border:1px solid var(--border);
+    border-radius: var(--radius-sm); padding:14px 22px;
+    box-shadow: var(--shadow-lg);
+    margin-bottom:10px;
+    transform: translateY(-140%);
+    opacity:0;
+    transition: transform .4s cubic-bezier(.2,1.4,.4,1), opacity .3s ease;
+    max-width: 480px;
+  }
+  .achToast.show{ transform: translateY(0); opacity:1; }
+  .achToast .achToastIcon{ font-size:22px; flex:none; }
+  .achToast .achToastLabel{ font-size:10px; font-weight:700; letter-spacing:1px; color:var(--warn); text-transform:uppercase; }
+  .achToast .achToastTitle{ font-family: var(--font); font-size:16px; font-weight:700; margin-top:3px; color:var(--ink); }
+
+  @media (max-width: 1px){ /* keep linter happy, real responsiveness via JS transform */ }
+
+  /* ---------- Touch devices: the 1280x720 stage gets shrunk a lot on a
+     phone, so blow the HUD, buttons and menus up to stay readable. ---------- */
+  body.touch #hudTop{ zoom:1.7; padding:16px 16px 0 16px; }
+  body.touch #levelLabel{ zoom:1.6; top:16px; }
+  body.touch #topButtons{ zoom:1.6; right:14px; top:84px; }
+  body.touch #mineBtn{ zoom:1.7; right:18px; bottom:40px; }
+  body.touch #hint{ zoom:1.6; top:auto; bottom:12px; }
+  body.touch #levelBanner .lbCard{ zoom:1.5; }
+  body.touch #achToastWrap{ zoom:1.45; width:883px; }
+  body.touch .screen > *{ zoom:1.45; }
+  body.touch #screen-leaderboard, body.touch #screen-achievements{ padding-top:40px; gap:12px; }
+  body.touch #lbList, body.touch #achList{ max-height:300px; }
+  body.touch .stick{ width:190px; height:190px; }
+  body.touch .stickKnob{ width:84px; height:84px; }
+  .tapMark{
+    position:absolute; width:46px; height:46px; margin:-23px 0 0 -23px;
+    border-radius:50%; border:3px solid var(--accent);
+    pointer-events:none; z-index:15;
+    animation: tapPing .35s ease-out forwards;
+  }
+  @keyframes tapPing{ from{ transform:scale(.4); opacity:.9; } to{ transform:scale(1.25); opacity:0; } }
+</style>
+</head>
+<body>
+  <div id="viewport">
+    <div id="stage">
+      <canvas id="game" width="1280" height="720"></canvas>
+
+      <div id="hud">
+        <div id="hudTop">
+          <div>
+            <div id="livesWrap"></div>
+            <div id="mineRow"></div>
+            <div id="mineLabel">Mines</div>
+          </div>
+          <div id="scoreWrap">
+            <div id="scoreLabel">SCORE</div>
+            <div id="scoreValue">0</div>
+          </div>
+        </div>
+        <div id="levelLabel">LEVEL 1</div>
+        <div id="topButtons">
+          <div class="iconBtn" id="btnMute" title="Mute"></div>
+          <div class="iconBtn" id="btnFullscreen" title="Fullscreen"></div>
+        </div>
+        <div id="mineBtn" title="Drop mine"><div class="mbCount" id="mbCount">3</div></div>
+      </div>
+
+      <div id="levelBanner"><div class="lbCard" id="levelBannerText">LEVEL 1</div></div>
+      <div class="stick" id="stickLeft"><div class="stickKnob"></div></div>
+      <div class="stick" id="stickRight"><div class="stickKnob"></div></div>
+      <div id="hint">WASD / arrows to move &middot; aim with the mouse &middot; click or space to fire &middot; E to drop a mine</div>
+
+
+      <div class="screen" id="screen-start">
+        <h1 class="title">Tanks</h1>
+        <div class="subtitle">Roll into the arena, dodge the ricochets, and clear every enemy tank on the field. Bullets bounce off walls, so use the angles &mdash; and drop a mine if you need cover.</div>
+        <div class="bestRow">
+          <div class="statChip"><div class="n" id="startBest">0</div><div class="l">Best</div></div>
+        </div>
+        <div class="modeRow">
+          <button class="primary" id="btnStartGame">New Game</button>
+        </div>
+      </div>
+
+      <div class="screen hidden" id="screen-gameover">
+        <div class="badge" id="goBadge">Game Over</div>
+        <h1 class="title" style="font-size:34px; margin-bottom:2px;">Tank Destroyed</h1>
+        <div class="bestRow" style="margin-top:18px;">
+          <div class="statChip"><div class="n" id="goScore">0</div><div class="l">Score</div></div>
+          <div class="statChip"><div class="n" id="goLevel">1</div><div class="l">Level</div></div>
+          <div class="statChip"><div class="n" id="goKills">0</div><div class="l">Kills</div></div>
+          <div class="statChip"><div class="n" id="goBest">0</div><div class="l">Best</div></div>
+        </div>
+        <div style="height:22px;"></div>
+        <button class="primary" id="btnRetry">Play Again</button>
+      </div>
+
+
+    </div>
+  </div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================================
+   TANKS
+   Top-down tank arena battle. Pure canvas 2D. Part of dailygametree.com.
+   ========================================================================= */
+
+const BASE_W = 1280, BASE_H = 720;
+// phones/tablets (coarse pointer) get the bigger touch UI; touchscreen laptops keep the desktop layout
+const IS_TOUCH = window.matchMedia ? window.matchMedia("(pointer: coarse)").matches : ("ontouchstart" in window);
+if(IS_TOUCH){
+  document.body.classList.add("touch");
+  const h = document.getElementById("hint");
+  if(h) h.textContent = "Drag on the left to move \u00b7 tap anywhere to fire \u00b7 mine button to drop a mine";
+}
+
+/* ---------------------------------------------------------------------
+   Platform helpers: best score (localStorage) + fullscreen.
+   --------------------------------------------------------------------- */
+const Platform = (function(){
+  const BEST_KEY = "tanks_best_v1";
+  function getLocalBest(){
+    try{ return parseInt(localStorage.getItem(BEST_KEY) || "0", 10) || 0; }catch(e){ return 0; }
+  }
+  function submitScore(score){
+    if(score > getLocalBest()){ try{ localStorage.setItem(BEST_KEY, String(score)); }catch(e){} }
+  }
+  function requestFullscreen(on){
+    try{
+      if(on){ document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
+      else{ document.exitFullscreen && document.exitFullscreen(); }
+    }catch(e){}
+  }
+  return { getLocalBest, submitScore, requestFullscreen };
+})();
+
+/* ---------------------------------------------------------------------
+   Audio -- tiny synthesized SFX, no asset files.
+   --------------------------------------------------------------------- */
+const Audio2 = (function(){
+  let ctx = null, muted = false, master = null;
+  let musicEl = null, musicSource = null, musicGain = null;
+  try{ muted = localStorage.getItem("tanks_muted") === "1"; }catch(e){}
+
+  function ensure(){
+    if(!ctx){
+      try{
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        master = ctx.createGain();
+        master.gain.value = muted ? 0 : 0.5;
+        master.connect(ctx.destination);
+      }catch(e){ ctx = null; }
+    }
+    if(ctx && ctx.state === "suspended"){ ctx.resume().catch(()=>{}); }
+  }
+  // Background music: a single looping track, routed through the same
+  // master gain as the synthesized SFX so the existing mute button silences
+  // both together. Created lazily and started on the first user gesture
+  // (browsers block audio autoplay until then), same as ctx.resume() above.
+  function ensureMusic(){
+    if(!ctx) return;
+    if(!musicEl){
+      musicEl = new Audio("music.mp3");
+      musicEl.loop = true;
+      musicEl.preload = "auto";
+    }
+    if(!musicSource){
+      try{
+        musicSource = ctx.createMediaElementSource(musicEl);
+        musicGain = ctx.createGain();
+        musicGain.gain.value = 0.32;
+        musicSource.connect(musicGain);
+        musicGain.connect(master);
+      }catch(e){ /* already connected, or unsupported -- ignore */ }
+    }
+  }
+  function tone(freq, dur, type, peak, slideTo){
+    if(!ctx) return;
+    const t0 = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, t0);
+    if(slideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(20,slideTo), t0+dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(peak||0.4, t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    osc.connect(g); g.connect(master);
+    osc.start(t0); osc.stop(t0+dur+0.02);
+  }
+  function noiseBurst(dur, peak){
+    if(!ctx) return;
+    const t0 = ctx.currentTime;
+    const bufSize = Math.floor(ctx.sampleRate*dur);
+    const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for(let i=0;i<bufSize;i++) data[i] = (Math.random()*2-1) * (1 - i/bufSize);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(peak||0.3, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    src.connect(g); g.connect(master);
+    src.start(t0);
+  }
+
+  return {
+    unlock(){
+      ensure();
+      ensureMusic();
+      if(musicEl && musicEl.paused){ musicEl.play().catch(()=>{}); }
+    },
+    shoot(){ ensure(); tone(260,0.08,"square",0.14,140); },
+    enemyShoot(){ ensure(); tone(200,0.09,"square",0.11,110); },
+    bounce(){ ensure(); tone(520,0.05,"triangle",0.12,700); },
+    hitClang(){ ensure(); tone(180,0.08,"square",0.18,90); },
+    explode(){ ensure(); noiseBurst(0.35,0.4); tone(90,0.3,"sine",0.25,40); },
+    minePlace(){ ensure(); tone(380,0.06,"sine",0.14,460); },
+    mineExplode(){ ensure(); noiseBurst(0.45,0.45); tone(70,0.35,"sine",0.3,30); },
+    playerHit(){ ensure(); noiseBurst(0.4,0.4); tone(120,0.35,"sawtooth",0.3,40); },
+    levelClear(){ ensure(); if(!ctx) return; [523,659,784].forEach((f,i)=>{ setTimeout(()=>tone(f,0.16,"triangle",0.3), i*90); }); },
+    gameover(){ ensure(); if(!ctx) return; [392,330,262,196].forEach((f,i)=>{ setTimeout(()=>tone(f,0.28,"sine",0.3), i*120); }); },
+    achievement(){ ensure(); if(!ctx) return; [520,660,880].forEach((f,i)=>{ setTimeout(()=>tone(f,0.18,"sine",0.32), i*90); }); },
+    setMuted(v){
+      muted = v;
+      try{ localStorage.setItem("tanks_muted", v?"1":"0"); }catch(e){}
+      if(master) master.gain.value = v?0:0.5;
+    },
+    isMuted(){ return muted; }
+  };
+})();
+
+/* ---------------------------------------------------------------------
+   Canvas + responsive letterboxed stage
+   --------------------------------------------------------------------- */
+const stageEl = document.getElementById("stage");
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+function fitStage(){
+  const scale = Math.min(window.innerWidth / BASE_W, window.innerHeight / BASE_H);
+  stageEl.style.transform = `scale(${scale})`;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.round(BASE_W * dpr);
+  canvas.height = Math.round(BASE_H * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener("resize", fitStage);
+window.addEventListener("orientationchange", fitStage);
+fitStage();
+
+/* ---------------------------------------------------------------------
+   Utility
+   --------------------------------------------------------------------- */
+function rand(a,b){ return a + Math.random()*(b-a); }
+function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
+function dist(x1,y1,x2,y2){ return Math.hypot(x2-x1,y2-y1); }
+function normalizeAngle(a){ a = a % (Math.PI*2); if(a>Math.PI) a-=Math.PI*2; if(a<-Math.PI) a+=Math.PI*2; return a; }
+function approachAngle(cur,target,maxDelta){
+  const diff = normalizeAngle(target-cur);
+  const c = clamp(diff,-maxDelta,maxDelta);
+  return cur+c;
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+}
+function roundRectPath(x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+/* ---------------------------------------------------------------------
+   Arena wall layouts. Bottom ~250px is always kept clear for the
+   player's spawn point. Layouts are mirrored horizontally on repeat
+   cycles (past a full pass through the list) for a bit of variety as
+   the level number climbs.
+   --------------------------------------------------------------------- */
+const LEVEL_LAYOUTS = [
+  [ // A: central cross + side bunkers
+    {x:590,y:140,w:100,h:200},
+    {x:340,y:420,w:600,h:50},
+    {x:140,y:170,w:140,h:140},
+    {x:1000,y:170,w:140,h:140},
+  ],
+  [ // B: corridor maze
+    {x:110,y:110,w:50,h:220},
+    {x:1120,y:110,w:50,h:220},
+    {x:230,y:110,w:230,h:50},
+    {x:820,y:110,w:230,h:50},
+    {x:440,y:250,w:400,h:50},
+    {x:230,y:450,w:820,h:50},
+  ],
+  [ // C: scattered bunkers (3x2 grid)
+    {x:140,y:130,w:130,h:130},
+    {x:575,y:130,w:130,h:130},
+    {x:1010,y:130,w:130,h:130},
+    {x:140,y:390,w:130,h:130},
+    {x:575,y:390,w:130,h:130},
+    {x:1010,y:390,w:130,h:130},
+  ],
+  [ // D: funnel arena
+    {x:100,y:170,w:1080,h:40},
+    {x:100,y:170,w:40,h:330},
+    {x:1140,y:170,w:40,h:330},
+    {x:590,y:330,w:100,h:40},
+  ],
+  [ // E: corner bunkers + center pillar
+    {x:100,y:120,w:150,h:150},
+    {x:1030,y:120,w:150,h:150},
+    {x:100,y:420,w:150,h:110},
+    {x:1030,y:420,w:150,h:110},
+    {x:590,y:270,w:100,h:100},
+  ],
+];
+
+function mirrorLayout(layout){
+  return layout.map(w=>({ x: BASE_W-w.x-w.w, y:w.y, w:w.w, h:w.h }));
+}
+
+/* ---------------------------------------------------------------------
+   Enemy type configuration
+   --------------------------------------------------------------------- */
+const ENEMY_TYPES = {
+  patrol: { radius:24, speed:70, turnRate:5, fireCooldown:1.6, range:640, aimTolerance:0.12, aimMaxTime:0.8, bulletSpeed:340, bulletRadius:6, bulletBounces:1, hp:1, color:"#9c8a54", points:100 },
+  sentry: { radius:24, speed:0, turnRate:2.6, fireCooldown:1.3, range:640, aimTolerance:0.1, bulletSpeed:360, bulletRadius:6, bulletBounces:1, hp:1, color:"#666a5c", points:150 },
+  hunter: { radius:22, speed:120, turnRate:6, turretTurnRate:8, fireCooldown:1.0, aimTolerance:0.12, bulletSpeed:420, bulletRadius:6, bulletBounces:1, hp:1, color:"#a3402c", points:125 },
+  heavy:  { radius:32, speed:48, turnRate:3, fireCooldown:2.2, range:640, aimTolerance:0.16, aimMaxTime:1.0, bulletSpeed:300, bulletRadius:9, bulletBounces:1, hp:2, color:"#333c25", points:300 },
+};
+const PLAYER_COLOR = "#4b5320";
+const PLAYER_TURRET_COLOR = "#38400f";
+
+const PLAYER_RADIUS = 26;
+const PLAYER_SPEED = 230;
+const PLAYER_TURN_RATE = 10;
+const PLAYER_FIRE_COOLDOWN = 0.30;
+const BULLET_RADIUS_PLAYER = 6;
+const BULLET_SPEED_PLAYER = 520;
+const BULLET_BOUNCES_PLAYER = 2;
+const BULLET_LIFETIME = 3.6;
+const MAX_MINE_CHARGES = 3;
+const MINE_ARM_DELAY = 0.9;
+const MINE_TRIGGER_RADIUS = 18;
+const MINE_EXPLOSION_RADIUS = 78;
+const PLAYER_LIVES = 3;
+const PLAYER_RESPAWN_INVULN = 1.6;
+
+/* ---------------------------------------------------------------------
+   Game state
+   --------------------------------------------------------------------- */
+const State = { START:"start", PLAYING:"playing", GAMEOVER:"gameover" };
+let state = State.START;
+
+let walls = [];
+let enemies = [];
+let bullets = [];
+let mines = [];
+let particles = [];
+let groundTexture = [];
+
+/* Generates a row of overlapping "sandbag" lumps along a wall's longer
+   axis, and a mottled dirt/gravel speckle field for the arena floor --
+   both computed once per level (not per frame) so the rustic texture
+   stays stable instead of flickering. */
+function buildSandbagWall(w){
+  const lumps = [];
+  const vertical = w.h > w.w;
+  if(!vertical){
+    const lumpR = Math.min(w.h/2, 22);
+    const count = Math.max(1, Math.round(w.w/(lumpR*1.5)));
+    for(let i=0;i<count;i++){
+      lumps.push({ cx: w.x+(i+0.5)*(w.w/count), cy: w.y+w.h/2, r: lumpR*rand(0.92,1.08), shade: rand(-12,12) });
+    }
+  }else{
+    const lumpR = Math.min(w.w/2, 22);
+    const count = Math.max(1, Math.round(w.h/(lumpR*1.5)));
+    for(let i=0;i<count;i++){
+      lumps.push({ cx: w.x+w.w/2, cy: w.y+(i+0.5)*(w.h/count), r: lumpR*rand(0.92,1.08), shade: rand(-12,12) });
+    }
+  }
+  return { ...w, lumps };
+}
+function buildGroundTexture(){
+  const specks = [];
+  for(let i=0;i<160;i++){
+    specks.push({
+      x: rand(0,BASE_W), y: rand(0,BASE_H), r: rand(2,7),
+      shade: rand(-14,14), a: rand(0.12,0.32),
+    });
+  }
+  return specks;
+}
+
+let level = 1;
+let score = 0;
+let best = 0;
+let lives = PLAYER_LIVES;
+let killsThisRun = 0;
+let levelTransitioning = false;
+
+const player = {
+  x: BASE_W/2, y: BASE_H-140, bodyAngle: -Math.PI/2, turretAngle: -Math.PI/2,
+  fireCooldown: 0, mineCharges: MAX_MINE_CHARGES,
+  invulnerable: 0, alive: true,
+};
+
+/* ---------------------------------------------------------------------
+   Level composition + generation
+   --------------------------------------------------------------------- */
+function composeLevel(n){
+  const counts = { patrol:0, sentry:0, hunter:0, heavy:0 };
+  counts.patrol = clamp(2 + Math.floor(n/2), 2, 6);
+  counts.sentry = n>=2 ? clamp(Math.floor((n-1)/2), 0, 4) : 0;
+  counts.hunter = n>=4 ? clamp(Math.floor((n-3)/2), 0, 4) : 0;
+  counts.heavy  = n>=6 ? (1 + Math.floor((n-6)/5)) : 0;
+  return counts;
+}
+
+function circleRectOverlap(x,y,r,w){
+  const cx = clamp(x, w.x, w.x+w.w);
+  const cy = clamp(y, w.y, w.y+w.h);
+  return dist(x,y,cx,cy) < r;
+}
+const ARENA_TOP_MARGIN = 90;
+const ARENA_BOTTOM_MARGIN = 190;
+const ARENA_SIDE_MARGIN = 40;
+
+function pointFree(x,y,r,taken){
+  if(x-r<ARENA_SIDE_MARGIN || x+r>BASE_W-ARENA_SIDE_MARGIN || y-r<ARENA_TOP_MARGIN || y+r>BASE_H-ARENA_BOTTOM_MARGIN) return false;
+  for(const w of walls){ if(circleRectOverlap(x,y,r+10,w)) return false; }
+  for(const p of taken){ if(dist(x,y,p.x,p.y) < r+p.r+70) return false; }
+  return true;
+}
+function randomFreePoint(r,taken){
+  for(let i=0;i<80;i++){
+    const x = rand(ARENA_SIDE_MARGIN+20, BASE_W-ARENA_SIDE_MARGIN-20);
+    const y = rand(ARENA_TOP_MARGIN+20, BASE_H-ARENA_BOTTOM_MARGIN-20);
+    if(pointFree(x,y,r,taken)) return {x,y};
+  }
+  return { x: rand(80,BASE_W-80), y: rand(ARENA_TOP_MARGIN+20, BASE_H-ARENA_BOTTOM_MARGIN-20) };
+}
+
+function makeEnemy(type, x, y){
+  const cfg = ENEMY_TYPES[type];
+  return {
+    type, x, y,
+    bodyAngle: rand(-Math.PI,Math.PI),
+    turretAngle: 0,
+    hp: cfg.hp,
+    fireCooldown: rand(0.2, cfg.fireCooldown),
+    mode: "roam",
+    waypoint: null,
+    aimTimer: 0,
+    strafeSign: Math.random()<0.5?1:-1,
+    flash: 0,
+    stuckCheckTimer: rand(0,0.5),
+    lastCheckX: x, lastCheckY: y,
+    escapeTimer: 0, escapeAngle: 0,
+  };
+}
+
+function spawnLevel(n){
+  level = n;
+  // Mines no longer regenerate over time -- you get exactly one charge back
+  // (capped at the max) at the start of each new level, starting from level 2.
+  if(n>1) player.mineCharges = Math.min(MAX_MINE_CHARGES, player.mineCharges+1);
+  const cycleIndex = (n-1) % LEVEL_LAYOUTS.length;
+  const cycleNum = Math.floor((n-1) / LEVEL_LAYOUTS.length);
+  const base = LEVEL_LAYOUTS[cycleIndex];
+  walls = (cycleNum % 2 === 1) ? mirrorLayout(base) : base.slice();
+  walls = walls.map(buildSandbagWall);
+  groundTexture = buildGroundTexture();
+
+  enemies = [];
+  bullets = [];
+  mines = [];
+  particles = [];
+  levelTransitioning = false;
+
+  player.x = BASE_W/2; player.y = BASE_H-140;
+  player.bodyAngle = -Math.PI/2; player.turretAngle = -Math.PI/2;
+  player.invulnerable = PLAYER_RESPAWN_INVULN * 0.6;
+
+  const taken = [];
+  const composition = composeLevel(n);
+  for(const type of Object.keys(composition)){
+    const cfg = ENEMY_TYPES[type];
+    for(let i=0;i<composition[type];i++){
+      const p = randomFreePoint(cfg.radius, taken);
+      taken.push({ x:p.x, y:p.y, r:cfg.radius });
+      const e = makeEnemy(type, p.x, p.y);
+      if(type==="sentry"){ e.bodyAngle = rand(-Math.PI,Math.PI); e.turretAngle = e.bodyAngle; }
+      enemies.push(e);
+    }
+  }
+
+  updateHud();
+  showLevelBanner(`LEVEL ${n}`);
+  state = State.PLAYING;
+  showScreen(null);
+  document.getElementById("hud").classList.add("show");
+}
+
+/* ---------------------------------------------------------------------
+   Collision helpers
+   --------------------------------------------------------------------- */
+function wallPushAndClamp(entity){
+  for(const w of walls){
+    const cx = clamp(entity.x, w.x, w.x+w.w);
+    const cy = clamp(entity.y, w.y, w.y+w.h);
+    const dx = entity.x-cx, dy = entity.y-cy;
+    const d2 = dx*dx+dy*dy;
+    const r = entity.radius;
+    if(d2 < r*r){
+      const d = Math.sqrt(d2) || 0.0001;
+      const overlap = r-d;
+      entity.x += (dx/d)*overlap;
+      entity.y += (dy/d)*overlap;
+    }
+  }
+  entity.x = clamp(entity.x, entity.radius+6, BASE_W-entity.radius-6);
+  entity.y = clamp(entity.y, entity.radius+6, BASE_H-entity.radius-6);
+}
+
+function hasLineOfSight(x1,y1,x2,y2){
+  const dx=x2-x1, dy=y2-y1;
+  const d = Math.hypot(dx,dy);
+  const steps = Math.max(1, Math.ceil(d/14));
+  for(let i=1;i<steps;i++){
+    const t = i/steps;
+    const px = x1+dx*t, py = y1+dy*t;
+    for(const w of walls){
+      if(px>w.x && px<w.x+w.w && py>w.y && py<w.y+w.h) return false;
+    }
+  }
+  return true;
+}
+
+/* ---------------------------------------------------------------------
+   Particles
+   --------------------------------------------------------------------- */
+function spawnBurst(x,y,color,count){
+  for(let i=0;i<(count||16);i++){
+    const angle = rand(0,Math.PI*2);
+    const speed = rand(60,220);
+    particles.push({
+      x,y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed,
+      age:0, life: rand(0.35,0.7), color, size: rand(3,6),
+    });
+  }
+}
+function updateParticles(dt){
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.age += dt;
+    if(p.age>p.life){ particles.splice(i,1); continue; }
+    p.x += p.vx*dt; p.y += p.vy*dt;
+    p.vx *= 0.90; p.vy *= 0.90;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Bullets
+   --------------------------------------------------------------------- */
+function fireBullet(owner, x, y, angle, speed, radius, bounces){
+  bullets.push({
+    owner, x, y,
+    vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed,
+    radius, bounces, age:0,
+  });
+}
+function firePlayerBullet(){
+  const ox = player.x + Math.cos(player.turretAngle)*(PLAYER_RADIUS+BULLET_RADIUS_PLAYER+4);
+  const oy = player.y + Math.sin(player.turretAngle)*(PLAYER_RADIUS+BULLET_RADIUS_PLAYER+4);
+  fireBullet("player", ox, oy, player.turretAngle, BULLET_SPEED_PLAYER, BULLET_RADIUS_PLAYER, BULLET_BOUNCES_PLAYER);
+  Audio2.shoot();
+}
+function fireEnemyBullet(e, cfg){
+  const ox = e.x + Math.cos(e.turretAngle)*(ENEMY_TYPES[e.type].radius+cfg.bulletRadius+4);
+  const oy = e.y + Math.sin(e.turretAngle)*(ENEMY_TYPES[e.type].radius+cfg.bulletRadius+4);
+  fireBullet("enemy", ox, oy, e.turretAngle, cfg.bulletSpeed, cfg.bulletRadius, cfg.bulletBounces);
+  Audio2.enemyShoot();
+}
+
+function bounceBulletOffWalls(b){
+  for(const w of walls){
+    const cx = clamp(b.x, w.x, w.x+w.w);
+    const cy = clamp(b.y, w.y, w.y+w.h);
+    const dx = b.x-cx, dy = b.y-cy;
+    const d2 = dx*dx+dy*dy;
+    if(d2 < b.radius*b.radius){
+      if(Math.abs(dx) > Math.abs(dy)){
+        b.vx = -b.vx;
+        b.x = cx + (dx>=0 ? b.radius : -b.radius);
+      }else{
+        b.vy = -b.vy;
+        b.y = cy + (dy>=0 ? b.radius : -b.radius);
+      }
+      b.bounces--;
+      Audio2.bounce();
+      return;
+    }
+  }
+  const m = 6;
+  if(b.x-b.radius < m){ b.x = m+b.radius; b.vx = Math.abs(b.vx); b.bounces--; Audio2.bounce(); }
+  else if(b.x+b.radius > BASE_W-m){ b.x = BASE_W-m-b.radius; b.vx = -Math.abs(b.vx); b.bounces--; Audio2.bounce(); }
+  if(b.y-b.radius < m){ b.y = m+b.radius; b.vy = Math.abs(b.vy); b.bounces--; Audio2.bounce(); }
+  else if(b.y+b.radius > BASE_H-m){ b.y = BASE_H-m-b.radius; b.vy = -Math.abs(b.vy); b.bounces--; Audio2.bounce(); }
+}
+
+function damageEnemy(idx, killedByMine){
+  const e = enemies[idx];
+  const cfg = ENEMY_TYPES[e.type];
+  e.hp--;
+  e.flash = 1;
+  if(e.hp<=0){
+    enemies.splice(idx,1);
+    score += cfg.points;
+    killsThisRun++;
+    spawnBurst(e.x,e.y,cfg.color,18);
+    Audio2.explode();
+    updateHud();
+  }else{
+    Audio2.hitClang();
+  }
+}
+
+function playerHit(){
+  if(player.invulnerable>0 || !player.alive) return;
+  spawnBurst(player.x,player.y,PLAYER_COLOR,20);
+  Audio2.playerHit();
+  lives--;
+  updateHud();
+  if(lives<=0){
+    player.alive = false;
+    triggerGameOver();
+    return;
+  }
+  player.alive = false;
+  setTimeout(()=>{
+    player.x = BASE_W/2; player.y = BASE_H-140;
+    player.bodyAngle = -Math.PI/2; player.turretAngle = -Math.PI/2;
+    player.invulnerable = PLAYER_RESPAWN_INVULN;
+    player.alive = true;
+  }, 700);
+}
+
+function updateBullets(dt){
+  for(let i=bullets.length-1;i>=0;i--){
+    const b = bullets[i];
+    b.age += dt;
+    b.x += b.vx*dt; b.y += b.vy*dt;
+    bounceBulletOffWalls(b);
+
+    let remove = false;
+    if(b.owner==="player"){
+      for(let j=enemies.length-1;j>=0;j--){
+        const e = enemies[j];
+        if(dist(b.x,b.y,e.x,e.y) < b.radius+ENEMY_TYPES[e.type].radius){
+          damageEnemy(j,false);
+          remove = true;
+          break;
+        }
+      }
+      // A player bullet is fired outward from the player's own turret, so
+      // it physically can't hit them until it has ricocheted at least once
+      // (bounces < the starting count) and come back around -- so your
+      // own shot can catch you on the rebound.
+      if(!remove && b.bounces < BULLET_BOUNCES_PLAYER && player.alive && player.invulnerable<=0
+         && dist(b.x,b.y,player.x,player.y) < b.radius+PLAYER_RADIUS){
+        playerHit();
+        remove = true;
+      }
+    }else{
+      if(player.alive && player.invulnerable<=0 && dist(b.x,b.y,player.x,player.y) < b.radius+PLAYER_RADIUS){
+        playerHit();
+        remove = true;
+      }
+    }
+    if(remove || b.bounces<0 || b.age>BULLET_LIFETIME){
+      bullets.splice(i,1);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Mines
+   --------------------------------------------------------------------- */
+function placeMine(x,y){
+  mines.push({ x, y, armTimer: MINE_ARM_DELAY, armed:false });
+}
+function explodeMine(idx){
+  const m = mines[idx];
+  mines.splice(idx,1);
+  let killedOne = false;
+  for(let j=enemies.length-1;j>=0;j--){
+    const e = enemies[j];
+    if(dist(m.x,m.y,e.x,e.y) < MINE_EXPLOSION_RADIUS+ENEMY_TYPES[e.type].radius){
+      const wasAlive = true;
+      damageEnemy(j, true);
+      if(wasAlive) killedOne = true;
+    }
+  }
+  spawnBurst(m.x,m.y,"#c9902b",22);
+  Audio2.mineExplode();
+}
+function updateMines(dt){
+  for(let i=mines.length-1;i>=0;i--){
+    const m = mines[i];
+    if(!m.armed){
+      m.armTimer -= dt;
+      if(m.armTimer<=0) m.armed = true;
+      continue;
+    }
+    let triggered = false;
+    for(const e of enemies){
+      if(dist(m.x,m.y,e.x,e.y) < MINE_TRIGGER_RADIUS+ENEMY_TYPES[e.type].radius){ triggered = true; break; }
+    }
+    if(triggered) explodeMine(i);
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Enemy AI
+   --------------------------------------------------------------------- */
+function moveEntityToward(e, target, speed, dt, turnRate){
+  const dx = target.x-e.x, dy = target.y-e.y;
+  const d = Math.hypot(dx,dy);
+  if(d>4){
+    e.x += (dx/d)*speed*dt;
+    e.y += (dy/d)*speed*dt;
+    e.bodyAngle = approachAngle(e.bodyAngle, Math.atan2(dy,dx), turnRate*dt);
+  }
+  e.radius = ENEMY_TYPES[e.type].radius;
+  wallPushAndClamp(e);
+}
+
+/* A roaming tank that just beelines straight for a random point will drive
+   face-first into any wall between here and there, then sit there
+   shoving against it forever (the "drives into walls and gets stuck"
+   problem). Two fixes work together: waypoints are picked with a
+   line-of-sight check so a tank mostly only ever aims somewhere it can
+   actually walk straight to, and a stuck-detector watches for a tank that
+   hasn't gone anywhere in the last half second and kicks it off in a
+   fresh random direction (and drops its old waypoint) to break the
+   deadlock in the rarer case it still gets wedged against something. */
+function pickRoamWaypoint(e, cfg){
+  for(let i=0;i<20;i++){
+    const p = randomFreePoint(cfg.radius, []);
+    if(hasLineOfSight(e.x,e.y,p.x,p.y)) return p;
+  }
+  return randomFreePoint(cfg.radius, []);
+}
+function updateStuckEscape(e, dt, speed){
+  if(e.escapeTimer>0){
+    e.escapeTimer -= dt;
+    e.x += Math.cos(e.escapeAngle)*speed*dt;
+    e.y += Math.sin(e.escapeAngle)*speed*dt;
+    e.bodyAngle = approachAngle(e.bodyAngle, e.escapeAngle, 8*dt);
+    e.radius = ENEMY_TYPES[e.type].radius;
+    wallPushAndClamp(e);
+    return true;
+  }
+  e.stuckCheckTimer += dt;
+  if(e.stuckCheckTimer>0.5){
+    const moved = dist(e.x,e.y,e.lastCheckX,e.lastCheckY);
+    if(speed>0 && moved<10){
+      e.escapeTimer = 0.45;
+      e.escapeAngle = rand(-Math.PI,Math.PI);
+      e.waypoint = null;
+    }
+    e.lastCheckX = e.x; e.lastCheckY = e.y;
+    e.stuckCheckTimer = 0;
+  }
+  return false;
+}
+
+function updateRoamAim(e, dt, cfg){
+  if(e.mode==="roam"){
+    if(updateStuckEscape(e, dt, cfg.speed)){ e.turretAngle = e.bodyAngle; return; }
+    if(!e.waypoint || dist(e.x,e.y,e.waypoint.x,e.waypoint.y)<16){
+      e.waypoint = pickRoamWaypoint(e, cfg);
+    }
+    moveEntityToward(e, e.waypoint, cfg.speed, dt, cfg.turnRate);
+    e.turretAngle = e.bodyAngle;
+    if(e.fireCooldown<=0 && dist(e.x,e.y,player.x,player.y)<cfg.range && hasLineOfSight(e.x,e.y,player.x,player.y)){
+      e.mode = "aim";
+      e.aimTimer = 0;
+    }
+  }else{
+    const targetAngle = Math.atan2(player.y-e.y, player.x-e.x);
+    e.bodyAngle = approachAngle(e.bodyAngle, targetAngle, cfg.turnRate*1.4*dt);
+    e.turretAngle = e.bodyAngle;
+    e.aimTimer += dt;
+    const aligned = Math.abs(normalizeAngle(targetAngle-e.bodyAngle)) < cfg.aimTolerance;
+    if(aligned || e.aimTimer>cfg.aimMaxTime){
+      if(aligned && hasLineOfSight(e.x,e.y,player.x,player.y)) fireEnemyBullet(e,cfg);
+      e.fireCooldown = cfg.fireCooldown;
+      e.mode = "roam";
+    }
+  }
+}
+
+function updateSentry(e, dt, cfg){
+  e.radius = cfg.radius;
+  const canSee = hasLineOfSight(e.x,e.y,player.x,player.y);
+  if(canSee){
+    const targetAngle = Math.atan2(player.y-e.y, player.x-e.x);
+    e.turretAngle = approachAngle(e.turretAngle, targetAngle, cfg.turnRate*dt);
+    const aligned = Math.abs(normalizeAngle(targetAngle-e.turretAngle)) < cfg.aimTolerance;
+    if(aligned && e.fireCooldown<=0){
+      fireEnemyBullet(e,cfg);
+      e.fireCooldown = cfg.fireCooldown;
+    }
+  }
+}
+
+function updateHunter(e, dt, cfg){
+  e.radius = cfg.radius;
+  if(updateStuckEscape(e, dt, cfg.speed)){
+    if(hasLineOfSight(e.x,e.y,player.x,player.y)){
+      e.turretAngle = approachAngle(e.turretAngle, Math.atan2(player.y-e.y,player.x-e.x), cfg.turretTurnRate*dt);
+    }
+    return;
+  }
+  const dx = player.x-e.x, dy = player.y-e.y;
+  const d = Math.hypot(dx,dy) || 0.0001;
+  let moveAngle;
+  if(d>230){ moveAngle = Math.atan2(dy,dx); }
+  else if(d<130){ moveAngle = Math.atan2(-dy,-dx); }
+  else{
+    const base = Math.atan2(dy,dx);
+    if(Math.random()<0.01) e.strafeSign *= -1;
+    moveAngle = base + e.strafeSign*(Math.PI/2);
+  }
+  e.x += Math.cos(moveAngle)*cfg.speed*dt;
+  e.y += Math.sin(moveAngle)*cfg.speed*dt;
+  e.bodyAngle = approachAngle(e.bodyAngle, moveAngle, cfg.turnRate*dt);
+  wallPushAndClamp(e);
+
+  const canSee = hasLineOfSight(e.x,e.y,player.x,player.y);
+  if(canSee){
+    const targetAngle = Math.atan2(dy,dx);
+    e.turretAngle = approachAngle(e.turretAngle, targetAngle, cfg.turretTurnRate*dt);
+    const aligned = Math.abs(normalizeAngle(targetAngle-e.turretAngle)) < cfg.aimTolerance;
+    if(aligned && e.fireCooldown<=0){
+      fireEnemyBullet(e,cfg);
+      e.fireCooldown = cfg.fireCooldown;
+    }
+  }else{
+    e.turretAngle = approachAngle(e.turretAngle, e.bodyAngle, cfg.turretTurnRate*dt);
+  }
+}
+
+function updateEnemies(dt){
+  for(const e of enemies){
+    e.fireCooldown = Math.max(0, e.fireCooldown-dt);
+    e.flash = Math.max(0, e.flash-dt*3);
+    const cfg = ENEMY_TYPES[e.type];
+    if(e.type==="patrol" || e.type==="heavy") updateRoamAim(e,dt,cfg);
+    else if(e.type==="sentry") updateSentry(e,dt,cfg);
+    else if(e.type==="hunter") updateHunter(e,dt,cfg);
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Input
+   --------------------------------------------------------------------- */
+const Input = { up:false, down:false, left:false, right:false, fireHeld:false, mineRequested:false };
+let mouseX = BASE_W/2, mouseY = BASE_H/2, mouseActive = false;
+const STICK_MAX = IS_TOUCH ? 95 : 60;
+const STICK_C = IS_TOUCH ? 95 : 60; // centre of the stick element (half its size)
+// Tap-to-fire (touch): every tap that isn't the movement joystick aims the
+// turret at the tapped point and fires one shot. If the gun is still
+// cooling down the shot is queued briefly so quick taps never get eaten.
+let touchAim = { active:false, id:null, x:0, y:0 };
+let tapShot = null; // { x, y, ttl }
+let leftStick = { active:false, id:null, originX:0, originY:0, dx:0, dy:0 };
+let rightStick = { active:false, id:null, originX:0, originY:0, dx:0, dy:0 };
+
+const stickLeftEl = document.getElementById("stickLeft");
+const stickRightEl = document.getElementById("stickRight");
+function showStick(el, x, y){ el.style.left = x+"px"; el.style.top = y+"px"; el.classList.add("show"); }
+function moveStickKnob(el, x, y){ const k = el.querySelector(".stickKnob"); k.style.left = (x)+"px"; k.style.top = (y)+"px"; }
+function hideStick(el){ el.classList.remove("show"); moveStickKnob(el,STICK_C,STICK_C); }
+function showTapMark(x, y){
+  const m = document.createElement("div");
+  m.className = "tapMark"; m.style.left = x+"px"; m.style.top = y+"px";
+  stageEl.appendChild(m);
+  setTimeout(()=>m.remove(), 400);
+}
+
+function toCanvasXY(clientX, clientY){
+  const rect = stageEl.getBoundingClientRect();
+  return {
+    x: clamp((clientX-rect.left) * (BASE_W/rect.width), 0, BASE_W),
+    y: clamp((clientY-rect.top) * (BASE_H/rect.height), 0, BASE_H),
+  };
+}
+
+window.addEventListener("keydown", (e)=>{
+  if(["ArrowLeft","KeyA"].includes(e.code)) Input.left = true;
+  if(["ArrowRight","KeyD"].includes(e.code)) Input.right = true;
+  if(["ArrowUp","KeyW"].includes(e.code)) Input.up = true;
+  if(["ArrowDown","KeyS"].includes(e.code)) Input.down = true;
+  if(e.code==="Space"){ Input.fireHeld = true; e.preventDefault(); Audio2.unlock(); }
+  if(e.code==="KeyE" && !e.repeat){ Input.mineRequested = true; }
+  if(["ArrowLeft","ArrowRight","ArrowUp","ArrowDown","Space"].includes(e.code)) e.preventDefault();
+});
+window.addEventListener("keyup", (e)=>{
+  if(["ArrowLeft","KeyA"].includes(e.code)) Input.left = false;
+  if(["ArrowRight","KeyD"].includes(e.code)) Input.right = false;
+  if(["ArrowUp","KeyW"].includes(e.code)) Input.up = false;
+  if(["ArrowDown","KeyS"].includes(e.code)) Input.down = false;
+  if(e.code==="Space") Input.fireHeld = false;
+});
+
+stageEl.addEventListener("pointerdown", (e)=>{
+  Audio2.unlock();
+  const p = toCanvasXY(e.clientX, e.clientY);
+  if(e.pointerType==="touch"){
+    // taps on buttons / menus never move or fire the tank
+    if(e.target.closest && e.target.closest("button, .iconBtn, #mineBtn, .screen:not(.hidden)")) return;
+    if(p.x < BASE_W/2 && !leftStick.active){
+      leftStick = { active:true, id:e.pointerId, originX:p.x, originY:p.y, dx:0, dy:0, t0:performance.now(), maxD:0 };
+      showStick(stickLeftEl, p.x, p.y);
+      moveStickKnob(stickLeftEl,STICK_C,STICK_C);
+    }else{
+      // anywhere else (incl. the left side while already steering): fire at it
+      touchAim = { active:true, id:e.pointerId, x:p.x, y:p.y };
+      tapShot = { x:p.x, y:p.y, ttl:0.35 };
+      showTapMark(p.x, p.y);
+    }
+  }else{
+    mouseX = p.x; mouseY = p.y; mouseActive = true;
+    Input.fireHeld = true;
+  }
+});
+stageEl.addEventListener("pointermove", (e)=>{
+  const p = toCanvasXY(e.clientX, e.clientY);
+  if(e.pointerType==="touch"){
+    if(leftStick.active && e.pointerId===leftStick.id){
+      let dx = p.x-leftStick.originX, dy = p.y-leftStick.originY;
+      const d = Math.hypot(dx,dy);
+      if(d>STICK_MAX){ dx *= STICK_MAX/d; dy *= STICK_MAX/d; }
+      leftStick.dx = dx; leftStick.dy = dy;
+      leftStick.maxD = Math.max(leftStick.maxD || 0, d);
+      moveStickKnob(stickLeftEl, STICK_C+dx, STICK_C+dy);
+    }else if(touchAim.active && e.pointerId===touchAim.id){
+      // keep a finger down and slide it to steer the turret
+      touchAim.x = p.x; touchAim.y = p.y;
+    }
+  }else{
+    mouseX = p.x; mouseY = p.y; mouseActive = true;
+  }
+});
+function endPointer(e){
+  if(e.pointerType==="touch"){
+    if(leftStick.active && e.pointerId===leftStick.id){
+      // a quick tap on the left (no real drag) counts as a fire tap too
+      if((leftStick.maxD || 0) < 14 && performance.now() - (leftStick.t0 || 0) < 280){
+        tapShot = { x:leftStick.originX, y:leftStick.originY, ttl:0.35 };
+        showTapMark(leftStick.originX, leftStick.originY);
+      }
+      leftStick.active = false; leftStick.dx = 0; leftStick.dy = 0;
+      hideStick(stickLeftEl);
+    }
+    if(touchAim.active && e.pointerId===touchAim.id){
+      touchAim.active = false;
+    }
+  }else{
+    Input.fireHeld = false;
+  }
+}
+stageEl.addEventListener("pointerup", endPointer);
+stageEl.addEventListener("pointercancel", endPointer);
+
+const mineBtn = document.getElementById("mineBtn");
+mineBtn.addEventListener("pointerdown", (e)=>{ e.stopPropagation(); Input.mineRequested = true; });
+
+/* ---------------------------------------------------------------------
+   Player update
+   --------------------------------------------------------------------- */
+function updatePlayer(dt){
+  player.fireCooldown = Math.max(0, player.fireCooldown-dt);
+  player.invulnerable = Math.max(0, player.invulnerable-dt);
+
+  if(!player.alive) return;
+
+  let mx = 0, my = 0;
+  if(leftStick.active){ mx = leftStick.dx; my = leftStick.dy; }
+  else{
+    if(Input.left) mx -= 1;
+    if(Input.right) mx += 1;
+    if(Input.up) my -= 1;
+    if(Input.down) my += 1;
+  }
+  const mlen = Math.hypot(mx,my);
+  // Deadzone threshold has to work for both input scales: keyboard gives a
+  // unit-ish vector (length ~1, or ~1.41 diagonally), while the touch
+  // joystick gives a pixel-drag distance up to STICK_MAX (60) -- a
+  // threshold tuned for the joystick (e.g. 8) silently swallows all
+  // keyboard input, which is why movement could look completely dead.
+  if(mlen > 0.15){
+    const nx = mx/mlen, ny = my/mlen;
+    player.x += nx*PLAYER_SPEED*dt;
+    player.y += ny*PLAYER_SPEED*dt;
+    player.bodyAngle = approachAngle(player.bodyAngle, Math.atan2(ny,nx), PLAYER_TURN_RATE*dt);
+  }
+  player.radius = PLAYER_RADIUS;
+  wallPushAndClamp(player);
+
+  let haveAim = false, aimAngle = player.turretAngle;
+  if(tapShot){
+    aimAngle = Math.atan2(tapShot.y-player.y, tapShot.x-player.x);
+    haveAim = true;
+  }else if(touchAim.active){
+    aimAngle = Math.atan2(touchAim.y-player.y, touchAim.x-player.x);
+    haveAim = true;
+  }else if(mouseActive){
+    aimAngle = Math.atan2(mouseY-player.y, mouseX-player.x);
+    haveAim = true;
+  }
+  if(haveAim) player.turretAngle = aimAngle;
+
+  if(Input.fireHeld && player.fireCooldown<=0){
+    firePlayerBullet();
+    player.fireCooldown = PLAYER_FIRE_COOLDOWN;
+  }
+  if(tapShot){
+    if(player.fireCooldown<=0){
+      firePlayerBullet(); // turret already points at the tap (set above)
+      player.fireCooldown = PLAYER_FIRE_COOLDOWN;
+      tapShot = null;
+    }else{
+      tapShot.ttl -= dt;
+      if(tapShot.ttl<=0) tapShot = null;
+    }
+  }
+
+  if(Input.mineRequested){
+    Input.mineRequested = false;
+    if(player.mineCharges>0){
+      player.mineCharges--;
+      placeMine(player.x, player.y);
+      Audio2.minePlace();
+      updateHud();
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Level flow
+   --------------------------------------------------------------------- */
+function checkLevelClear(){
+  if(levelTransitioning) return;
+  if(enemies.length===0){
+    levelTransitioning = true;
+    const clearedLevel = level;
+    score += 50*clearedLevel;
+    updateHud();
+    Audio2.levelClear();
+    showLevelBanner("LEVEL CLEAR!");
+    setTimeout(()=>{ spawnLevel(clearedLevel+1); }, 1200);
+  }
+}
+
+const levelBannerEl = document.getElementById("levelBanner");
+const levelBannerTextEl = document.getElementById("levelBannerText");
+let levelBannerTimer = null;
+function showLevelBanner(text){
+  levelBannerTextEl.textContent = text;
+  levelBannerEl.classList.add("show");
+  if(levelBannerTimer) clearTimeout(levelBannerTimer);
+  levelBannerTimer = setTimeout(()=> levelBannerEl.classList.remove("show"), 1100);
+}
+
+/* ---------------------------------------------------------------------
+   HUD
+   --------------------------------------------------------------------- */
+function updateHud(){
+  document.getElementById("scoreValue").textContent = score.toLocaleString();
+  document.getElementById("levelLabel").textContent = "LEVEL "+level;
+  const livesWrap = document.getElementById("livesWrap");
+  livesWrap.innerHTML = "";
+  for(let i=0;i<PLAYER_LIVES;i++){
+    const d = document.createElement("div");
+    d.className = "lifeIcon" + (i>=lives ? " lost" : "");
+    livesWrap.appendChild(d);
+  }
+  const mineRow = document.getElementById("mineRow");
+  mineRow.innerHTML = "";
+  for(let i=0;i<MAX_MINE_CHARGES;i++){
+    const d = document.createElement("div");
+    d.className = "mineIcon" + (i>=player.mineCharges ? " empty" : "");
+    mineRow.appendChild(d);
+  }
+  document.getElementById("mbCount").textContent = player.mineCharges;
+}
+
+/* ---------------------------------------------------------------------
+   Screens
+   --------------------------------------------------------------------- */
+const screens = {
+  start: document.getElementById("screen-start"),
+  gameover: document.getElementById("screen-gameover"),
+};
+function showScreen(name){
+  Object.values(screens).forEach(el=> el.classList.add("hidden"));
+  if(name && screens[name]) screens[name].classList.remove("hidden");
+}
+
+function goToStart(){
+  state = State.START;
+  document.getElementById("hud").classList.remove("show");
+  showScreen("start");
+}
+
+function newGame(){
+  score = 0;
+  lives = PLAYER_LIVES;
+  killsThisRun = 0;
+  player.mineCharges = MAX_MINE_CHARGES;
+  player.alive = true;
+  spawnLevel(1);
+}
+
+function triggerGameOver(){
+  state = State.GAMEOVER;
+  document.getElementById("hud").classList.remove("show");
+  Audio2.gameover();
+  const finalScore = score;
+  Platform.submitScore(finalScore);
+  best = Math.max(best, Platform.getLocalBest());
+  document.getElementById("goScore").textContent = finalScore.toLocaleString();
+  document.getElementById("goLevel").textContent = level;
+  document.getElementById("goKills").textContent = killsThisRun;
+  document.getElementById("goBest").textContent = Platform.getLocalBest().toLocaleString();
+  showScreen("gameover");
+}
+
+/* ---------------------------------------------------------------------
+   Rendering
+   --------------------------------------------------------------------- */
+function drawTank(x,y,bodyAngle,turretAngle,radius,bodyColor,turretColor,flash,alpha){
+  ctx.save();
+  ctx.globalAlpha = alpha==null?1:alpha;
+  ctx.translate(x,y);
+
+  ctx.save();
+  ctx.rotate(bodyAngle);
+  roundRectPath(-radius, -radius*0.72, radius*2, radius*1.44, radius*0.32);
+  ctx.fillStyle = flash>0 ? lerpColor(bodyColor,"#ffffff",flash) : bodyColor;
+  ctx.fill();
+  ctx.fillStyle = "rgba(20,22,40,0.16)";
+  ctx.fillRect(-radius, -radius*0.72, radius*2, radius*0.22);
+  ctx.fillRect(-radius, radius*0.5, radius*2, radius*0.22);
+  ctx.restore();
+
+  ctx.save();
+  ctx.rotate(turretAngle);
+  ctx.fillStyle = "rgba(20,22,40,0.25)";
+  ctx.fillRect(0, -4, radius*1.35, 8);
+  ctx.beginPath();
+  ctx.arc(0,0,radius*0.6,0,Math.PI*2);
+  ctx.fillStyle = flash>0 ? lerpColor(turretColor,"#ffffff",flash) : turretColor;
+  ctx.fill();
+  ctx.restore();
+
+  ctx.restore();
+}
+function hexToRgb(hex){
+  const h = hex.replace("#","");
+  const n = parseInt(h.length===3 ? h.split("").map(c=>c+c).join("") : h, 16);
+  return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
+}
+function lerpColor(a,b,t){
+  const ca = hexToRgb(a), cb = hexToRgb(b);
+  const r = Math.round(ca.r+(cb.r-ca.r)*t);
+  const g = Math.round(ca.g+(cb.g-ca.g)*t);
+  const bl = Math.round(ca.b+(cb.b-ca.b)*t);
+  return `rgb(${r},${g},${bl})`;
+}
+
+function drawArena(){
+  ctx.fillStyle = "#8f7c52";
+  ctx.fillRect(0,0,BASE_W,BASE_H);
+
+  ctx.save();
+  for(const s of groundTexture){
+    const v = s.shade;
+    ctx.fillStyle = v>=0 ? `rgba(60,50,26,${s.a})` : `rgba(190,172,120,${s.a})`;
+    ctx.beginPath();
+    ctx.ellipse(s.x,s.y,s.r,s.r*0.7,0,0,Math.PI*2);
+    ctx.fill();
+  }
+  ctx.restore();
+
+  for(const w of walls){
+    // shadow base
+    ctx.fillStyle = "rgba(20,17,8,0.28)";
+    roundRectPath(w.x+3,w.y+4,w.w,w.h,10);
+    ctx.fill();
+    for(const lump of (w.lumps||[])){
+      const base = 196+lump.shade, g = 172+lump.shade*0.9, b = 118+lump.shade*0.6;
+      ctx.beginPath();
+      ctx.ellipse(lump.cx,lump.cy,lump.r,lump.r*0.86,0,0,Math.PI*2);
+      ctx.fillStyle = `rgb(${base},${g},${b})`;
+      ctx.fill();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = "rgba(70,58,30,0.55)";
+      ctx.stroke();
+    }
+  }
+}
+
+function drawMines(){
+  for(const m of mines){
+    ctx.save();
+    ctx.translate(m.x,m.y);
+    if(m.armed){
+      const pulse = 1 + Math.sin(performance.now()/180)*0.14;
+      ctx.beginPath();
+      ctx.arc(0,0,MINE_TRIGGER_RADIUS*pulse,0,Math.PI*2);
+      ctx.strokeStyle = "rgba(156,59,46,0.6)";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(0,0,12,0,Math.PI*2);
+    ctx.fillStyle = m.armed ? "#241f14" : "#8a7a4e";
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+function drawBullets(){
+  for(const b of bullets){
+    ctx.beginPath();
+    ctx.arc(b.x,b.y,b.radius,0,Math.PI*2);
+    ctx.fillStyle = b.owner==="player" ? "#e8c468" : "#c94b3a";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(b.x,b.y,b.radius*0.45,0,Math.PI*2);
+    ctx.fillStyle = "rgba(255,247,224,0.75)";
+    ctx.fill();
+  }
+}
+
+function drawParticles(){
+  for(const p of particles){
+    const a = 1 - p.age/p.life;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.size*a,0,Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = Math.max(0,a);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+}
+
+function render(){
+  drawArena();
+  drawMines();
+  drawBullets();
+  for(const e of enemies){
+    const cfg = ENEMY_TYPES[e.type];
+    drawTank(e.x,e.y,e.bodyAngle,e.turretAngle,cfg.radius,cfg.color,shade(cfg.color),e.flash,1);
+  }
+  if(player.alive){
+    const blinking = player.invulnerable>0 && Math.floor(performance.now()/100)%2===0;
+    if(!blinking){
+      drawTank(player.x,player.y,player.bodyAngle,player.turretAngle,PLAYER_RADIUS,PLAYER_COLOR,PLAYER_TURRET_COLOR,0,1);
+    }
+  }
+  drawParticles();
+}
+function shade(hex){
+  const c = hexToRgb(hex);
+  return `rgb(${Math.max(0,c.r-30)},${Math.max(0,c.g-30)},${Math.max(0,c.b-30)})`;
+}
+
+/* ---------------------------------------------------------------------
+   Main loop
+   --------------------------------------------------------------------- */
+let lastTs = 0;
+function update(dt){
+  updatePlayer(dt);
+  updateEnemies(dt);
+  updateBullets(dt);
+  updateMines(dt);
+  updateParticles(dt);
+  checkLevelClear();
+}
+function loop(ts){
+  requestAnimationFrame(loop);
+  if(!lastTs) lastTs = ts;
+  let dt = (ts-lastTs)/1000;
+  lastTs = ts;
+  dt = Math.min(dt, 0.033);
+  if(state===State.PLAYING) update(dt);
+  render();
+}
+requestAnimationFrame(loop);
+
+/* ---------------------------------------------------------------------
+   UI wiring
+   --------------------------------------------------------------------- */
+document.getElementById("btnStartGame").addEventListener("click", ()=>{ Audio2.unlock(); newGame(); });
+document.getElementById("btnRetry").addEventListener("click", ()=>{ Audio2.unlock(); newGame(); });
+
+
+const MUTE_ON_SVG = `<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4z"/></svg>`;
+const MUTE_OFF_SVG = `<svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9H4zm11.5 3l2.5 2.5 1.4-1.4L16.9 12l2.5-2.5-1.4-1.4L15.5 10.6 13 8.1l-1.4 1.4L14.1 12l-2.5 2.5 1.4 1.4 2.5-2.5z"/></svg>`;
+const FS_SVG = `<svg viewBox="0 0 24 24"><path d="M4 4h6V2H2v8h2V4zm0 16v-6H2v8h8v-2H4zm16 0h-6v2h8v-8h-2v6zM14 2v2h6v6h2V2h-8z"/></svg>`;
+const MINE_SVG = `<svg viewBox="0 0 24 24"><path d="M12 3l1.2 2.6L16 6l-1.8 2L15 11h-2.2L12 13l-.8-2H9l.8-3L8 6l2.8-.4z"/><circle cx="12" cy="15" r="6"/></svg>`;
+
+const btnMute = document.getElementById("btnMute");
+function refreshMuteIcon(){ btnMute.innerHTML = Audio2.isMuted() ? MUTE_OFF_SVG : MUTE_ON_SVG; }
+refreshMuteIcon();
+btnMute.addEventListener("click", ()=>{
+  const next = !Audio2.isMuted();
+  Audio2.setMuted(next);
+  refreshMuteIcon();
+});
+
+let isFs = false;
+const btnFullscreen = document.getElementById("btnFullscreen");
+btnFullscreen.innerHTML = FS_SVG;
+btnFullscreen.addEventListener("click", ()=>{
+  isFs = !isFs;
+  Platform.requestFullscreen(isFs);
+});
+mineBtn.innerHTML = MINE_SVG + '<div class="mbCount" id="mbCount">3</div>';
+
+setTimeout(()=>{
+  const hintEl = document.getElementById("hint");
+  hintEl.style.opacity = "0";
+}, 6000);
+
+/* ---------------------------------------------------------------------
+   Boot
+   --------------------------------------------------------------------- */
+best = Platform.getLocalBest();
+state = State.START;
+showScreen("start");
+document.getElementById("startBest").textContent = Platform.getLocalBest().toLocaleString();
+
+})();
+</script>
+</body>
+</html>

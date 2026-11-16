@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Tic Tac Toe</title>
+<style>
+@font-face{
+  font-family:"Baloo 2";
+  src:url("baloo2.woff2") format("woff2");
+  font-weight:800;
+  font-style:normal;
+  font-display:swap;
+}
+@font-face{
+  font-family:"Baloo 2";
+  src:url("baloo2-700.woff2") format("woff2");
+  font-weight:700;
+  font-style:normal;
+  font-display:swap;
+}
+
+:root{
+  --font-display:"Baloo 2", system-ui, sans-serif;
+  --font-body:-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --bg-a:#8EC5FC;
+  --bg-b:#D9BBFC;
+  --bg-c:#FDCBF1;
+
+  --card:#ffffff;
+  --ink:#2B2545;
+  --dim:#8880a3;
+
+  --x-color:#FF4D6D;
+  --x-dark:#D63A57;
+  --o-color:#14B8A6;
+  --o-dark:#0E8C7F;
+
+  --accent-a:#8B5CF6;
+  --accent-b:#EC4899;
+  --gold:#FBBF24;
+
+  --cell-bg:#F4F1FB;
+  --cell-hover:#EAE2FA;
+  --cell-border:#E5DDF6;
+
+  --shadow-md:0 10px 26px rgba(60,40,110,0.16);
+  --shadow-lg:0 18px 44px rgba(60,40,110,0.22);
+  --radius-lg:28px;
+  --radius-md:18px;
+  --radius-sm:12px;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family:var(--font-body);
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 15% 8%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 40%),
+    linear-gradient(135deg, var(--bg-a) 0%, var(--bg-b) 50%, var(--bg-c) 100%);
+  min-height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px 16px;
+  overflow-x:hidden;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+
+#app{
+  width:100%;
+  max-width:460px;
+  position:relative;
+}
+
+.topbar{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-bottom:10px;
+}
+.iconBtn{
+  width:42px; height:42px;
+  border-radius:50%;
+  border:none;
+  background:rgba(255,255,255,0.75);
+  box-shadow:var(--shadow-md);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  color:var(--ink);
+  transition:transform .15s ease, background .15s ease;
+}
+.iconBtn:hover{ transform:translateY(-2px) scale(1.05); background:#fff; }
+.iconBtn:active{ transform:translateY(0) scale(0.96); }
+.iconBtn svg{ width:20px; height:20px; }
+
+.card{
+  background:var(--card);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);
+  padding:32px 26px 28px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.hidden{ display:none !important; }
+.screen{ display:none; }
+.screen.active{ display:block; animation:fadeUp .38s cubic-bezier(.2,.8,.25,1); }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+
+/* ---------------- Start screen ---------------- */
+.logoRow{ display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:6px; }
+.logoMark{ width:46px; height:46px; }
+h1.title{
+  font-family:var(--font-display);
+  font-weight:800;
+  font-size:clamp(34px,9vw,44px);
+  margin:0 0 4px;
+  letter-spacing:1px;
+  line-height:1;
+}
+.title .lx{ color:var(--x-color); }
+.title .lo{ color:var(--o-color); }
+.title .la{ color:var(--accent-a); }
+.subtitle{
+  color:var(--dim);
+  font-size:15px;
+  margin:0 0 26px;
+  font-weight:600;
+}
+
+.modeGrid{ display:flex; flex-direction:column; gap:14px; }
+.modeBtn{
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:19px;
+  border:none;
+  border-radius:var(--radius-md);
+  padding:18px 20px;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:12px;
+  color:#fff;
+  box-shadow:var(--shadow-md);
+  transition:transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+.modeBtn:hover{ transform:translateY(-3px); filter:brightness(1.05); }
+.modeBtn:active{ transform:translateY(0); }
+.modeBtn .emoji{ font-size:24px; }
+#btn1p{ background:linear-gradient(135deg,var(--accent-a),var(--accent-b)); }
+#btn2p{ background:linear-gradient(135deg,#22C1C3,#2E86FF); }
+
+.linkRow{ margin-top:22px; display:flex; justify-content:center; gap:22px; }
+.linkBtn{
+  background:none; border:none; cursor:pointer;
+  font-family:var(--font-body); font-weight:700; font-size:14px;
+  color:var(--dim);
+  display:flex; align-items:center; gap:6px;
+  padding:6px;
+}
+.linkBtn:hover{ color:var(--accent-a); }
+
+/* difficulty picker */
+.pickPanel{ margin-top:8px; }
+.pickPanel.hidden{ display:none; }
+.pickLabel{ font-weight:700; color:var(--dim); font-size:13px; text-transform:uppercase; letter-spacing:1px; margin:18px 0 10px; }
+.pillRow{ display:flex; gap:10px; justify-content:center; }
+.pillBtn{
+  flex:1;
+  font-family:var(--font-display); font-weight:700; font-size:16px;
+  border:2px solid var(--cell-border);
+  background:var(--cell-bg);
+  color:var(--ink);
+  border-radius:16px;
+  padding:14px 10px;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.pillBtn:hover{ border-color:var(--accent-a); }
+.pillBtn.selected{
+  background:linear-gradient(135deg,var(--accent-a),var(--accent-b));
+  border-color:transparent;
+  color:#fff;
+  box-shadow:var(--shadow-md);
+}
+.backBtn{
+  margin-top:20px;
+  background:none; border:none; cursor:pointer;
+  font-family:var(--font-body); font-weight:700; color:var(--dim); font-size:14px;
+}
+.backBtn:hover{ color:var(--ink); }
+.startPlayBtn{
+  margin-top:20px;
+  width:100%;
+  font-family:var(--font-display); font-weight:700; font-size:18px;
+  border:none; border-radius:var(--radius-md);
+  padding:16px; cursor:pointer; color:#fff;
+  background:linear-gradient(135deg,var(--accent-a),var(--accent-b));
+  box-shadow:var(--shadow-md);
+  transition:transform .15s ease;
+}
+.startPlayBtn:hover{ transform:translateY(-2px); }
+
+/* ---------------- Game screen ---------------- */
+.turnBadge{
+  display:inline-flex; align-items:center; gap:10px;
+  background:var(--cell-bg);
+  border-radius:999px;
+  padding:9px 20px;
+  font-family:var(--font-display); font-weight:700; font-size:16px;
+  margin-bottom:18px;
+  transition:background .2s ease;
+}
+.turnDot{ width:14px; height:14px; border-radius:50%; transition:background .2s ease; }
+
+.scoreRow{
+  display:flex; justify-content:center; gap:10px;
+  margin-bottom:20px;
+}
+.scoreChip{
+  flex:1;
+  background:var(--cell-bg);
+  border-radius:14px;
+  padding:10px 6px;
+  min-width:0;
+}
+.scoreChip .n{ font-family:var(--font-display); font-weight:800; font-size:22px; display:block; }
+.scoreChip .l{ font-size:11px; font-weight:700; color:var(--dim); text-transform:uppercase; letter-spacing:0.5px; }
+.scoreChip.xchip .n{ color:var(--x-color); }
+.scoreChip.ochip .n{ color:var(--o-color); }
+.scoreChip.dchip .n{ color:var(--dim); }
+
+.boardWrap{ position:relative; width:100%; max-width:340px; margin:0 auto; }
+.board{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  aspect-ratio:1/1;
+}
+.cell{
+  background:var(--cell-bg);
+  border:2px solid var(--cell-border);
+  border-radius:18px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  position:relative;
+  transition:background .15s ease, transform .1s ease, border-color .15s ease;
+}
+.cell:hover:not(.filled){ background:var(--cell-hover); transform:translateY(-2px); }
+.cell:active:not(.filled){ transform:translateY(0) scale(0.97); }
+.cell.filled{ cursor:default; }
+.cell.win{ background:#FFF7DD; border-color:var(--gold); }
+.cell svg{ width:62%; height:62%; overflow:visible; }
+
+.markPath{ fill:none; stroke-linecap:round; stroke-linejoin:round; }
+.markX .markPath{ stroke:var(--x-color); stroke-width:11; }
+.markO .markPath{ stroke:var(--o-color); stroke-width:11; }
+
+.winOverlay{ position:absolute; inset:0; pointer-events:none; }
+.winLine{ fill:none; stroke:var(--gold); stroke-width:5; stroke-linecap:round;
+  filter:drop-shadow(0 0 6px rgba(251,191,36,0.9)); }
+
+.gameFooter{ display:flex; gap:10px; justify-content:center; margin-top:22px; }
+.footBtn{
+  font-family:var(--font-display); font-weight:700; font-size:14px;
+  border:none; border-radius:14px; padding:12px 18px; cursor:pointer;
+  background:var(--cell-bg); color:var(--ink);
+  transition:transform .15s ease, background .15s ease;
+}
+.footBtn:hover{ transform:translateY(-2px); background:var(--cell-hover); }
+.footBtn.primary{ background:linear-gradient(135deg,var(--accent-a),var(--accent-b)); color:#fff; }
+
+/* result overlay */
+.resultOverlay{
+  position:absolute; inset:0;
+  background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(3px);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  border-radius:var(--radius-lg);
+  opacity:0; pointer-events:none;
+  transition:opacity .25s ease;
+  z-index:5;
+  padding:20px;
+}
+.resultOverlay.show{ opacity:1; pointer-events:auto; }
+.resultEmoji{ font-size:52px; margin-bottom:6px; }
+.resultTitle{ font-family:var(--font-display); font-weight:800; font-size:30px; margin:0 0 6px; }
+.resultTitle.win-x{ color:var(--x-color); }
+.resultTitle.win-o{ color:var(--o-color); }
+.resultTitle.draw{ color:var(--dim); }
+.resultSub{ color:var(--dim); font-weight:600; font-size:14px; margin-bottom:22px; }
+.resultBtns{ display:flex; gap:10px; }
+
+/* confetti */
+.confettiPiece{
+  position:absolute; top:44%; left:50%;
+  width:9px; height:14px;
+  border-radius:3px;
+  opacity:0;
+  animation:confettiBurst 1100ms ease-out forwards;
+}
+@keyframes confettiBurst{
+  0%{ opacity:1; transform:translate(-50%,-50%) rotate(0deg) scale(0.6); }
+  100%{ opacity:0; transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) rotate(var(--rot)) scale(1); }
+}
+
+/* ---------------- Achievements screen ---------------- */
+.achHeader{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.achHeader h2{ font-family:var(--font-display); font-size:24px; margin:0; }
+.achList{ display:flex; flex-direction:column; gap:10px; text-align:left; max-height:420px; overflow-y:auto; }
+.achRow{
+  display:flex; align-items:center; gap:12px;
+  background:var(--cell-bg);
+  border-radius:14px; padding:12px 14px;
+  opacity:0.55;
+}
+.achRow.unlocked{ opacity:1; background:linear-gradient(135deg,#FFF7DD,#FDEFC7); }
+.achIcon{ font-size:24px; width:34px; text-align:center; flex-shrink:0; }
+.achTitle{ font-weight:800; font-size:14.5px; }
+.achDesc{ font-size:12.5px; color:var(--dim); font-weight:600; }
+
+/* achievement toast */
+#achToastWrap{ position:fixed; top:18px; left:50%; transform:translateX(-50%); z-index:50; display:flex; flex-direction:column; gap:8px; align-items:center; }
+.achToast{
+  display:flex; align-items:center; gap:10px;
+  background:#2B2545; color:#fff;
+  border-radius:14px; padding:10px 16px;
+  box-shadow:var(--shadow-lg);
+  opacity:0; transform:translateY(-14px) scale(0.95);
+  transition:opacity .3s ease, transform .3s ease;
+  max-width:88vw;
+}
+.achToast.show{ opacity:1; transform:translateY(0) scale(1); }
+.achToastIcon{ font-size:22px; }
+.achToastLabel{ font-size:10.5px; color:#FBBF24; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; }
+.achToastTitle{ font-weight:800; font-size:14px; }
+
+.footNote{ margin-top:18px; font-size:12px; color:var(--dim); font-weight:600; }
+.footNote b{ color:var(--ink); }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="topbar">
+    <button class="iconBtn" id="btnMute" aria-label="Mute"></button>
+    <button class="iconBtn" id="btnFullscreen" aria-label="Fullscreen"></button>
+  </div>
+
+  <div class="card">
+
+    <!-- START SCREEN -->
+    <div class="screen active" id="screen-start">
+      <div class="logoRow">
+        <svg class="logoMark" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#EAE2FA" stroke-width="8"/>
+          <path d="M28,28 L72,72" fill="none" stroke="#FF4D6D" stroke-width="11" stroke-linecap="round"/>
+          <path d="M72,28 L28,72" fill="none" stroke="#FF4D6D" stroke-width="11" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1 class="title"><span class="lx">TIC</span> <span class="la">TAC</span> <span class="lo">TOE</span></h1>
+      <p class="subtitle">Simple. Fast. Fun.</p>
+
+      <div id="modePanel">
+        <div class="modeGrid">
+          <button class="modeBtn" id="btn1p"><span class="emoji">&#129302;</span> 1 Player <span style="opacity:.85;font-weight:600;font-size:14px;">vs AI</span></button>
+          <button class="modeBtn" id="btn2p"><span class="emoji">&#128101;</span> 2 Players <span style="opacity:.85;font-weight:600;font-size:14px;">same device</span></button>
+        </div>
+      </div>
+
+      <div id="diffPanel" class="pickPanel hidden">
+        <div class="pickLabel">You play as</div>
+        <div class="pillRow">
+          <button class="pillBtn selected" data-first="yes">X &middot; Go First</button>
+          <button class="pillBtn" data-first="no">O &middot; Go Second</button>
+        </div>
+        <button class="startPlayBtn" id="btnStart1p">Play</button>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div class="screen" id="screen-game">
+      <div class="turnBadge" id="turnBadge">
+        <span class="turnDot" id="turnDot"></span>
+        <span id="turnLabel">Your Turn</span>
+      </div>
+
+      <div class="scoreRow" id="scoreRow">
+        <div class="scoreChip xchip"><span class="n" id="scoreX">0</span><span class="l" id="scoreXLabel">X</span></div>
+        <div class="scoreChip dchip"><span class="n" id="scoreD">0</span><span class="l">Draws</span></div>
+        <div class="scoreChip ochip"><span class="n" id="scoreO">0</span><span class="l" id="scoreOLabel">O</span></div>
+      </div>
+
+      <div class="boardWrap">
+        <div class="board" id="board"></div>
+        <svg class="winOverlay" id="winOverlay" viewBox="0 0 100 100"></svg>
+        <div class="resultOverlay" id="resultOverlay">
+          <div class="resultEmoji" id="resultEmoji">&#127881;</div>
+          <div class="resultTitle" id="resultTitle">You Win!</div>
+          <div class="resultSub" id="resultSub">Nice one.</div>
+          <div class="resultBtns">
+            <button class="footBtn primary" id="btnPlayAgain">Play Again</button>
+            <button class="footBtn" id="btnResultMenu">Menu</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="gameFooter">
+        <button class="footBtn" id="btnNewRound">New Round</button>
+        <button class="footBtn" id="btnGameMenu">Menu</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================================
+   Tic Tac Toe -- simple, modern, colorful. Part of dailygametree.com.
+   The mode is chosen by the page URL:
+     ?mode=easy  -- 1 player vs the AI on Easy
+     ?mode=hard  -- 1 player vs the AI on Hard
+     ?mode=2p    -- 2 players, same device
+   ========================================================================= */
+
+/* ---------------------------------------------------------------------
+   Fullscreen helper
+   --------------------------------------------------------------------- */
+const Platform = {
+  requestFullscreen(on){
+    try{
+      if(on){ document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
+      else{ document.exitFullscreen && document.exitFullscreen(); }
+    }catch(e){}
+  }
+};
+
+/* ---------------------------------------------------------------------
+   Audio -- tiny synthesized SFX, no asset files
+   --------------------------------------------------------------------- */
+const Audio2 = (function(){
+  let ctx = null, muted = false, master = null;
+  try{ muted = localStorage.getItem("ttt_muted") === "1"; }catch(e){}
+
+  function ensure(){
+    if(!ctx){
+      try{
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        master = ctx.createGain();
+        master.gain.value = muted ? 0 : 0.5;
+        master.connect(ctx.destination);
+      }catch(e){ ctx = null; }
+    }
+    if(ctx && ctx.state === "suspended"){ ctx.resume().catch(()=>{}); }
+  }
+  function tone(freq, dur, type, peak, delay, slideTo){
+    if(!ctx) return;
+    const t0 = ctx.currentTime + (delay||0);
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type || "sine";
+    osc.frequency.setValueAtTime(freq, t0);
+    if(slideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(20,slideTo), t0+dur);
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(peak||0.35, t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
+    osc.connect(g); g.connect(master);
+    osc.start(t0); osc.stop(t0+dur+0.02);
+  }
+  return {
+    unlock(){ ensure(); },
+    placeX(){ ensure(); tone(520,0.11,"sine",0.3,0,460); },
+    placeO(){ ensure(); tone(360,0.11,"sine",0.3,0,300); },
+    click(){ ensure(); tone(700,0.05,"square",0.12,0); },
+    win(){ ensure(); if(!ctx) return; [523,659,784,1046].forEach((f,i)=>tone(f,0.2,"triangle",0.32,i*0.09)); },
+    draw(){ ensure(); if(!ctx) return; [440,349].forEach((f,i)=>tone(f,0.24,"sine",0.28,i*0.12)); },
+    achievement(){ ensure(); if(!ctx) return; [520,660,880].forEach((f,i)=>tone(f,0.18,"sine",0.32,i*0.09)); },
+    setMuted(v){
+      muted = v;
+      try{ localStorage.setItem("ttt_muted", v?"1":"0"); }catch(e){}
+      if(master) master.gain.value = v?0:0.5;
+    },
+    isMuted(){ return muted; }
+  };
+})();
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+}
+
+/* ---------------------------------------------------------------------
+   Screen management
+   --------------------------------------------------------------------- */
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=> s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+/* ---------------------------------------------------------------------
+   Game logic
+   --------------------------------------------------------------------- */
+const WIN_LINES = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6],
+];
+
+let board = Array(9).fill(null);
+let mode = "pvp";          // "pvp" | "pvai"
+let difficulty = "easy";   // "easy" | "hard"
+let humanMark = "X";       // for pvai
+let aiMark = "O";
+let current = "X";
+let gameOver = false;
+let moveCountByMark = { X:0, O:0 };
+let score = { X:0, O:0, D:0 };
+
+function checkWinner(b){
+  for(const line of WIN_LINES){
+    const [a,c,d] = line;
+    if(b[a] && b[a]===b[c] && b[a]===b[d]) return { mark:b[a], line };
+  }
+  return null;
+}
+function isFull(b){ return b.every(c=>c); }
+function emptyIndices(b){ return b.map((c,i)=>c?null:i).filter(i=>i!==null); }
+
+function minimax(b, player){
+  const w = checkWinner(b);
+  if(w) return w.mark===aiMark ? 10 : -10;
+  if(isFull(b)) return 0;
+  const moves = emptyIndices(b);
+  if(player===aiMark){
+    let best=-Infinity;
+    for(const m of moves){ b[m]=player; best=Math.max(best, minimax(b, humanMark)-1); b[m]=null; }
+    return best;
+  }else{
+    let best=Infinity;
+    for(const m of moves){ b[m]=player; best=Math.min(best, minimax(b, aiMark)+1); b[m]=null; }
+    return best;
+  }
+}
+function bestMove(b){
+  let bestScore=-Infinity, move=emptyIndices(b)[0];
+  for(const m of emptyIndices(b)){
+    b[m]=aiMark;
+    const s = minimax(b, humanMark);
+    b[m]=null;
+    if(s>bestScore){ bestScore=s; move=m; }
+  }
+  return move;
+}
+function aiPickMove(){
+  if(difficulty==="hard") return bestMove(board);
+  if(Math.random() < 0.35) return bestMove(board);
+  const moves = emptyIndices(board);
+  return moves[Math.floor(Math.random()*moves.length)];
+}
+
+/* ---------------------------------------------------------------------
+   Rendering
+   --------------------------------------------------------------------- */
+const boardEl = document.getElementById("board");
+const winOverlay = document.getElementById("winOverlay");
+
+function buildBoardDom(){
+  boardEl.innerHTML = "";
+  for(let i=0;i<9;i++){
+    const cell = document.createElement("div");
+    cell.className = "cell";
+    cell.dataset.idx = i;
+    cell.addEventListener("click", onCellClick);
+    boardEl.appendChild(cell);
+  }
+}
+function markSvg(mark){
+  if(mark==="X"){
+    return `<svg class="markX" viewBox="0 0 100 100">
+      <path class="markPath" id="p1" d="M25,25 L75,75"/>
+      <path class="markPath" id="p2" d="M75,25 L25,75"/>
+    </svg>`;
+  }
+  return `<svg class="markO" viewBox="0 0 100 100">
+    <circle class="markPath" cx="50" cy="50" r="32"/>
+  </svg>`;
+}
+function animateDrawIn(svgEl){
+  const paths = svgEl.querySelectorAll(".markPath");
+  paths.forEach(p=>{
+    const len = p.getTotalLength ? p.getTotalLength() : 150;
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+    p.getBoundingClientRect();
+    p.style.transition = "stroke-dashoffset .28s ease";
+    requestAnimationFrame(()=> requestAnimationFrame(()=>{ p.style.strokeDashoffset = "0"; }));
+  });
+}
+
+function placeMark(idx, mark){
+  board[idx] = mark;
+  moveCountByMark[mark]++;
+  const cell = boardEl.children[idx];
+  cell.classList.add("filled");
+  cell.innerHTML = markSvg(mark);
+  animateDrawIn(cell.querySelector("svg"));
+  if(mark==="X") Audio2.placeX(); else Audio2.placeO();
+}
+
+function cellCenter(idx){
+  const row = Math.floor(idx/3), col = idx%3;
+  return { x:(col+0.5)/3*100, y:(row+0.5)/3*100 };
+}
+function drawWinLine(line){
+  const p0 = cellCenter(line[0]);
+  const p2 = cellCenter(line[2]);
+  const ns = "http://www.w3.org/2000/svg";
+  const el = document.createElementNS(ns, "line");
+  el.setAttribute("class","winLine");
+  el.setAttribute("x1", p0.x); el.setAttribute("y1", p0.y);
+  el.setAttribute("x2", p0.x); el.setAttribute("y2", p0.y);
+  winOverlay.appendChild(el);
+  requestAnimationFrame(()=>{
+    el.style.transition = "x2 .3s ease, y2 .3s ease";
+    el.setAttribute("x2", p2.x); el.setAttribute("y2", p2.y);
+  });
+  for(const idx of line){ boardEl.children[idx].classList.add("win"); }
+}
+
+function updateTurnBadge(){
+  const label = document.getElementById("turnLabel");
+  const dot = document.getElementById("turnDot");
+  dot.style.background = current==="X" ? "var(--x-color)" : "var(--o-color)";
+  if(mode==="pvai"){
+    label.textContent = current===humanMark ? "Your Turn" : "AI's Turn…";
+  }else{
+    label.textContent = (current==="X" ? "Player 1" : "Player 2") + "'s Turn (" + current + ")";
+  }
+}
+function updateScoreRow(){
+  document.getElementById("scoreX").textContent = score.X;
+  document.getElementById("scoreO").textContent = score.O;
+  document.getElementById("scoreD").textContent = score.D;
+  if(mode==="pvai"){
+    document.getElementById("scoreXLabel").textContent = humanMark==="X" ? "You" : "AI";
+    document.getElementById("scoreOLabel").textContent = humanMark==="O" ? "You" : "AI";
+  }else{
+    document.getElementById("scoreXLabel").textContent = "P1 (X)";
+    document.getElementById("scoreOLabel").textContent = "P2 (O)";
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Confetti
+   --------------------------------------------------------------------- */
+const CONFETTI_COLORS = ["#FF4D6D","#14B8A6","#FBBF24","#8B5CF6","#2E86FF","#EC4899"];
+function burstConfetti(){
+  const host = boardEl.parentElement;
+  for(let i=0;i<26;i++){
+    const p = document.createElement("div");
+    p.className = "confettiPiece";
+    const angle = Math.random()*Math.PI*2;
+    const dist = 90 + Math.random()*150;
+    p.style.setProperty("--tx", (Math.cos(angle)*dist)+"px");
+    p.style.setProperty("--ty", (Math.sin(angle)*dist - 40)+"px");
+    p.style.setProperty("--rot", (Math.random()*720-360)+"deg");
+    p.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+    p.style.animationDelay = (Math.random()*0.12)+"s";
+    host.appendChild(p);
+    setTimeout(()=> p.remove(), 1400);
+  }
+}
+
+/* ---------------------------------------------------------------------
+   Game flow
+   --------------------------------------------------------------------- */
+function startMatch(newMode){
+  mode = newMode;
+  board = Array(9).fill(null);
+  current = "X";
+  gameOver = false;
+  moveCountByMark = { X:0, O:0 };
+  score = { X:0, O:0, D:0 };
+  buildBoardDom();
+  winOverlay.innerHTML = "";
+  document.getElementById("resultOverlay").classList.remove("show");
+  updateScoreRow();
+  updateTurnBadge();
+  showScreen("screen-game");
+  if(mode==="pvai" && current!==humanMark){
+    setTimeout(aiTurnIfNeeded, 450);
+  }
+}
+function resetRound(){
+  board = Array(9).fill(null);
+  current = "X";
+  gameOver = false;
+  moveCountByMark = { X:0, O:0 };
+  buildBoardDom();
+  winOverlay.innerHTML = "";
+  document.getElementById("resultOverlay").classList.remove("show");
+  updateTurnBadge();
+  if(mode==="pvai" && current!==humanMark){
+    setTimeout(aiTurnIfNeeded, 450);
+  }
+}
+
+function onCellClick(e){
+  const idx = parseInt(e.currentTarget.dataset.idx, 10);
+  if(gameOver || board[idx]) return;
+  if(mode==="pvai" && current!==humanMark) return;
+  Audio2.unlock();
+  makeMove(idx);
+}
+function makeMove(idx){
+  const mark = current;
+  placeMark(idx, mark);
+  const winner = checkWinner(board);
+  if(winner){
+    endRound(winner);
+    return;
+  }
+  if(isFull(board)){
+    endRound(null);
+    return;
+  }
+  current = current==="X" ? "O" : "X";
+  updateTurnBadge();
+  if(mode==="pvai" && current===aiMark){
+    setTimeout(aiTurnIfNeeded, 480);
+  }
+}
+function aiTurnIfNeeded(){
+  if(gameOver || mode!=="pvai" || current!==aiMark) return;
+  const idx = aiPickMove();
+  if(idx==null) return;
+  makeMove(idx);
+}
+
+function endRound(winner){
+  gameOver = true;
+  if(winner){
+    drawWinLine(winner.line);
+    score[winner.mark]++;
+    updateScoreRow();
+    Audio2.win();
+    burstConfetti();
+
+    showResult(winner.mark);
+  }else{
+    score.D++;
+    updateScoreRow();
+    Audio2.draw();
+    showResult(null);
+  }
+}
+
+function showResult(winnerMark){
+  const overlay = document.getElementById("resultOverlay");
+  const emoji = document.getElementById("resultEmoji");
+  const title = document.getElementById("resultTitle");
+  const sub = document.getElementById("resultSub");
+  title.className = "resultTitle";
+  if(winnerMark==null){
+    emoji.textContent = "\u{1F91D}";
+    title.textContent = "Draw!";
+    title.classList.add("draw");
+    sub.textContent = "Well matched.";
+  }else if(mode==="pvai"){
+    const humanWon = winnerMark===humanMark;
+    emoji.textContent = humanWon ? "\u{1F389}" : "\u{1F916}";
+    title.textContent = humanWon ? "You Win!" : "AI Wins!";
+    title.classList.add(winnerMark==="X" ? "win-x" : "win-o");
+    sub.textContent = humanWon ? "Nice one." : "Better luck next round.";
+  }else{
+    emoji.textContent = "\u{1F3C6}";
+    title.textContent = (winnerMark==="X" ? "Player 1" : "Player 2") + " Wins!";
+    title.classList.add(winnerMark==="X" ? "win-x" : "win-o");
+    sub.textContent = winnerMark + " takes the round.";
+  }
+  setTimeout(()=> overlay.classList.add("show"), 550);
+}
+
+/* ---------------------------------------------------------------------
+   UI wiring
+   --------------------------------------------------------------------- */
+const modePanel = document.getElementById("modePanel");
+const diffPanel = document.getElementById("diffPanel");
+
+// This page plays one mode only (set by ?mode= in the URL).
+const MODE_PARAM = new URLSearchParams(location.search).get("mode");
+const PAGE_MODE = MODE_PARAM === "2p" ? "2p" : (MODE_PARAM === "hard" ? "hard" : "easy");
+if(PAGE_MODE === "2p"){
+  document.getElementById("btn1p").remove();
+  diffPanel.remove();
+  document.querySelector("#screen-start .subtitle").textContent = "2 players, same device.";
+}else{
+  difficulty = PAGE_MODE;
+  modePanel.remove();
+  diffPanel.classList.remove("hidden");
+  document.querySelector("#screen-start .subtitle").textContent = "1 player vs the AI \u00b7 " + (PAGE_MODE === "hard" ? "Hard" : "Easy");
+}
+if(diffPanel.isConnected) diffPanel.querySelectorAll('[data-first]').forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    Audio2.click();
+    diffPanel.querySelectorAll('[data-first]').forEach(b=> b.classList.remove("selected"));
+    btn.classList.add("selected");
+    humanMark = btn.dataset.first==="yes" ? "X" : "O";
+    aiMark = humanMark==="X" ? "O" : "X";
+  });
+});
+document.getElementById("btnStart1p")?.addEventListener("click", ()=>{
+  Audio2.unlock(); Audio2.click();
+  startMatch("pvai");
+});
+document.getElementById("btn2p")?.addEventListener("click", ()=>{
+  Audio2.unlock(); Audio2.click();
+  humanMark = "X"; aiMark = "O";
+  startMatch("pvp");
+});
+
+document.getElementById("btnPlayAgain").addEventListener("click", ()=>{
+  Audio2.click();
+  resetRound();
+});
+document.getElementById("btnNewRound").addEventListener("click", ()=>{
+  Audio2.click();
+  resetRound();
+});
+function goToMenu(){
+  showScreen("screen-start");
+}
+document.getElementById("btnResultMenu").addEventListener("click", ()=>{ Audio2.click(); goToMenu(); });
+document.getElementById("btnGameMenu").addEventListener("click", ()=>{ Audio2.click(); goToMenu(); });
+
+const MUTE_ON_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 5V4L8 9H4z"/></svg>`;
+const MUTE_OFF_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 9v6h4l5 5V4L8 9H4zm11.5 3l2.5 2.5 1.4-1.4L16.9 12l2.5-2.5-1.4-1.4L15.5 10.6 13 8.1l-1.4 1.4L14.1 12l-2.5 2.5 1.4 1.4 2.5-2.5z"/></svg>`;
+const FS_SVG = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h6V2H2v8h2V4zm0 16v-6H2v8h8v-2H4zm16 0h-6v2h8v-8h-2v6zM14 2v2h6v6h2V2h-8z"/></svg>`;
+
+const btnMute = document.getElementById("btnMute");
+function refreshMuteIcon(){ btnMute.innerHTML = Audio2.isMuted() ? MUTE_OFF_SVG : MUTE_ON_SVG; }
+refreshMuteIcon();
+btnMute.addEventListener("click", ()=>{
+  Audio2.setMuted(!Audio2.isMuted());
+  refreshMuteIcon();
+});
+
+let isFs = false;
+const btnFullscreen = document.getElementById("btnFullscreen");
+btnFullscreen.innerHTML = FS_SVG;
+btnFullscreen.addEventListener("click", ()=>{
+  isFs = !isFs;
+  Platform.requestFullscreen(isFs);
+});
+
+/* ---------------------------------------------------------------------
+   Boot
+   --------------------------------------------------------------------- */
+buildBoardDom();
+
+})();
+</script>
+</body>
+</html>

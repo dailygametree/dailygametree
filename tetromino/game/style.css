@@ -1,0 +1,548 @@
+:root {
+  --bg: #0a0a0f;
+  --panel: #0d0d14;
+  --panel-border: #3a4356;
+  --ink: #e8eaed;
+  --ink-soft: #8a92a3;
+  --accent: #00e5ff;
+  --accent-dim: #0aa8bd;
+  --danger: #ff4d4d;
+  /* Piece colors — one neon hue per shape (the pink one is the corner
+     piece). */
+  --i: #ff9d1a;
+  --o: #3d7bff;
+  --t: #33e07a;
+  --s: #ff4d4d;
+  --z: #c04dff;
+  --j: #ffd500;
+  --l: #00e5ff;
+  --v: #ff7ac8;
+  /* hard, unblurred "pixel" shadow used on chrome elements instead of a
+     soft drop shadow — reads as a sticker/sprite sitting on the screen */
+  --pixel-shadow: 4px 4px 0 rgba(0, 0, 0, 0.7);
+  --bevel-light: inset 2px 2px 0 rgba(255, 255, 255, 0.18);
+  --bevel-dark: inset -2px -2px 0 rgba(0, 0, 0, 0.4);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  font-family: "Rubik", "Segoe UI", sans-serif;
+  touch-action: none;
+  user-select: none;
+}
+
+#game-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 900px 600px at 50% 0%, #14141f 0%, var(--bg) 65%);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Faint CRT scanlines + vignette — pure atmosphere, low-opacity so it never
+   fights readability. */
+#game-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0px,
+      rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.12) 3px
+    ),
+    radial-gradient(ellipse 100% 100% at 50% 50%, rgba(0, 0, 0, 0) 60%, rgba(0, 0, 0, 0.35) 100%);
+  mix-blend-mode: multiply;
+}
+
+/* ---------------------------------------------------------------- */
+/* HUD                                                                */
+/* ---------------------------------------------------------------- */
+#hud {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  /* Extra right padding keeps the "Next" box clear of the pause/mute
+     icon buttons, which float on top at the same corner. */
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) 100px 6px 12px;
+  flex-shrink: 0;
+}
+
+#hud.hidden { display: none; }
+
+.mini-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--panel);
+  border: 2px solid var(--panel-border);
+  border-radius: 0;
+  padding: 6px 8px 7px;
+  box-shadow: var(--bevel-light), var(--bevel-dark), var(--pixel-shadow);
+  font-family: inherit;
+  cursor: default;
+}
+
+button.mini-box {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button.mini-box.cooling { cursor: not-allowed; }
+
+button.mini-box:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--bevel-dark), 2px 2px 0 rgba(0, 0, 0, 0.7);
+}
+
+.mini-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.5rem;
+  font-weight: 400;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+}
+
+#skip-canvas { width: 56px; height: 56px; display: block; }
+#next-canvas { width: 56px; height: 140px; display: block; }
+
+#stats {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-top: 4px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-row {
+  display: flex;
+  gap: 22px;
+}
+
+.stat-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.5rem;
+  letter-spacing: 1px;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1.15rem;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat.small .stat-value { font-size: 0.85rem; }
+
+/* ---------------------------------------------------------------- */
+/* Board                                                              */
+/* ---------------------------------------------------------------- */
+#board-canvas {
+  display: block;
+  margin: 0 auto;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border-top: 3px solid var(--panel-border);
+  border-bottom: 3px solid var(--panel-border);
+  box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------------------------------------------------------------- */
+/* Icon buttons — pause / mute                                       */
+/* ---------------------------------------------------------------- */
+.icon-btn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  width: 38px;
+  height: 38px;
+  border-radius: 0;
+  border: 2px solid var(--panel-border);
+  background: var(--panel);
+  box-shadow: var(--bevel-light), var(--bevel-dark), var(--pixel-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: manipulation;
+  z-index: 7;
+}
+.icon-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--bevel-dark), 2px 2px 0 rgba(0, 0, 0, 0.7);
+}
+.icon-btn.hidden { display: none; }
+#pause-btn { right: 56px; }
+#mute-btn { right: 12px; }
+
+/* ---------------------------------------------------------------- */
+/* Touch controls                                                     */
+/* ---------------------------------------------------------------- */
+#touch-controls {
+  display: none;
+  flex-shrink: 0;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 8px 14px calc(env(safe-area-inset-bottom, 0px) + 12px);
+  gap: 10px;
+}
+
+.tc-cluster {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.tc-btn {
+  border: 2px solid var(--panel-border);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--bevel-light), var(--bevel-dark), var(--pixel-shadow);
+  border-radius: 0;
+  width: 56px;
+  height: 56px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  touch-action: manipulation;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Press Start 2P", monospace;
+}
+.tc-btn:active {
+  background: #1f2636;
+  transform: translate(2px, 2px);
+  box-shadow: var(--bevel-dark), 2px 2px 0 rgba(0, 0, 0, 0.7);
+}
+
+.tc-btn.tc-sm {
+  width: 48px;
+  height: 40px;
+  font-size: 0.56rem;
+  letter-spacing: 0.5px;
+}
+
+.tc-btn.tc-sm.cooling {
+  opacity: 0.5;
+  color: var(--ink-soft);
+}
+
+.tc-btn.tc-rotate {
+  width: 68px;
+  height: 68px;
+  font-size: 1.8rem;
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+
+.tc-right {
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.tc-right .tc-rotate { order: 1; }
+.tc-right .tc-sm:nth-child(1) { order: 0; }
+.tc-right .tc-sm:nth-child(3) { order: 2; }
+
+/* ---------------------------------------------------------------- */
+/* Overlay + panel                                                    */
+/* ---------------------------------------------------------------- */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 2, 4, 0.82);
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 6;
+}
+
+.overlay.hidden { display: none; }
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  color: var(--ink);
+  background: var(--panel);
+  border: 3px solid var(--panel-accent, var(--accent));
+  border-radius: 0;
+  box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.75);
+  padding: 30px 26px 26px;
+  width: 100%;
+  max-width: 320px;
+  margin: auto;
+  animation: panelIn 0.18s steps(3, end) both;
+}
+
+/* Per-screen accent, drawn straight from the piece palette so the menu
+   chrome speaks the same color language as the falling blocks. */
+.panel.accent-i { --panel-accent: var(--i); }
+.panel.accent-o { --panel-accent: var(--o); }
+.panel.accent-z { --panel-accent: var(--z); }
+.panel.accent-t { --panel-accent: var(--t); }
+
+/* Small corner "rivets" — an arcade-cabinet-panel detail. */
+.panel-corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--panel-accent, var(--accent));
+  z-index: 1;
+}
+.panel-corner.tl { top: -5px; left: -5px; }
+.panel-corner.tr { top: -5px; right: -5px; }
+.panel-corner.bl { bottom: -5px; left: -5px; }
+.panel-corner.br { bottom: -5px; right: -5px; }
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel { animation: none !important; }
+}
+
+.title {
+  font-family: "Press Start 2P", monospace;
+  font-size: clamp(1.3rem, 7vw, 1.7rem);
+  line-height: 1.4;
+  margin: 6px 0;
+  letter-spacing: 1px;
+}
+
+.title span {
+  text-shadow: 0 0 10px currentColor, 2px 2px 0 rgba(0, 0, 0, 0.7);
+}
+
+.title-sm {
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 4px 0 8px;
+  padding-bottom: 8px;
+  color: var(--ink);
+  border-bottom: 3px solid var(--panel-accent, var(--accent));
+  letter-spacing: 1px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+
+.score-line {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.85rem;
+  margin: 4px 0;
+  color: var(--ink);
+}
+
+.score-line.best { color: var(--panel-accent, var(--accent)); }
+
+/* ---------------------------------------------------------------- */
+/* Buttons                                                            */
+/* ---------------------------------------------------------------- */
+.btn {
+  font-family: "Press Start 2P", monospace;
+  border: 2px solid #000;
+  border-radius: 0;
+  padding: 14px 20px;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-top: 6px;
+  touch-action: manipulation;
+  transition: transform 0.05s steps(1, end);
+  width: 100%;
+}
+
+.btn.primary {
+  color: #06222a;
+  background: var(--panel-accent, var(--accent));
+  box-shadow: var(--bevel-light), var(--bevel-dark), 4px 4px 0 rgba(0, 0, 0, 0.75);
+}
+
+.btn.primary:active {
+  transform: translate(3px, 3px);
+  box-shadow: var(--bevel-dark), 1px 1px 0 rgba(0, 0, 0, 0.75);
+}
+
+/* A slow attract-mode blink on the primary call to action, like an arcade
+   cabinet's "PRESS START". Purely decorative — disabled for users who
+   asked for less motion. */
+.blink-label { animation: btnBlink 1.4s steps(1, end) infinite; }
+@keyframes btnBlink {
+  0%, 60% { opacity: 1; }
+  80% { opacity: 0.45; }
+  100% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blink-label { animation: none; }
+}
+
+.btn.text {
+  background: transparent;
+  border-color: transparent;
+  color: var(--panel-accent, var(--accent));
+  font-size: 0.66rem;
+  padding: 8px 10px;
+  margin-top: 0;
+}
+
+.btn.text:active {
+  opacity: 0.6;
+  transform: translate(2px, 2px);
+}
+
+.controls-hint {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------------- */
+/* Leaderboard                                                       */
+/* ---------------------------------------------------------------- */
+.name-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  margin: 2px 0 4px;
+}
+
+.name-field label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  flex-shrink: 0;
+}
+
+.name-field input {
+  flex: 1;
+  min-width: 0;
+  border: 2px solid var(--panel-border);
+  border-radius: 0;
+  padding: 7px 10px;
+  font-size: 0.92rem;
+  font-family: "Rubik", sans-serif;
+  font-weight: 500;
+  background: #000;
+  color: var(--ink);
+}
+
+.name-field input:focus {
+  outline: none;
+  border-color: var(--panel-accent, var(--accent));
+}
+
+.lb-list {
+  list-style: none;
+  margin: 2px 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 0;
+  background: #000;
+  border: 2px solid var(--panel-border);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.lb-row.me {
+  background: rgba(192, 77, 255, 0.12);
+  border-color: var(--t);
+  color: var(--t);
+}
+
+.lb-rank {
+  width: 1.7em;
+  text-align: right;
+  color: var(--ink-soft);
+  flex-shrink: 0;
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.68rem;
+}
+
+.lb-row.me .lb-rank { color: var(--t); }
+
+.lb-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.lb-score {
+  font-family: "Press Start 2P", monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+}
+
+.lb-note {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+  line-height: 1.4;
+  margin: 2px 0 0;
+}
+
+/* Show touch-only elements / hints depending on input type available */
+.touch-only { display: none; }
+@media (pointer: coarse) {
+  .desktop-only { display: none; }
+  #touch-controls.touch-only { display: flex; }
+  .controls-hint .touch-only { display: inline; }
+}

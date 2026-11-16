@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Flappy Turd</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Pixelify+Sans:wght@500;600;700&display=swap" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+<div id="game-wrap">
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="hud" class="hidden">
+    <div id="hud-score">0</div>
+  </div>
+
+  <!-- Start screen -->
+  <div id="start-screen" class="overlay">
+    <div class="panel">
+      <h1>FLAPPY<br />TURD</h1>
+      <p class="tagline">Flap through the pipes.<br />Don't get flushed.</p>
+      <p class="score-line best" id="start-best">BEST 0</p>
+      <button id="start-btn" class="btn pulse">PLAY</button>
+      <div class="btn-row">
+        <button id="skins-btn-start" class="btn-sm">SKINS</button>
+      </div>
+      <p class="controls-hint">
+        <span class="desktop-only">Click or press Space to flap</span>
+        <span class="touch-only">Tap anywhere to flap</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- Game over screen -->
+  <div id="gameover-screen" class="overlay hidden">
+    <div class="panel">
+      <h2>SPLAT!</h2>
+      <p class="newbest hidden" id="newbest-tag">NEW BEST!</p>
+      <div class="score-big" id="final-score">0</div>
+      <p class="score-line best" id="best-score">BEST 0</p>
+      <button id="restart-btn" class="btn pulse">TRY AGAIN</button>
+      <div class="btn-row">
+        <button id="skins-btn-over" class="btn-sm">SKINS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skins screen -->
+  <div id="skins-screen" class="overlay hidden">
+    <div class="panel">
+      <h3>SKINS</h3>
+      <p class="tagline">Pick your poop.</p>
+      <div id="skin-list" class="skin-list"></div>
+      <p class="lb-note" id="skins-note"></p>
+      <button id="skins-back-btn" class="btn-sm primary">BACK</button>
+    </div>
+  </div>
+
+  <button id="mute-btn" class="icon-btn" type="button" aria-pressed="false" aria-label="Mute sound">
+    <svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true" focusable="false">
+      <path d="M3 8 H6.5 L11 4.5 V17.5 L6.5 14 H3 Z" fill="#2b1c10" />
+      <g class="mute-waves">
+        <path d="M14.5 7.5 Q17 11 14.5 14.5" fill="none" stroke="#2b1c10" stroke-width="1.8" stroke-linecap="round" />
+        <path d="M16.8 5 Q20.5 11 16.8 17" fill="none" stroke="#2b1c10" stroke-width="1.8" stroke-linecap="round" />
+      </g>
+      <path class="mute-slash" d="M14 6 L20 16" stroke="#2b1c10" stroke-width="2.2" stroke-linecap="round" style="display:none" />
+    </svg>
+  </button>
+</div>
+
+<script src="./game.js"></script>
+</body>
+</html>

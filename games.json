@@ -293,5 +293,787 @@
   "dateAdded": "2026-09-04",
   "tags": ["word", "puzzle", "daily"],
   "hiddenTags": ["wordle", "wordle clone", "wordle alternative", "word game", "5 letter word game", "five letter word", "guess the word", "guess a word", "daily word game", "word of the day", "word puzzle", "letter game", "guess word game"]
-}
+},
+  {
+    "id": "block-breaker-levels",
+    "folder": "block-breaker-levels",
+    "title": "Block Breaker: Levels",
+    "tagline": "Five hand-built levels, then forever",
+    "description": "A clean, minimal brick breaker. Clear five designed levels — a classic grid, a crown, a smiley, a broken heart and a galaxy — then keep going in Infinity Mode. Multi-ball, mega-ball and explosive power-ups included.",
+    "banner": "block-breaker-levels/banner.png",
+    "favicon": "block-breaker-levels/favicon.png",
+    "accent": "#4F5BFF",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "brick breaker",
+      "breakout",
+      "arkanoid",
+      "block breaker",
+      "paddle game",
+      "ball game",
+      "bricks",
+      "levels",
+      "power ups"
+    ]
+  },
+  {
+    "id": "block-breaker-infinity",
+    "folder": "block-breaker-infinity",
+    "title": "Block Breaker: Infinity",
+    "tagline": "Endless levels, faster every time",
+    "description": "Block Breaker's endless mode. Procedurally generated layouts keep coming, and the ball speeds up after every level you clear. How far can you get before you run out of lives?",
+    "banner": "block-breaker-infinity/banner.png",
+    "favicon": "block-breaker-infinity/favicon.png",
+    "accent": "#4F5BFF",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "brick breaker",
+      "breakout",
+      "arkanoid",
+      "block breaker",
+      "endless",
+      "infinite",
+      "infinity mode",
+      "paddle game"
+    ]
+  },
+  {
+    "id": "brick-breaker-levels",
+    "folder": "brick-breaker-levels",
+    "title": "Brick Breaker: Levels",
+    "tagline": "Retro neon brick smashing",
+    "description": "A classic retro-arcade brick breaker in neon. Clear five designed levels — a rainbow wall, a space invader, a smiley, a broken heart and a galaxy — then carry on into Infinity Mode.",
+    "banner": "brick-breaker-levels/banner.png",
+    "favicon": "brick-breaker-levels/favicon.png",
+    "accent": "#FF2BD6",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "brick breaker",
+      "breakout",
+      "arkanoid",
+      "retro",
+      "neon",
+      "arcade",
+      "paddle game",
+      "bricks",
+      "levels"
+    ]
+  },
+  {
+    "id": "brick-breaker-infinity",
+    "folder": "brick-breaker-infinity",
+    "title": "Brick Breaker: Infinity",
+    "tagline": "Endless neon levels, ever faster",
+    "description": "Brick Breaker's endless mode. Procedurally generated neon layouts keep coming and the ball speeds up after every level you clear.",
+    "banner": "brick-breaker-infinity/banner.png",
+    "favicon": "brick-breaker-infinity/favicon.png",
+    "accent": "#FF2BD6",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "brick breaker",
+      "breakout",
+      "arkanoid",
+      "retro",
+      "neon",
+      "endless",
+      "infinite",
+      "infinity mode"
+    ]
+  },
+  {
+    "id": "chop-shop-chef",
+    "folder": "chop-shop-chef",
+    "title": "Chop Shop Chef",
+    "tagline": "Slice the veg, dodge the bombs",
+    "description": "Swipe across the flying vegetables to slice them. Don't let three fall uncut, and never slice a bomb. Chain slices in one swipe for combo points — it gets faster the longer you last.",
+    "banner": "chop-shop-chef/banner.png",
+    "favicon": "chop-shop-chef/favicon.png",
+    "accent": "#C2410C",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "fruit ninja",
+      "vegetable ninja",
+      "slice",
+      "slicing game",
+      "swipe",
+      "chef",
+      "cooking game",
+      "knife"
+    ]
+  },
+  {
+    "id": "flappy-turd",
+    "folder": "flappy-turd",
+    "title": "Flappy Turd",
+    "tagline": "Flap through the sewer pipes",
+    "description": "Flap your way through the sewer pipes without getting flushed. One tap to flap, one hit and it's over. Unlock the Golden Turd skin for free from the Skins menu.",
+    "banner": "flappy-turd/banner.png",
+    "favicon": "flappy-turd/favicon.png",
+    "accent": "#8A5A2E",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "flappy bird",
+      "flappy",
+      "poop",
+      "turd",
+      "tap game",
+      "one button",
+      "pipes",
+      "sewer"
+    ]
+  },
+  {
+    "id": "maze-muncher",
+    "folder": "maze-muncher",
+    "title": "Maze Muncher",
+    "tagline": "Clear the maze, dodge the Thornbugs",
+    "description": "Crunch every seed in the maze while dodging the Thornbugs. Grab a star-berry to turn the tables and munch them for bonus points.",
+    "banner": "maze-muncher/banner.png",
+    "favicon": "maze-muncher/favicon.png",
+    "accent": "#7C3AED",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "pac-man",
+      "pacman",
+      "pac man",
+      "maze game",
+      "ghosts",
+      "dots",
+      "retro",
+      "arcade classic"
+    ]
+  },
+  {
+    "id": "ping-360",
+    "folder": "ping-360",
+    "title": "Ping 360",
+    "tagline": "Keep the ball inside the ring",
+    "description": "Pong in a circle. Slide your paddle around the ring and keep the ball alive at the centre — it only gets faster.",
+    "banner": "ping-360/banner.png",
+    "favicon": "ping-360/favicon.png",
+    "accent": "#0EA5E9",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "pong",
+      "circular pong",
+      "ring",
+      "paddle",
+      "reflex",
+      "360",
+      "ping pong"
+    ]
+  },
+  {
+    "id": "pings-and-pongs",
+    "folder": "pings-and-pongs",
+    "title": "Pings and Pongs",
+    "tagline": "Classic pong against the computer",
+    "description": "Classic two-paddle pong against the computer. Keep the volley alive and score past the CPU before it scores past you — the ball speeds up as you level up.",
+    "banner": "pings-and-pongs/banner.png",
+    "favicon": "pings-and-pongs/favicon.png",
+    "accent": "#22C55E",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "pong",
+      "ping pong",
+      "table tennis",
+      "paddle game",
+      "retro",
+      "atari",
+      "vs computer"
+    ]
+  },
+  {
+    "id": "2048",
+    "folder": "2048",
+    "title": "2048",
+    "tagline": "Slide, merge, reach 2048",
+    "description": "Slide the tiles and merge matching numbers. Reach the 2048 tile — then keep going for an even bigger score.",
+    "banner": "2048/banner.png",
+    "favicon": "2048/favicon.png",
+    "accent": "#4F46E5",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "puzzle",
+      "math"
+    ],
+    "hiddenTags": [
+      "2048",
+      "number puzzle",
+      "sliding tiles",
+      "merge game",
+      "tiles",
+      "threes"
+    ]
+  },
+  {
+    "id": "snake",
+    "folder": "snake",
+    "title": "Snake",
+    "tagline": "Eat the dots, don't bite yourself",
+    "description": "The classic. Eat the dots to grow longer, and don't hit the walls or your own tail. The snake speeds up as you score.",
+    "banner": "snake/banner.png",
+    "favicon": "snake/favicon.png",
+    "accent": "#6C47FF",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "snake",
+      "nokia snake",
+      "slither",
+      "classic",
+      "retro",
+      "grow"
+    ]
+  },
+  {
+    "id": "tetromino",
+    "folder": "tetromino",
+    "title": "Tetromino",
+    "tagline": "Falling blocks, clear the lines",
+    "description": "A falling-block puzzle on an 11-wide board with eight shapes, a ghost piece, hard drop, and a Skip button on a 30-second cooldown. Clear lines to level up.",
+    "banner": "tetromino/banner.png",
+    "favicon": "tetromino/favicon.png",
+    "accent": "#06B6D4",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "puzzle",
+      "arcade"
+    ],
+    "hiddenTags": [
+      "tetris",
+      "blocks",
+      "falling blocks",
+      "tetromino",
+      "line clear",
+      "puzzle",
+      "stacking"
+    ]
+  },
+  {
+    "id": "rise",
+    "folder": "rise",
+    "title": "Rise",
+    "tagline": "Steer your balloon ever higher",
+    "description": "One balloon, one life. Steer through the sky as it gets faster the higher you go, grab helium for a shield, and graze hazards for close-call bonuses.",
+    "banner": "rise/banner.png",
+    "favicon": "rise/favicon.png",
+    "accent": "#FF5D73",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "balloon",
+      "rise up",
+      "dodge",
+      "endless",
+      "sky",
+      "one tap",
+      "altitude"
+    ]
+  },
+  {
+    "id": "skyguard",
+    "folder": "skyguard",
+    "title": "Skyguard",
+    "tagline": "Shield your balloon from falling shapes",
+    "description": "Your hot-air balloon climbs through a storm of falling debris. Steer the shield to knock shapes out of the way, and climb as high as you can before you run out of lives.",
+    "banner": "skyguard/banner.png",
+    "favicon": "skyguard/favicon.png",
+    "accent": "#8B5CF6",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "balloon",
+      "shield",
+      "protect",
+      "rise up",
+      "physics",
+      "dodge",
+      "endless"
+    ]
+  },
+  {
+    "id": "sweet-smash",
+    "folder": "sweet-smash",
+    "title": "Sweet Smash",
+    "tagline": "Endless candy match-3",
+    "description": "Swap neighbouring candies to line up three or more. Cascades chain into combos. No timer and no move limit — play until the board runs out of moves.",
+    "banner": "sweet-smash/banner.png",
+    "favicon": "sweet-smash/favicon.png",
+    "accent": "#E11D74",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "puzzle"
+    ],
+    "hiddenTags": [
+      "candy crush",
+      "match 3",
+      "match three",
+      "bejeweled",
+      "candy",
+      "sweets",
+      "swap"
+    ]
+  },
+  {
+    "id": "tanks",
+    "folder": "tanks",
+    "title": "Tanks",
+    "tagline": "Bounce shots, clear the arena",
+    "description": "Roll into a walled arena and clear out waves of enemy tanks. Shots ricochet off walls, so use the angles — and drop a mine when things get crowded.",
+    "banner": "tanks/banner.png",
+    "favicon": "tanks/favicon.png",
+    "accent": "#556B2F",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "tank game",
+      "wii tanks",
+      "ricochet",
+      "shooter",
+      "army",
+      "battle",
+      "top down"
+    ]
+  },
+  {
+    "id": "galactic-defenders-alpha",
+    "folder": "galactic-defenders-alpha",
+    "title": "Galactic Defenders: Sector Alpha",
+    "tagline": "Hold the line, wave after wave",
+    "description": "Earth's last gunner. Blast wave after wave of descending aliens, grab power-ups and take down the boss. Sector Alpha is the original, balanced defense line.",
+    "banner": "galactic-defenders-alpha/banner.png",
+    "favicon": "galactic-defenders-alpha/favicon.png",
+    "accent": "#16A34A",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "space invaders",
+      "invaders",
+      "shooter",
+      "aliens",
+      "retro",
+      "arcade",
+      "galaga"
+    ]
+  },
+  {
+    "id": "galactic-defenders-omega",
+    "folder": "galactic-defenders-omega",
+    "title": "Galactic Defenders: Sector Omega",
+    "tagline": "Splitter drones and piercing rounds",
+    "description": "The harder sector. Splitter drones break apart when hit, you get piercing rounds, and the boss calls for backup.",
+    "banner": "galactic-defenders-omega/banner.png",
+    "favicon": "galactic-defenders-omega/favicon.png",
+    "accent": "#DC2626",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "space invaders",
+      "invaders",
+      "shooter",
+      "aliens",
+      "retro",
+      "hard mode",
+      "omega"
+    ]
+  },
+  {
+    "id": "meteor-madness-solo",
+    "folder": "meteor-madness-solo",
+    "title": "Meteor Madness",
+    "tagline": "Dodge meteors, survive the storm",
+    "description": "Pilot your ship through an endless meteor storm. Dodge the rocks, grab power-ups, and see how long you can survive as it gets faster every minute.",
+    "banner": "meteor-madness-solo/banner.png",
+    "favicon": "meteor-madness-solo/favicon.png",
+    "accent": "#00A7CC",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "meteor",
+      "asteroids",
+      "space",
+      "dodge",
+      "endless runner",
+      "survival",
+      "spaceship"
+    ]
+  },
+  {
+    "id": "meteor-madness-party",
+    "folder": "meteor-madness-party",
+    "title": "Meteor Madness: Party",
+    "tagline": "Up to 4 players, last ship flying wins",
+    "description": "Local multiplayer Meteor Madness for 2 to 4 players on one device. Everyone dodges the same meteor storm — last ship flying wins.",
+    "banner": "meteor-madness-party/banner.png",
+    "favicon": "meteor-madness-party/favicon.png",
+    "accent": "#00A7CC",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade",
+      "multiplayer"
+    ],
+    "hiddenTags": [
+      "meteor",
+      "asteroids",
+      "multiplayer",
+      "local multiplayer",
+      "2 player",
+      "4 player",
+      "party game",
+      "same keyboard"
+    ]
+  },
+  {
+    "id": "minesweeper-beginner",
+    "folder": "minesweeper-beginner",
+    "title": "Minesweeper: Beginner",
+    "tagline": "9×9 board, 10 mines",
+    "description": "Classic Minesweeper on a 9×9 board with 10 mines. Your first click is always safe; numbers show how many mines touch each square.",
+    "banner": "minesweeper-beginner/banner.png",
+    "favicon": "minesweeper-beginner/favicon.png",
+    "accent": "#475569",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "puzzle",
+      "logic"
+    ],
+    "hiddenTags": [
+      "minesweeper",
+      "mines",
+      "classic",
+      "windows",
+      "logic puzzle",
+      "easy",
+      "beginner"
+    ]
+  },
+  {
+    "id": "minesweeper-intermediate",
+    "folder": "minesweeper-intermediate",
+    "title": "Minesweeper: Intermediate",
+    "tagline": "16×16 board, 40 mines",
+    "description": "Classic Minesweeper on a 16×16 board with 40 mines. First click is always safe, flood-fill reveal and chording included.",
+    "banner": "minesweeper-intermediate/banner.png",
+    "favicon": "minesweeper-intermediate/favicon.png",
+    "accent": "#475569",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "puzzle",
+      "logic"
+    ],
+    "hiddenTags": [
+      "minesweeper",
+      "mines",
+      "classic",
+      "windows",
+      "logic puzzle",
+      "medium",
+      "intermediate"
+    ]
+  },
+  {
+    "id": "minesweeper-expert",
+    "folder": "minesweeper-expert",
+    "title": "Minesweeper: Expert",
+    "tagline": "30×16 board, 99 mines",
+    "description": "Classic Minesweeper on the full 30×16 expert board with 99 mines. First click is always safe — after that it's all logic.",
+    "banner": "minesweeper-expert/banner.png",
+    "favicon": "minesweeper-expert/favicon.png",
+    "accent": "#475569",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "puzzle",
+      "logic"
+    ],
+    "hiddenTags": [
+      "minesweeper",
+      "mines",
+      "classic",
+      "windows",
+      "logic puzzle",
+      "hard",
+      "expert"
+    ]
+  },
+  {
+    "id": "chess-easy",
+    "folder": "chess-easy",
+    "title": "Chess vs Computer: Easy",
+    "tagline": "A gentle computer opponent",
+    "description": "Full chess against an Easy computer opponent that blunders fairly often — good for beginners. All the rules: castling, en passant, promotion, and every kind of draw.",
+    "banner": "chess-easy/banner.png",
+    "favicon": "chess-easy/favicon.png",
+    "accent": "#5D8A34",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "board",
+      "logic"
+    ],
+    "hiddenTags": [
+      "chess",
+      "chess vs computer",
+      "chess ai",
+      "play chess",
+      "easy chess",
+      "beginner",
+      "board game",
+      "strategy"
+    ]
+  },
+  {
+    "id": "chess-medium",
+    "folder": "chess-medium",
+    "title": "Chess vs Computer: Medium",
+    "tagline": "Solid, consistent computer play",
+    "description": "Full chess against a Medium computer opponent — solid and consistent, but still beatable.",
+    "banner": "chess-medium/banner.png",
+    "favicon": "chess-medium/favicon.png",
+    "accent": "#5D8A34",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "board",
+      "logic"
+    ],
+    "hiddenTags": [
+      "chess",
+      "chess vs computer",
+      "chess ai",
+      "play chess",
+      "medium",
+      "board game",
+      "strategy"
+    ]
+  },
+  {
+    "id": "chess-hard",
+    "folder": "chess-hard",
+    "title": "Chess vs Computer: Hard",
+    "tagline": "A computer that thinks ahead",
+    "description": "Full chess against the Hard computer, which searches several moves deep and rarely makes a mistake.",
+    "banner": "chess-hard/banner.png",
+    "favicon": "chess-hard/favicon.png",
+    "accent": "#5D8A34",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "board",
+      "logic"
+    ],
+    "hiddenTags": [
+      "chess",
+      "chess vs computer",
+      "chess ai",
+      "play chess",
+      "hard chess",
+      "board game",
+      "strategy"
+    ]
+  },
+  {
+    "id": "chess-2-player",
+    "folder": "chess-2-player",
+    "title": "Chess: 2 Players",
+    "tagline": "Pass and play with a friend",
+    "description": "Two-player chess on one device. White moves first and the board flips to face whoever's turn it is.",
+    "banner": "chess-2-player/banner.png",
+    "favicon": "chess-2-player/favicon.png",
+    "accent": "#5D8A34",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "board",
+      "logic",
+      "multiplayer"
+    ],
+    "hiddenTags": [
+      "chess",
+      "2 player chess",
+      "two player",
+      "pass and play",
+      "local multiplayer",
+      "board game"
+    ]
+  },
+  {
+    "id": "tic-tac-toe-easy",
+    "folder": "tic-tac-toe-easy",
+    "title": "Tic Tac Toe vs AI: Easy",
+    "tagline": "Three in a row against an easy AI",
+    "description": "Simple, fast tic tac toe against an Easy AI. Choose whether you go first as X or second as O.",
+    "banner": "tic-tac-toe-easy/banner.png",
+    "favicon": "tic-tac-toe-easy/favicon.png",
+    "accent": "#FF4D6D",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "board",
+      "logic"
+    ],
+    "hiddenTags": [
+      "tic tac toe",
+      "noughts and crosses",
+      "x and o",
+      "xo",
+      "vs ai",
+      "easy"
+    ]
+  },
+  {
+    "id": "tic-tac-toe-hard",
+    "folder": "tic-tac-toe-hard",
+    "title": "Tic Tac Toe vs AI: Hard",
+    "tagline": "Can you beat (or draw) the perfect AI?",
+    "description": "Tic tac toe against the Hard AI, which plays perfectly. A draw is a good result — can you find a win when it slips?",
+    "banner": "tic-tac-toe-hard/banner.png",
+    "favicon": "tic-tac-toe-hard/favicon.png",
+    "accent": "#FF4D6D",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "board",
+      "logic"
+    ],
+    "hiddenTags": [
+      "tic tac toe",
+      "noughts and crosses",
+      "x and o",
+      "xo",
+      "vs ai",
+      "hard",
+      "unbeatable"
+    ]
+  },
+  {
+    "id": "tic-tac-toe-2-player",
+    "folder": "tic-tac-toe-2-player",
+    "title": "Tic Tac Toe: 2 Players",
+    "tagline": "Noughts and crosses with a friend",
+    "description": "Two-player tic tac toe on the same device. Take turns placing X and O — first to three in a row wins.",
+    "banner": "tic-tac-toe-2-player/banner.png",
+    "favicon": "tic-tac-toe-2-player/favicon.png",
+    "accent": "#FF4D6D",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "board",
+      "logic",
+      "multiplayer"
+    ],
+    "hiddenTags": [
+      "tic tac toe",
+      "noughts and crosses",
+      "x and o",
+      "2 player",
+      "two player",
+      "pass and play"
+    ]
+  },
+  {
+    "id": "up-you-go-cloud-kingdom",
+    "folder": "up-you-go-cloud-kingdom",
+    "title": "Up You Go: Cloud Kingdom",
+    "tagline": "Bounce as high as you can",
+    "description": "Bounce from platform to platform and climb as high as you can without falling. Cloud Kingdom is the original world — no gimmicks, just good bouncing.",
+    "banner": "up-you-go-cloud-kingdom/banner.png",
+    "favicon": "up-you-go-cloud-kingdom/favicon.png",
+    "accent": "#3B82F6",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "doodle jump",
+      "jump",
+      "bounce",
+      "platformer",
+      "climb",
+      "endless",
+      "clouds"
+    ]
+  },
+  {
+    "id": "up-you-go-ember-peaks",
+    "folder": "up-you-go-ember-peaks",
+    "title": "Up You Go: Ember Peaks",
+    "tagline": "Ride the updraft vents",
+    "description": "Up You Go in the volcanic Ember Peaks, where updraft vents launch you into a soaring, low-gravity climb.",
+    "banner": "up-you-go-ember-peaks/banner.png",
+    "favicon": "up-you-go-ember-peaks/favicon.png",
+    "accent": "#EA580C",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "doodle jump",
+      "jump",
+      "bounce",
+      "platformer",
+      "climb",
+      "endless",
+      "volcano",
+      "lava"
+    ]
+  },
+  {
+    "id": "up-you-go-frostbite-summit",
+    "folder": "up-you-go-frostbite-summit",
+    "title": "Up You Go: Frostbite Summit",
+    "tagline": "Wind gusts shove you sideways",
+    "description": "Up You Go on the icy Frostbite Summit, where wind-gust tiles shove you hard sideways — great for crossing wide gaps.",
+    "banner": "up-you-go-frostbite-summit/banner.png",
+    "favicon": "up-you-go-frostbite-summit/favicon.png",
+    "accent": "#0891B2",
+    "dateAdded": "2026-11-16",
+    "tags": [
+      "arcade"
+    ],
+    "hiddenTags": [
+      "doodle jump",
+      "jump",
+      "bounce",
+      "platformer",
+      "climb",
+      "endless",
+      "snow",
+      "ice"
+    ]
+  }
 ]
